@@ -257,7 +257,7 @@ function resolvePkg (context) {
   })
 
   if (
-    !dependencies.includes('gridsome') &&
+    !dependencies.includes('@kriya/gridsome') &&
     !process.env.GRIDSOME_TEST
   ) {
     throw new Error('This is not a Gridsome project.')
