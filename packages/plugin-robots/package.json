@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "name": "@kriya/gridsome-plugin-robots",
   "description": "Gridsome plugin that automatically creates robots.txt for your site",
   "homepage": "https://github.com/rkalkani/gridsome-plugin-robots",

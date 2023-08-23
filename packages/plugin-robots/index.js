@@ -44,7 +44,7 @@ function getOptions (pluginOptions) {
 function RobotsPlugin (api, options) {
   /**
    * The after build hook with gridsome config and queue??
-   * config.{pathPrefix,publicPath,staticDir,outDir,assetsDir,imagesDir,filesDir,dataDir,appPath}
+   * config.{pathPrefix,publicPath,staticDir,outputDir,assetsDir,imagesDir,filesDir,dataDir,appPath}
    */
   api.afterBuild(async ({ config }) => {
     const userOptions = getOptions(options)
@@ -65,7 +65,7 @@ function RobotsPlugin (api, options) {
       host,
       configFile
     })
-    const filename = path.join(config.outDir, output)
+    const filename = path.join(config.outputDir, output)
 
     return writeFile(path.resolve(filename), content)
   })
