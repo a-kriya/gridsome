@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "@kriya/gridsome-source-graphql",
   "description": "GraphQL source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-graphql#readme",
@@ -17,7 +17,7 @@
     "graphql": "^16.0.1"
   },
   "peerDependencies": {
-    "@kriya/gridsome": "0.8.1-1"
+    "@kriya/gridsome": "^0.8.1-1"
   },
   "publishConfig": {
     "access": "public"

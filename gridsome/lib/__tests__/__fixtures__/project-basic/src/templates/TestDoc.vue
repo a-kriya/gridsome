@@ -18,7 +18,7 @@
 <page-query src="~/queries/TestDoc.gql" />
 
 <script>
-import { Pager } from 'gridsome'
+import { Pager } from '@kriya/gridsome'
 
 export default {
   components: {

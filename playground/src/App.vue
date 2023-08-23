@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useStaticQuery } from 'gridsome'
+import { useStaticQuery } from '@kriya/gridsome'
 
 const data = useStaticQuery()
 </script>

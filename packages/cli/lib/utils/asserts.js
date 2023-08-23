@@ -3,5 +3,5 @@ exports.isGridsomeProject = (pkgPath) => {
   const { devDependencies = {}, dependencies = {}} = projectPkgJson
   const packages = { ...devDependencies, ...dependencies }
 
-  return packages.hasOwnProperty('gridsome')
+  return packages.hasOwnProperty('@kriya/gridsome')
 }

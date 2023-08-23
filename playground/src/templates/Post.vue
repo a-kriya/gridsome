@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useMetaInfo, usePageQuery } from 'gridsome'
+import { useMetaInfo, usePageQuery } from '@kriya/gridsome'
 
 const data = usePageQuery()
 

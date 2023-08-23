@@ -69,7 +69,7 @@ query Home {
 </page-query>
 
 <script>
-import { fetch } from 'gridsome'
+import { fetch } from '@kriya/gridsome'
 
 export default {
   data () {

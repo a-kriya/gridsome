@@ -28,8 +28,8 @@ program
   })
 
 try {
-  const commandsPath = resolveCwd.silent('gridsome/commands')
-  const gridsomePath = resolveCwd.silent('gridsome')
+  const commandsPath = resolveCwd.silent('@kriya/gridsome/commands')
+  const gridsomePath = resolveCwd.silent('@kriya/gridsome')
 
   if (commandsPath) {
     require(commandsPath)({ context, program })

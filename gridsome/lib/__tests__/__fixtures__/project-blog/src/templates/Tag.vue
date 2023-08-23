@@ -49,7 +49,7 @@ query Tag (
 </page-query>
 
 <script>
-import { Pager } from 'gridsome'
+import { Pager } from '@kriya/gridsome'
 
 export default {
   components: {

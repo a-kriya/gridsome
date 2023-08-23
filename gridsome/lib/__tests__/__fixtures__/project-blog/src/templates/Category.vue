@@ -41,7 +41,7 @@ query Category ($id: ID!, $page: Int, $showType: TypeName) {
 </page-query>
 
 <script>
-import { Pager } from 'gridsome'
+import { Pager } from '@kriya/gridsome'
 
 export default {
   components: {

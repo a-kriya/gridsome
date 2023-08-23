@@ -1,6 +1,6 @@
 {
   "name": "@kriya/gridsome-source-airtable",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Airtable source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-airtable",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-airtable#readme",
@@ -15,7 +15,7 @@
     "airtable": "^0.7.2"
   },
   "peerDependencies": {
-    "@kriya/gridsome": "0.8.1-1"
+    "@kriya/gridsome": "^0.8.1-1"
   },
   "publishConfig": {
     "access": "public"
