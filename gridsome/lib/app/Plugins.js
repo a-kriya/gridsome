@@ -50,9 +50,7 @@ class Plugins {
           : null
 
       if (typeof Plugin !== 'function') {
-        throw new Error(
-          `Plugin at ${entry.entries.serverEntry} did not export a function.`
-        )
+        continue
       }
 
       const defaults = typeof Plugin.defaultOptions === 'function'

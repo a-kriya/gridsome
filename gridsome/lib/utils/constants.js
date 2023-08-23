@@ -16,7 +16,7 @@ module.exports = {
   BOOTSTRAP_FULL: Number.MAX_SAFE_INTEGER,
 
   internalRE: /^internal:\/\//,
-  transformerRE: /(?:^@?gridsome[/-]|\/)transformer-([\w-]+)/,
+  transformerRE: /(?:gridsome[/-]|\/)transformer-([\w-]+)/,
 
   NODE_FIELDS: ['$uid', '$loki', 'internal', 'id'],
 
@@ -62,4 +62,3 @@ module.exports = {
     'YYYY-MM-DD HH:mm:ss.SSSS'
   ]
 }
-
