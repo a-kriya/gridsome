@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "name": "@kriya/gridsome-plugin-robots",
+  "description": "Gridsome plugin that automatically creates robots.txt for your site",
+  "homepage": "https://github.com/rkalkani/gridsome-plugin-robots",
+  "repository": "https://github.com/rkalkani/gridsome-plugin-robots.git",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": [
+    "gridsome",
+    "gridsome-plugin"
+  ],
+  "dependencies": {
+    "fs-extra": "^11.1.1",
+    "generate-robotstxt": "^8.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

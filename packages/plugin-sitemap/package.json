@@ -13,7 +13,7 @@
     "seo"
   ],
   "dependencies": {
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^11.1.1",
     "micromatch": "^3.1.10",
     "sitemap": "^2.1.0"
   },
