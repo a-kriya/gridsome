@@ -114,7 +114,7 @@ function createSocketServer(app, server) {
 
 function setupGraphQLMiddleware(middlewares, app) {
   const express = require('express')
-  const { graphqlHTTP } = require('express-graphql')
+  const { createHandler } = require('graphql-http/lib/use/express')
   const { default: playground } = require('graphql-playground-middleware-express')
   const graphqlMiddleware = require('./server/middlewares/graphql')
   const index = middlewares.findIndex((m) => m.name === 'connect-history-api-fallback')
@@ -135,7 +135,7 @@ function setupGraphQLMiddleware(middlewares, app) {
     middleware: [
       express.json(),
       graphqlMiddleware(app),
-      graphqlHTTP({
+      createHandler({
         schema: app.schema.getSchema(),
         context: app.schema.createContext(),
         customFormatErrorFn: err => ({
