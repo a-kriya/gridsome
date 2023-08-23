@@ -1,6 +1,6 @@
 {
   "version": "0.2.6",
-  "name": "@gridsome/vue-remark",
+  "name": "@kriya/gridsome-vue-remark",
   "description": "Use Vue Components in Markdown",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/vue-remark#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/vue-remark",
@@ -16,8 +16,8 @@
     "@babel/parser": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/traverse": "^7.0.0",
-    "@gridsome/source-filesystem": "^0.6.2",
-    "@gridsome/transformer-remark": "^0.6.4",
+    "@kriya/gridsome-source-filesystem": "^0.6.2",
+    "@kriya/gridsome-transformer-remark": "^0.6.4",
     "babel-loader": "8.0.5",
     "hash-sum": "^1.0.2",
     "hast-util-to-html": "^5.0.0",
@@ -36,12 +36,12 @@
     "vue-loader": "^15.10.0"
   },
   "peerDependencies": {
-    "gridsome": "0.x"
+    "@kriya/gridsome": "0.8.1-1"
   },
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

@@ -1,6 +1,6 @@
 {
   "version": "0.3.0",
-  "name": "@gridsome/source-faker",
+  "name": "@kriya/gridsome-source-faker",
   "description": "Source with fake data for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-faker#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-faker",
@@ -17,6 +17,6 @@
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

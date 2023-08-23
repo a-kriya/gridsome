@@ -7,7 +7,7 @@ export default {
     if (typeof $vueRemark !== 'function') {
       throw new Error(
         'The <VueRemarkContent> component can only be used in ' +
-        'templates for the @gridsome/vue-remark plugin.'
+        'templates for the @kriya/gridsome-vue-remark plugin.'
       )
     }
 

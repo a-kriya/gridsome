@@ -3,7 +3,7 @@ const resolveCwd = require('resolve-cwd')
 
 module.exports = function resolveVersions (pkgPath) {
   const cliVersion = require('../../package.json').version
-  const versions = [`@gridsome/cli v${cliVersion}`]
+  const versions = [`@kriya/gridsome-cli v${cliVersion}`]
 
   if (pkgPath) {
     try {
@@ -24,9 +24,9 @@ function resolveProjectVersions (pkgPath) {
   const { devDependencies = {}, dependencies = {}} = projectPkgJson
   const packages = { ...devDependencies, ...dependencies }
 
-  if (packages.gridsome) {
-    const version = resolvePackageVersion('gridsome')
-    if (version) versions.push(`gridsome v${version}`)
+  if (packages['@kriya/gridsome']) {
+    const version = resolvePackageVersion('@kriya/gridsome')
+    if (version) versions.push(`@kriya/gridsome v${version}`)
   }
 
   // for (const name in packages) {

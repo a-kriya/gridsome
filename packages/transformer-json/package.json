@@ -1,6 +1,6 @@
 {
   "version": "0.2.1",
-  "name": "@gridsome/transformer-json",
+  "name": "@kriya/gridsome-transformer-json",
   "description": "JSON transformer for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-json#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-json",
@@ -19,6 +19,6 @@
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

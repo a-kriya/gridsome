@@ -2,17 +2,17 @@ const path = require('path')
 
 const runCLI = require('./utils/helpers')
 
-test('show @gridsome/cli version', async () => {
+test('show @kriya/gridsome-cli version', async () => {
   const { stdout } = await runCLI(['-v'])
 
-  expect(stdout).toMatch(/@gridsome\/cli v(\d+\.?){3}/)
+  expect(stdout).toMatch(/@kriya\/gridsome-cli v(\d+\.?){3}/)
 })
 
 test('show local gridsome version', async () => {
   const testPath = path.join(__dirname, '__fixtures__', 'project')
   const { stdout } = await runCLI(['-v'], { cwd: testPath })
 
-  expect(stdout).toMatch(/gridsome v(\d+\.?){3}/)
+  expect(stdout).toMatch(/@kriya\/gridsome v(\d+\.?){3}/)
 })
 
 test('warn about unknown command', async () => {

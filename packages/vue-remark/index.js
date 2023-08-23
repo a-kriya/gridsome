@@ -1,9 +1,9 @@
 const path = require('path')
 const pathToRegexp = require('path-to-regexp')
-const Filesystem = require('@gridsome/source-filesystem')
-const RemarkTransformer = require('@gridsome/transformer-remark')
+const Filesystem = require('@kriya/gridsome-source-filesystem')
+const RemarkTransformer = require('@kriya/gridsome-transformer-remark')
 const { omit, trimEnd, kebabCase } = require('lodash')
-const { GraphQLList, GraphQLBoolean } = require('gridsome/graphql')
+const { GraphQLList, GraphQLBoolean } = require('@kriya/gridsome/graphql')
 
 const toSFC = require('./lib/toSfc')
 const sfcSyntax = require('./lib/sfcSyntax')
@@ -87,16 +87,16 @@ class VueRemark {
 
   constructor (api, options) {
     if (!options.baseDir) {
-      throw new Error(`@gridsome/vue-remark requires the 'baseDir' option.`)
+      throw new Error(`@kriya/gridsome-vue-remark requires the 'baseDir' option.`)
     }
 
     if (!options.typeName) {
-      throw new Error(`@gridsome/vue-remark requires the 'typeName' option.`)
+      throw new Error(`@kriya/gridsome-vue-remark requires the 'typeName' option.`)
     }
 
     if (api.config.templates[options.typeName]) {
       throw new Error(
-        `@gridsome/vue-remark does not work with a template. ` +
+        `@kriya/gridsome-vue-remark does not work with a template. ` +
         `Remove "${options.typeName}" from the global templates config ` +
         `and use the "template" option for the plugin instead.`
       )

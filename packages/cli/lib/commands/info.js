@@ -7,7 +7,7 @@ module.exports = async () => {
       Binaries: ['Node', 'Yarn', 'npm'],
       Browsers: ['Chrome', 'Edge', 'Firefox', 'Safari'],
       npmPackages: '?(@)gridsome{-*,/*,}',
-      npmGlobalPackages: ['@gridsome/cli']
+      npmGlobalPackages: ['@kriya/gridsome-cli']
     })
   console.log(data)
 }

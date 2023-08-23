@@ -1,6 +1,6 @@
 {
   "version": "0.6.2",
-  "name": "@gridsome/source-filesystem",
+  "name": "@kriya/gridsome-source-filesystem",
   "description": "Filesystem source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-filesystem#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-filesystem",
@@ -22,6 +22,6 @@
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

@@ -1,6 +1,6 @@
 {
   "version": "0.1.2",
-  "name": "@gridsome/plugin-google-analytics",
+  "name": "@kriya/gridsome-plugin-google-analytics",
   "description": "Google Analytics plugin for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-google-analytics#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-google-analytics",
@@ -21,6 +21,6 @@
     "vue-analytics": "^5.16.1"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

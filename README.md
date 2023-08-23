@@ -94,10 +94,6 @@ To use the local version of `@gridsome/cli` as the global command, enter the `./
 
 Yarn will add dependencies from your test projects to the root `yarn.lock` file. So you should not commit changes in that file unless you have added dependencies to any of the core packages. If you need to commit it, remove your projects from the `./projects` folder temporary and run `yarn install` in the root folder. Yarn will then clean up the lock file with only necessary dependencies. Commit the file and move your projects back and run `yarn install` again to start developing.
 
-### Code of Conduct
-
-In the interest of fostering an open and welcoming environment please read and follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
-
 ## License
 
 Licensed under the [MIT License](./LICENSE).

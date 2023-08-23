@@ -1,6 +1,6 @@
 {
   "version": "0.2.2",
-  "name": "@gridsome/transformer-csv",
+  "name": "@kriya/gridsome-transformer-csv",
   "description": "CSV transformer for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-csv#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-csv",
@@ -19,6 +19,6 @@
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

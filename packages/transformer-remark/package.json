@@ -1,6 +1,6 @@
 {
   "version": "0.6.4",
-  "name": "@gridsome/transformer-remark",
+  "name": "@kriya/gridsome-transformer-remark",
   "description": "Markdown transformer for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-remark#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-remark",
@@ -30,12 +30,12 @@
     "vfile": "^4.0.0"
   },
   "peerDependencies": {
-    "gridsome": "0.x"
+    "@kriya/gridsome": "0.8.1-1"
   },
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

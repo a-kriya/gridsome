@@ -1,6 +1,6 @@
 const path = require('path')
 const VueRemark = require('..')
-const App = require('gridsome/lib/app/App')
+const App = require('@kriya/gridsome/lib/app/App')
 
 test('parse simple title', async () => {
   const plugin = await createPlugin()

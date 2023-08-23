@@ -31,9 +31,9 @@ async function run () {
   })
 
   const packages = packagesList.split('\n').map(name => {
-    const dirname = /@gridsome/.test(name)
-      ? name.replace(/@gridsome/, 'packages')
-      : 'gridsome'
+    const dirname = /@kriya\/gridsome/.test(name)
+      ? name.replace(/@kriya\/gridsome/, 'packages')
+      : '@kriya/gridsome'
 
     const tags = allTags.slice().reverse().filter(tag => {
       return tag.name.startsWith(name)

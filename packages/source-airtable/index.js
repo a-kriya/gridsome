@@ -1,5 +1,5 @@
 const Airtable = require('airtable')
-const { deprecate } = require('gridsome/lib/utils/deprecate')
+const { deprecate } = require('@kriya/gridsome/lib/utils/deprecate')
 
 class AirtableSource {
   constructor (api, options) {

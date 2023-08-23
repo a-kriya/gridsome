@@ -7,7 +7,6 @@
     "projects/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "test:unit": "GRIDSOME_TEST=unit jest --runInBand",
     "test:e2e": "GRIDSOME_TEST=e2e jest --runInBand",
     "test:pnp": "node scripts/pnp-test.js",
@@ -25,14 +24,14 @@
     "eslint-plugin-vue": "^9.3.0",
     "eslint-plugin-vue-libs": "^3.0.0",
     "execa": "^6.0.0",
-    "jest": "^27.4.7",
-    "lerna": "^3.22.0",
+    "jest": "^27.5.1",
+    "lerna": "^7.1.5",
     "minimist": "^1.2.0",
     "puppeteer": "^13.1.3",
     "supertest": "^6.2.2"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0",
+    "node": ">=18",
     "yarn": "^1.5.1"
   }
 }

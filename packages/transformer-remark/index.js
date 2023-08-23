@@ -27,7 +27,7 @@ const {
   GraphQLList,
   GraphQLString,
   GraphQLBoolean
-} = require('gridsome/graphql')
+} = require('@kriya/gridsome/graphql')
 
 class RemarkTransformer {
   static mimeTypes () {

@@ -3,7 +3,7 @@ const {
   GraphQLString,
   GraphQLEnumType,
   GraphQLObjectType
-} = require('gridsome/graphql')
+} = require('@kriya/gridsome/graphql')
 
 const HeadingType = new GraphQLObjectType({
   name: 'RemarkHeading',

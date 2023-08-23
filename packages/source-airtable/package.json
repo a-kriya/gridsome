@@ -1,5 +1,5 @@
 {
-  "name": "@gridsome/source-airtable",
+  "name": "@kriya/gridsome-source-airtable",
   "version": "0.2.0",
   "description": "Airtable source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-airtable",
@@ -15,12 +15,12 @@
     "airtable": "^0.7.2"
   },
   "peerDependencies": {
-    "gridsome": "0.x"
+    "@kriya/gridsome": "0.8.1-1"
   },
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }

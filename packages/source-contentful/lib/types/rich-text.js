@@ -1,5 +1,5 @@
 const { documentToHtmlString } = require('@contentful/rich-text-html-renderer')
-const { GraphQLScalarType } = require('gridsome/graphql')
+const { GraphQLScalarType } = require('@kriya/gridsome/graphql')
 
 const ContentfulRichTextField = new GraphQLScalarType({
   name: 'ContentfulRichTextField',

@@ -1,6 +1,6 @@
 {
   "version": "0.5.3",
-  "name": "@gridsome/source-wordpress",
+  "name": "@kriya/gridsome-source-wordpress",
   "description": "WordPress source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-wordpress#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-wordpress",
@@ -21,6 +21,6 @@
     "access": "public"
   },
   "engines": {
-    "node": "^12.13.0 || ^14.0.0 || >=16.0.0"
+    "node": ">=18"
   }
 }
