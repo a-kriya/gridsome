@@ -309,6 +309,7 @@ module.exports = (app, { isProd, isServer }) => {
     .type('json')
     .use('yaml-loader')
     .loader(require.resolve('yaml-loader'))
+    .options({ asJSON: true })
 
   // plugins
 
