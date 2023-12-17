@@ -76,7 +76,7 @@ class Store {
   addCollection (options, store) {
     options = this.hooks.addCollection.call(options)
 
-    if (this.collections.hasOwnProperty(options.typeName)) {
+    if (Object.hasOwn(this.collections, options.typeName)) {
       return this.getCollection(options.typeName)
     }
 

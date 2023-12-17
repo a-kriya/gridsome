@@ -1,7 +1,6 @@
 const fs = require('fs-extra')
 const robotsTxt = require('generate-robotstxt')
 const path = require('path')
-const url = require('url')
 
 const defaultEnv = 'development'
 
@@ -54,7 +53,7 @@ function RobotsPlugin (api, options) {
       !Object.prototype.hasOwnProperty.call(userOptions, 'sitemap')
     ) {
       userOptions.host = config.siteUrl || config.url
-      userOptions.sitemap = url.resolve(config.siteUrl, 'sitemap.xml')
+      userOptions.sitemap = new URL('sitemap.xml', config.siteUrl).href
     }
 
     const { policy, sitemap, host, output, configFile } = userOptions

@@ -35,10 +35,10 @@ function addExtensionDirectives (schemaComposer, extensions, location) {
     const extension = extensions[name]
 
     const directive = new GraphQLDirective({
-      args: normalizeArgs(schemaComposer, extension.args),
+      name,
       description: extension.description,
       locations: [location],
-      name
+      args: normalizeArgs(schemaComposer, extension.args)
     })
 
     schemaComposer.addDirective(directive)
@@ -75,7 +75,7 @@ function applyFieldExtensions (typeComposer, customExtensions = {}) {
   typeComposer.getFieldNames().forEach(fieldName => {
     const directives = typeComposer
       .getFieldDirectives(fieldName)
-      .filter(({ name }) => allFieldExtensions.hasOwnProperty(name))
+      .filter(({ name }) => Object.hasOwn(allFieldExtensions, name))
 
     directives.forEach(({ name, args }) => {
       const { apply } = allFieldExtensions[name] || {}

@@ -22,8 +22,8 @@ exports.isRefField = function (field) {
   return (
     isPlainObject(field) &&
     Object.keys(field).length === 2 &&
-    field.hasOwnProperty('typeName') &&
-    field.hasOwnProperty('id')
+    Object.hasOwn(field, 'typeName') &&
+    Object.hasOwn(field, 'id')
   )
 }
 

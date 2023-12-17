@@ -4,7 +4,7 @@ const sharp = require('sharp')
 const crypto = require('crypto')
 const mime = require('mime-types')
 const colorString = require('color-string')
-const md5File = require('md5-file/promise')
+const md5File = require('md5-file')
 const { forwardSlash } = require('../../utils')
 const { reject, pickBy } = require('lodash')
 

@@ -58,13 +58,13 @@ exports.isRefFieldDefinition = function (field) {
   return (
     isPlainObject(field) &&
     Object.keys(field).length === 2 &&
-    field.hasOwnProperty('typeName') &&
-    field.hasOwnProperty('isList')
+    Object.hasOwn(field, 'typeName') &&
+    Object.hasOwn(field, 'isList')
   )
 }
 
 exports.isCreatedType = function (value) {
-  return isObject(value) && CreatedGraphQLType.hasOwnProperty(value.type)
+  return isObject(value) && Object.hasOwn(CreatedGraphQLType, value.type)
 }
 
 exports.createEnumType = options => ({ options, type: CreatedGraphQLType.Enum })

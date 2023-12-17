@@ -6,11 +6,6 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings'
   ],
-  parserOptions: {
-    parser: 'babel-eslint',
-    sourceType: 'module',
-    allowImportExportEverywhere: true
-  },
   env: {
     jest: true,
     node: true
@@ -21,7 +16,7 @@ module.exports = {
     'semi': ['error', 'never'],
     'no-console': 'off',
     // Allow unresolved imports
-    'import/no-unresolved': 'off',
+    'import/no-unresolved': 'off'
   },
   overrides: [
     {

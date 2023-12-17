@@ -49,7 +49,7 @@ module.exports = async (context, args) => {
 
   log()
   logAllWarnings(app.context)
-  log(`  Done in ${buildTime(hirestime.S)}s`)
+  log(`  Done in ${buildTime.s()}s`)
   log()
 
   return app
@@ -64,7 +64,7 @@ async function runWebpack (app) {
 
   const stats = await app.compiler.run()
 
-  log(`Compile assets - ${compileTime(hirestime.S)}s`)
+  log(`Compile assets - ${compileTime.s()}s`)
 
   return stats
 }
@@ -94,7 +94,7 @@ async function renderHTML (renderQueue, app, hash) {
 
   worker.end()
 
-  log(`Render HTML (${renderQueue.length} files) - ${timer(hirestime.S)}s`)
+  log(`Render HTML (${renderQueue.length} files) - ${timer.s()}s`)
 }
 
 async function processFiles (files) {
@@ -105,7 +105,7 @@ async function processFiles (files) {
     await fs.copy(file.filePath, file.destPath)
   }
 
-  log(`Process files (${totalFiles} files) - ${timer(hirestime.S)}s`)
+  log(`Process files (${totalFiles} files) - ${timer.s()}s`)
 }
 
 async function processImages (images, config) {
@@ -143,7 +143,7 @@ async function processImages (images, config) {
 
   worker.end()
 
-  writeLine(`Process images (${totalAssets} images) - ${timer(hirestime.S)}s\n`)
+  writeLine(`Process images (${totalAssets} images) - ${timer.s()}s\n`)
 
   // Remove images that existed before this build started but isn't in use.
   if (config.images.purge && existingImages.length) {

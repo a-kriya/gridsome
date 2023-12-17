@@ -18,5 +18,13 @@ module.exports = {
     'quotes': ['error', 'single', { allowTemplateLiterals: true }],
     'comma-dangle': ['error', 'never'],
     'semi': ['error', 'never']
-  }
+  },
+  overrides: [
+    {
+      files: ['.eslintrc.js'],
+      rules: {
+        'no-undef': 'off'
+      }
+    }
+  ]
 }

@@ -45,8 +45,8 @@ const makePath = (object, { routeKeys, createPath }, dateField = 'date', slugify
       const segments = values.map(value => {
         if (
           isPlainObject(value) &&
-          value.hasOwnProperty('typeName') &&
-          value.hasOwnProperty('id') &&
+          Object.hasOwn(value, 'typeName') &&
+          Object.hasOwn(value, 'id') &&
           !Array.isArray(value.id)
         ) {
           return String(value.id)

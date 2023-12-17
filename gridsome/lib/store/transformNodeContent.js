@@ -14,7 +14,7 @@ module.exports = function transformNodeContent (node, collection) {
 
     // add transformer to content type to let it
     // extend the node type when creating schema
-    if (mimeType && !_mimeTypes.hasOwnProperty(mimeType)) {
+    if (mimeType && !Object.hasOwn(_mimeTypes, mimeType)) {
       _mimeTypes[mimeType] = transformer
     }
 

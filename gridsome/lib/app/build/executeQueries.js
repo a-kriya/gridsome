@@ -67,7 +67,7 @@ async function executeQueries (renderQueue, { context, pages, schema, graphql },
     await fs.outputFile(entry.dataOutput, content)
   }, { concurrency: sysinfo.cpus.physical })
 
-  log(`Execute GraphQL (${renderQueue.length} queries) - ${timer(hirestime.S)}s`)
+  log(`Execute GraphQL (${renderQueue.length} queries) - ${timer.s()}s`)
 }
 
 module.exports = executeQueries

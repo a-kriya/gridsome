@@ -50,7 +50,7 @@ class App {
           const timer = hirestime()
 
           const done = () => {
-            log(`${hook.label || hook.name} - ${timer(hirestime.S)}s`)
+            log(`${hook.label || hook.name} - ${timer.s()}s`)
             if (callback) callback()
           }
 
@@ -70,7 +70,7 @@ class App {
 
     await this.hooks.bootstrap.promise()
 
-    log(`Bootstrap finish - ${timer(hirestime.S)}s`)
+    log(`Bootstrap finish - ${timer.s()}s`)
 
     this.isBootstrapped = true
 

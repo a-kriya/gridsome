@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs-extra')
-const md5File = require('md5-file/promise')
+const md5File = require('md5-file')
 const { forwardSlash } = require('../../utils')
 
 class FileProcessQueue {
