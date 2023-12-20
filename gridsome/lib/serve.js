@@ -54,7 +54,7 @@ function createRoutes (app) {
   return pages.map(page => {
     const keys = []
     const regex = pathToRegexp(page.route, keys)
-    const toPath = compile(page.route)
+    const toPath = compile(page.route, { encode: encodeURIComponent })
 
     return {
       regex,

@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "name": "@kriya/gridsome-vue-remark",
   "description": "Use Vue Components in Markdown",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/vue-remark#readme",
@@ -30,13 +30,13 @@
     "lru-cache": "^10.1.0",
     "mdast-util-to-hast": "~10.2.0",
     "moment": "^2.29.4",
-    "path-to-regexp": "^6.2.1",
+    "path-to-regexp": "~5.0.0",
     "unist-builder": "~2.0.3",
     "unist-util-visit": "~2.0.3",
     "vue-loader": "~15.11.1"
   },
   "peerDependencies": {
-    "@kriya/gridsome": "^0.9.0"
+    "@kriya/gridsome": "^0.9.1"
   },
   "publishConfig": {
     "access": "public"

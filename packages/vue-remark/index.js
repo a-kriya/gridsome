@@ -124,7 +124,7 @@ class VueRemark {
       const routeKeys = []
       pathToRegexp(this.route.path, routeKeys)
 
-      this.route.createPath = compile(this.route.path)
+      this.route.createPath = compile(this.route.path, { encode: encodeURIComponent })
       this.route.routeKeys = normalizeRouteKeys(routeKeys)
     }
 

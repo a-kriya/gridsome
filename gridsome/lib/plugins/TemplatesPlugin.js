@@ -82,7 +82,7 @@ const createTemplateOptions = (options, trailingSlash) => {
       templatePath = trimEnd(templatePath, '/') + '/'
     }
 
-    createPath = compile(templatePath)
+    createPath = compile(templatePath, { encode: encodeURIComponent })
     pathToRegexp(templatePath, routeKeys)
   }
 

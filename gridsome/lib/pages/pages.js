@@ -457,7 +457,7 @@ class Route {
     this.internal = options.internal
     this.options = options
 
-    this.createPath = compile(options.path)
+    this.createPath = compile(options.path, { encode: encodeURIComponent })
 
     Object.defineProperty(this, '_factory', { value: factory })
     Object.defineProperty(this, '_pages', { value: factory._pages })
