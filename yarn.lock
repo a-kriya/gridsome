@@ -2300,6 +2300,18 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
+"@kriya/gridsome-source-filesystem@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@kriya/gridsome-source-filesystem/-/gridsome-source-filesystem-0.6.2.tgz#5cff905160075137ef940d0c389ad8f783647121"
+  integrity sha512-74vyqfwPuLa/NMj3pv2tBzKfR3cdXzSEUvePEqC8j+PT62BRLjI5omO9VRbVpykRxzpFGdpLZU/QZfr2gfGxrQ==
+  dependencies:
+    chokidar "^2.0.4"
+    fs-extra "^7.0.0"
+    globby "^8.0.1"
+    lodash "^4.17.10"
+    mime-types "^2.1.21"
+    slash "^2.0.0"
+
 "@kriya/gridsome-transformer-remark@^0.6.4":
   version "0.6.5"
   resolved "https://registry.yarnpkg.com/@kriya/gridsome-transformer-remark/-/gridsome-transformer-remark-0.6.5.tgz#e130b3e77b8466f480e109d4d90609147314fa91"
@@ -8189,6 +8201,15 @@ fs-extra@^11.2.0:
     graceful-fs "^4.2.0"
     jsonfile "^6.0.1"
     universalify "^2.0.0"
+
+fs-extra@^7.0.0:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.1.tgz#4f189c44aa123b895f722804f55ea23eadc348e9"
+  integrity sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
 
 fs-extra@^8.1.0:
   version "8.1.0"
