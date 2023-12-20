@@ -1,7 +1,7 @@
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const crypto = require('crypto')
 
-const cache = new LRU({ max: 1000 })
+const cache = new LRUCache({ max: 1000 })
 
 exports.cache = (cacheKey, fallback) => {
   let result = cache.get(cacheKey)

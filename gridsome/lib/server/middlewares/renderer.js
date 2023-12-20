@@ -1,4 +1,4 @@
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const createRenderFn = require('../createRenderFn')
 const { createQueryVariables } = require('../../graphql/utils')
 
@@ -9,8 +9,8 @@ module.exports = (app, routes) => {
     serverBundlePath: app.config.serverBundlePath
   })
 
-  const cache = new LRU({
-    maxAge: app.config.maxCacheAge,
+  const cache = new LRUCache({
+    ttl: app.config.maxCacheAge,
     max: 100
   })
 

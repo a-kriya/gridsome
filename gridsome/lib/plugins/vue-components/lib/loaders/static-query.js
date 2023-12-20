@@ -1,11 +1,11 @@
 const path = require('path')
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const hash = require('hash-sum')
 const validate = require('../validate')
 const { parse, NoDeprecatedCustomRule } = require('graphql')
 const { deprecate } = require('../../../../utils/deprecate')
 
-const cache = new LRU({ max: 1000 })
+const cache = new LRUCache({ max: 1000 })
 
 module.exports = async function (source, map) {
   const { config, store, schema } = process.GRIDSOME

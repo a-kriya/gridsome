@@ -5,7 +5,7 @@ const { distance } = require('fastest-levenshtein')
 const crypto = require('crypto')
 const moment = require('moment')
 const chokidar = require('chokidar')
-const pathToRegexp = require('path-to-regexp')
+const { pathToRegexp, compile } = require('path-to-regexp')
 const { validateTypeName } = require('../graphql/utils')
 const { SUPPORTED_DATE_FORMATS } = require('../utils/constants')
 const { isPlainObject, trimStart, trimEnd, get, memoize } = require('lodash')
@@ -82,7 +82,7 @@ const createTemplateOptions = (options, trailingSlash) => {
       templatePath = trimEnd(templatePath, '/') + '/'
     }
 
-    createPath = pathToRegexp.compile(templatePath)
+    createPath = compile(templatePath)
     pathToRegexp(templatePath, routeKeys)
   }
 

@@ -4,7 +4,7 @@ const express = require('express')
 const createApp = require('./app')
 const { uniqBy } = require('lodash')
 const Server = require('./server/Server')
-const pathToRegexp = require('path-to-regexp')
+const { pathToRegexp, compile } = require('path-to-regexp')
 const { prepareUrls } = require('./server/utils')
 const resolvePort = require('./server/resolvePort')
 const compileAssets = require('./webpack/compileAssets')
@@ -54,7 +54,7 @@ function createRoutes (app) {
   return pages.map(page => {
     const keys = []
     const regex = pathToRegexp(page.route, keys)
-    const toPath = pathToRegexp.compile(page.route)
+    const toPath = compile(page.route)
 
     return {
       regex,

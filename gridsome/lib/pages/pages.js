@@ -1,13 +1,13 @@
 const path = require('path')
 const fs = require('fs-extra')
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const crypto = require('crypto')
 const invariant = require('invariant')
 const initWatcher = require('./watch')
 const { Collection } = require('lokijs')
 const { FSWatcher } = require('chokidar')
 const { parseQuery } = require('../graphql')
-const pathToRegexp = require('path-to-regexp')
+const { pathToRegexp, compile } = require('path-to-regexp')
 const createPageQuery = require('./createPageQuery')
 const { HookMap, SyncWaterfallHook, SyncBailHook } = require('tapable')
 const { snakeCase, trimEnd } = require('lodash')
@@ -30,8 +30,8 @@ class Pages {
       pageContext: new SyncWaterfallHook(['context', 'data'])
     }
 
-    this._componentCache = new LRU({ max: 100 })
-    this._queryCache = new LRU({ max: 100 })
+    this._componentCache = new LRUCache({ max: 100 })
+    this._queryCache = new LRUCache({ max: 100 })
     this._watcher = null
 
     this._routes = new Collection('routes', {
@@ -89,13 +89,13 @@ class Pages {
   }
 
   clearCache () {
-    this._componentCache.reset()
-    this._queryCache.reset()
+    this._componentCache.clear()
+    this._queryCache.clear()
   }
 
   clearComponentCache (component) {
-    this._componentCache.del(component)
-    this._queryCache.del(component)
+    this._componentCache.delete(component)
+    this._queryCache.delete(component)
   }
 
   createRoute (input, meta = {}) {
@@ -457,7 +457,7 @@ class Route {
     this.internal = options.internal
     this.options = options
 
-    this.createPath = pathToRegexp.compile(options.path)
+    this.createPath = compile(options.path)
 
     Object.defineProperty(this, '_factory', { value: factory })
     Object.defineProperty(this, '_pages', { value: factory._pages })

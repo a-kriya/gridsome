@@ -1,8 +1,8 @@
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const hash = require('hash-sum')
 const validate = require('../validate')
 
-const cache = new LRU({ max: 1000 })
+const cache = new LRUCache({ max: 1000 })
 
 module.exports = function (source, map) {
   const { schema } = process.GRIDSOME
