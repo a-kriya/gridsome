@@ -1,5 +1,5 @@
 const path = require('path')
-const pathToRegexp = require('path-to-regexp')
+const { pathToRegexp, compile } = require('path-to-regexp')
 const Filesystem = require('@kriya/gridsome-source-filesystem')
 const RemarkTransformer = require('@kriya/gridsome-transformer-remark')
 const { omit, trimEnd, kebabCase } = require('lodash')
@@ -124,7 +124,7 @@ class VueRemark {
       const routeKeys = []
       pathToRegexp(this.route.path, routeKeys)
 
-      this.route.createPath = pathToRegexp.compile(this.route.path)
+      this.route.createPath = compile(this.route.path)
       this.route.routeKeys = normalizeRouteKeys(routeKeys)
     }
 

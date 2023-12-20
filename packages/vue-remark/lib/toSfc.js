@@ -27,7 +27,7 @@ module.exports = function toSfc () {
     })
 
     const hast = toHAST(ast, {
-      allowDangerousHTML: true,
+      allowDangerousHtml: true,
       handlers: {
         'g-link' (h, node) {
           return h(node, 'g-link', { to: node.url }, node.children)
@@ -43,7 +43,7 @@ module.exports = function toSfc () {
     })
 
     const html = toHTML(hast, {
-      allowDangerousHTML: true,
+      allowDangerousHtml: true,
       entities: {
         useNamedReferences: true
       }
