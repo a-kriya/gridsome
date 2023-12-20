@@ -1,4 +1,4 @@
-const LRU = require('lru-cache')
+const { LRUCache } = require('lru-cache')
 const unified = require('unified')
 const parse = require('gray-matter')
 const remarkHtml = require('remark-html')
@@ -6,7 +6,7 @@ const remarkParse = require('remark-parse')
 const sanitizeHTML = require('sanitize-html')
 const { defaultsDeep } = require('lodash')
 
-const cache = new LRU({ max: 1000 })
+const cache = new LRUCache({ max: 1000 })
 
 const {
   cacheKey,

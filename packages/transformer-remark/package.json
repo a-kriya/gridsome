@@ -1,5 +1,5 @@
 {
-  "version": "0.6.5",
+  "version": "0.7.0",
   "name": "@kriya/gridsome-transformer-remark",
   "description": "Markdown transformer for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-remark#readme",
@@ -13,24 +13,24 @@
     "remark"
   ],
   "dependencies": {
-    "gray-matter": "^4.0.2",
-    "hash-sum": "^1.0.2",
-    "lodash": "^4.17.11",
-    "lru-cache": "^5.1.1",
-    "remark-autolink-headings": "^5.0.0",
-    "remark-external-links": "^3.0.0",
-    "remark-fix-guillemets": "^1.0.15",
-    "remark-html": "^13.0.2",
-    "remark-parse": "^6.0.0",
-    "remark-slug": "^4.2.3",
-    "remark-squeeze-paragraphs": "^3.0.2",
-    "sanitize-html": "^2.3.2",
-    "unified": "^7.0.0",
-    "unist-util-visit": "^1.4.0",
-    "vfile": "^4.0.0"
+    "gray-matter": "^4.0.3",
+    "hash-sum": "^2.0.0",
+    "lodash": "^4.17.21",
+    "lru-cache": "^10.1.0",
+    "remark-autolink-headings": "~6.1.0",
+    "remark-external-links": "~8.0.0",
+    "remark-fix-guillemets": "^1.1.2",
+    "remark-html": "~13.0.2",
+    "remark-parse": "~8.0.3",
+    "remark-slug": "~6.1.0",
+    "remark-squeeze-paragraphs": "~4.0.0",
+    "sanitize-html": "^2.11.0",
+    "unified": "~9.2.2",
+    "unist-util-visit": "~2.0.3",
+    "vfile": "~4.2.1"
   },
   "peerDependencies": {
-    "@kriya/gridsome": "^0.8.1-1"
+    "@kriya/gridsome": "^0.9.0"
   },
   "publishConfig": {
     "access": "public"
