@@ -1,4 +1,4 @@
-const { Kind } = require('graphql')
+import { Kind } from 'graphql'
 
 const getNamedAstType = node => {
   if (node && node.kind !== Kind.NAMED_TYPE) {
@@ -8,7 +8,7 @@ const getNamedAstType = node => {
   return node
 }
 
-function fixIncorrectVariableUsage (schema, ast, variableDef) {
+function fixIncorrectVariableUsage(schema, ast, variableDef) {
   const typeNode = getNamedAstType(variableDef)
   const incorrectNodes = []
 
@@ -19,6 +19,7 @@ function fixIncorrectVariableUsage (schema, ast, variableDef) {
   return incorrectNodes
 }
 
-module.exports = {
+export { fixIncorrectVariableUsage }
+export default {
   fixIncorrectVariableUsage
 }

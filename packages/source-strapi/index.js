@@ -31,6 +31,7 @@ module.exports = function (api, options) {
         console.error('Strapi authentication error: ' + e)
       }
     }
+
     return Promise.all([
       Promise.all(contentTypes.map(resourceName => {
         const typeName = upperFirst(camelCase(`${options.typeName} ${resourceName}`))

@@ -1,15 +1,8 @@
-const { BOOTSTRAP_FULL } = require('../utils/constants')
+import { BOOTSTRAP_FULL } from '../utils/constants.js'
+import App from './App.js'
 
-module.exports = async (
-  context,
-  options = {},
-  phase = BOOTSTRAP_FULL
-) => {
-  const App = require('./App')
-
+export default async (context, options = {}, phase = BOOTSTRAP_FULL) => {
   const instance = new App(context, options)
-
   await instance.bootstrap(phase)
-
   return instance
 }

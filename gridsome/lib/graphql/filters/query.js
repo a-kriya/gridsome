@@ -1,6 +1,7 @@
-const { reduce, mapKeys, findLastIndex } = require('lodash')
-const { InputTypeComposer, ThunkComposer } = require('graphql-compose')
-
+import lodash from 'lodash'
+import * as graphqlCompose from 'graphql-compose'
+const { reduce, mapKeys, findLastIndex } = lodash
+const { InputTypeComposer, ThunkComposer } = graphqlCompose
 const listRefOpsMap = {
   '$in': '$refListIn',
   '$nin': '$refListNin',
@@ -8,7 +9,6 @@ const listRefOpsMap = {
   '$ne': '$refListNe',
   '$exists': '$refListExists'
 }
-
 const refOpsMap = {
   '$in': '$refIn',
   '$nin': '$refNin',
@@ -17,7 +17,7 @@ const refOpsMap = {
   '$exists': '$refExists'
 }
 
-function toFilterArgs (filter, typeComposer, currentKey = '') {
+function toFilterArgs(filter, typeComposer, currentKey = '') {
   const args = {}
 
   if (typeComposer instanceof ThunkComposer) {
@@ -26,9 +26,8 @@ function toFilterArgs (filter, typeComposer, currentKey = '') {
 
   for (let key in filter) {
     let value = filter[key]
-
-    if (value === undefined) continue
-
+    if (value === undefined)
+      continue
     const field = typeComposer.getFieldTC(key)
     const extensions = typeComposer.getFieldExtensions(key)
 
@@ -40,6 +39,7 @@ function toFilterArgs (filter, typeComposer, currentKey = '') {
     if (field instanceof InputTypeComposer) {
       const directives = typeComposer.getFieldDirectives(key)
       const index = findLastIndex(directives, ['name', 'proxy'])
+
       if (directives[index] && directives[index].args) {
         key = directives[index].args.from || key
       }
@@ -54,7 +54,8 @@ function toFilterArgs (filter, typeComposer, currentKey = '') {
       }
 
       Object.assign(args, newArgs)
-    } else {
+    }
+    else {
       args[currentKey] = convertFilterValues({ [key]: value })
     }
   }
@@ -62,17 +63,18 @@ function toFilterArgs (filter, typeComposer, currentKey = '') {
   return args
 }
 
-function convertFilterValues (value) {
+function convertFilterValues(value) {
   return reduce(value, (acc, value, key) => {
     const filterKey = `$${key}`
-
-    if (key === 'regex') acc[filterKey] = new RegExp(value)
-    else acc[filterKey] = value
-
+    if (key === 'regex')
+      acc[filterKey] = new RegExp(value)
+    else
+      acc[filterKey] = value
     return acc
   }, {})
 }
 
-module.exports = {
+export { toFilterArgs }
+export default {
   toFilterArgs
 }

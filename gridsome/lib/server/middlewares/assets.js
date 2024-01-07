@@ -1,20 +1,19 @@
-const path = require('path')
-const fs = require('fs-extra')
-const { mapValues } = require('lodash')
-const { createWorker } = require('../../workers')
-const { SUPPORTED_IMAGE_TYPES } = require('../../utils/constants')
+import path from 'path'
+import fs from 'fs-extra'
+import lodash from 'lodash'
+import { createWorker } from '../../workers/index.js'
+import { SUPPORTED_IMAGE_TYPES } from '../../utils/constants.js'
+const { mapValues } = lodash
 
-module.exports = ({ context, config, assets }) => {
+export default ({ context, config, assets }) => {
   const worker = createWorker('image-processor')
 
   return async (req, res, next) => {
     const relPath = req.params[1].replace(/(%2e|\.){2}/g, '')
     const filePath = path.join(context, relPath)
 
-    if (
-      !filePath.startsWith(context) ||
-      !fs.existsSync(filePath)
-    ) {
+    if (!filePath.startsWith(context) ||
+            !fs.existsSync(filePath)) {
       return res.sendStatus(404)
     }
 
@@ -22,12 +21,11 @@ module.exports = ({ context, config, assets }) => {
     const { key, ...options } = mapValues(req.query, value => {
       return decodeURIComponent(value)
     })
-
     const asset = assets.get(key || req.url)
+    if (!asset)
+      return res.sendStatus(404)
 
-    if (!asset) return res.sendStatus(404)
-
-    const serveFile = async file => {
+    const serveFile = async (file) => {
       const buffer = await fs.readFile(file)
 
       if (process.env.NODE_ENV === 'development') {
@@ -59,10 +57,12 @@ module.exports = ({ context, config, assets }) => {
         }
 
         serveFile(destPath)
-      } else {
+      }
+      else {
         serveFile(filePath)
       }
-    } catch (err) {
+    }
+    catch (err) {
       next(err)
     }
   }

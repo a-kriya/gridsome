@@ -18,6 +18,7 @@ module.exports = function (api, options) {
   api.createPages(async ({ graphql }) => {
     if (typeof options.staticUrls === 'function') {
       const urls = await options.staticUrls({ graphql })
+
       if (Array.isArray(urls)) {
         staticUrls.push(...urls)
       } else {

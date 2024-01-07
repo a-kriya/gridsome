@@ -1,46 +1,27 @@
-const camelCase = require('camelcase')
-const { warn } = require('../utils/log')
-const { isRefField } = require('../store/utils')
-const { isRefFieldDefinition } = require('./utils')
+import camelCase from 'camelcase'
+import { warn } from '../utils/log.js'
+import { isRefField } from '../store/utils.js'
+import { isRefFieldDefinition } from './utils.js'
+import lodash from 'lodash'
+const { omit, isNil, isEmpty, isNumber, isInteger, isPlainObject } = lodash
 
-const {
-  omit,
-  isNil,
-  isEmpty,
-  isNumber,
-  isInteger,
-  isPlainObject
-} = require('lodash')
-
-module.exports = function createFieldDefinitions (nodes, options = {}) {
-  let res = {}
-
-  for (let i = 0, l = nodes.length; i < l; i++) {
-    const fields = omit(nodes[i], ['internal'])
-    res = resolveValues(fields, res, options)
-  }
-
-  return res
-}
-
-function resolveValues (obj, currentObj = {}, options = {}, path = []) {
+function resolveValues(obj, currentObj = {}, options = {}, path = []) {
   const res = { ...currentObj }
 
   for (const key in obj) {
     const value = obj[key]
-
-    if (key.startsWith('$')) continue
-    if (key.startsWith('__')) continue
-    if (isNil(value)) continue
-
+    if (key.startsWith('$'))
+      continue
+    if (key.startsWith('__'))
+      continue
+    if (isNil(value))
+      continue
     const currentValue = currentObj[key] ? currentObj[key].value : undefined
     const resolvedValue = resolveValue(value, currentValue, options, path.concat(key))
 
-    if (
-      isNil(resolvedValue) ||
-      (Array.isArray(resolvedValue) && !resolvedValue.length) ||
-      (isPlainObject(resolvedValue) && isEmpty(resolvedValue))
-    ) {
+    if (isNil(resolvedValue) ||
+            (Array.isArray(resolvedValue) && !resolvedValue.length) ||
+            (isPlainObject(resolvedValue) && isEmpty(resolvedValue))) {
       continue
     }
 
@@ -64,7 +45,7 @@ function resolveValues (obj, currentObj = {}, options = {}, path = []) {
   return res
 }
 
-function resolveValue (value, currentValue, options, path = []) {
+function resolveValue(value, currentValue, options, path = []) {
   if (Array.isArray(value)) {
     const arr = Array.isArray(currentValue) ? currentValue : []
     const length = value.length
@@ -77,7 +58,8 @@ function resolveValue (value, currentValue, options, path = []) {
       for (let i = 0; i < length; i++) {
         if (!value[i].typeName) {
           warn(`Missing typeName for reference at: ${path.join('.')}.${i}`)
-        } else if (!currentValue.typeName.includes(value[i].typeName)) {
+        }
+        else if (!currentValue.typeName.includes(value[i].typeName)) {
           currentValue.typeName.push(value[i].typeName)
         }
       }
@@ -94,7 +76,8 @@ function resolveValue (value, currentValue, options, path = []) {
     }
 
     return arr.filter(v => !isNil(v))
-  } else if (isPlainObject(value)) {
+  }
+  else if (isPlainObject(value)) {
     if (isRefField(value)) {
       if (!value.typeName) {
         warn(`Missing typeName for reference in field: ${path.join('.')}`)
@@ -106,7 +89,8 @@ function resolveValue (value, currentValue, options, path = []) {
           if (!currentValue.typeName.includes(value.typeName)) {
             currentValue.typeName.push(value.typeName)
           }
-        } else if (currentValue.typeName !== value.typeName) {
+        }
+        else if (currentValue.typeName !== value.typeName) {
           // convert to union field if it has multiple typeNames
           currentValue.typeName = [currentValue.typeName, value.typeName]
         }
@@ -114,12 +98,12 @@ function resolveValue (value, currentValue, options, path = []) {
 
       const ref = currentValue || { typeName: value.typeName }
       ref.isList = ref.isList || Array.isArray(value.id)
-
       return ref
     }
 
     return resolveValues(value, currentValue, options, path)
-  } else if (isNumber(value)) {
+  }
+  else if (isNumber(value)) {
     return isNumber(currentValue) && isInteger(value)
       ? currentValue
       : value
@@ -131,10 +115,21 @@ function resolveValue (value, currentValue, options, path = []) {
 const nonValidCharsRE = new RegExp('[^a-zA-Z0-9_]', 'g')
 const leadingNumberRE = new RegExp('^([0-9])')
 
-function createFieldName (key, camelCased = false) {
+function createFieldName(key, camelCased = false) {
   key = key.replace(nonValidCharsRE, '_')
-  if (camelCased) key = camelCase(key)
+  if (camelCased)
+    key = camelCase(key)
   key = key.replace(leadingNumberRE, '_$1')
-
   return key
 }
+
+export default (function createFieldDefinitions(nodes, options = {}) {
+  let res = {}
+
+  for (let i = 0, l = nodes.length; i < l; i++) {
+    const fields = omit(nodes[i], ['internal'])
+    res = resolveValues(fields, res, options)
+  }
+
+  return res
+})

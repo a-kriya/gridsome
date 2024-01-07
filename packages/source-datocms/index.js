@@ -7,6 +7,7 @@ const withNoEmptyValues = (object) => {
 
     for (const [key, value] of Object.entries(object)) {
       const valueWithNoEmptyValues = withNoEmptyValues(value)
+
       if (valueWithNoEmptyValues) {
         result[key] = valueWithNoEmptyValues
       }
@@ -79,7 +80,7 @@ class DatoCmsSource {
       cache[itemType.id] = { titleField, slugField }
 
       const collection = addCollection(
-        this.createTypeName(itemType.name),
+        this.createTypeName(itemType.name)
       )
 
       fields

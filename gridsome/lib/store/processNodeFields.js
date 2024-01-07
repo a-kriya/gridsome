@@ -1,37 +1,24 @@
-const { omit, isDate } = require('lodash')
-const { isResolvablePath } = require('../utils')
-const { NODE_FIELDS } = require('../utils/constants')
-const { resolvePath } = require('./utils')
+import lodash from 'lodash'
+import { isResolvablePath } from '../utils/index.js'
+import { NODE_FIELDS } from '../utils/constants.js'
+import { resolvePath } from './utils.js'
+const { omit, isDate } = lodash
 
-module.exports = function processNodeFields (node, collection) {
-  const fields = omit(node, NODE_FIELDS)
-
-  const results = processFields(fields, {
-    origin: node.internal.origin,
-    context: collection._assetsContext,
-    resolveAbsolute: collection._resolveAbsolutePaths
-  })
-
-  return {
-    id: node.id,
-    $uid: node.$uid,
-    internal: node.internal,
-    ...results
-  }
-}
-
-function processFields (fields = {}, options = {}) {
+function processFields(fields = {}, options = {}) {
   const { origin = '', context, resolveAbsolute } = options
 
   const processField = field => {
-    if (field === undefined) return field
-    if (field === null) return field
+    if (field === undefined)
+      return field
+    if (field === null)
+      return field
 
     switch (typeof field) {
       case 'object':
         if (isDate(field)) {
           return field
         }
+
         return processFields(field)
       case 'string':
         return isResolvablePath(field)
@@ -63,3 +50,18 @@ function processFields (fields = {}, options = {}) {
 
   return processFields(fields)
 }
+
+export default (function processNodeFields(node, collection) {
+  const fields = omit(node, NODE_FIELDS)
+  const results = processFields(fields, {
+    origin: node.internal.origin,
+    context: collection._assetsContext,
+    resolveAbsolute: collection._resolveAbsolutePaths
+  })
+  return {
+    id: node.id,
+    $uid: node.$uid,
+    internal: node.internal,
+    ...results
+  }
+})

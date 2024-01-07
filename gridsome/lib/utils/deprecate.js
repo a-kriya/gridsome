@@ -1,17 +1,16 @@
-const path = require('path')
-const chalk = require('chalk')
-const columnify = require('columnify')
-const stackTrace = require('stack-trace')
-const { log: logUtil } = require('./log')
-
+import path from 'path'
+import chalk from 'chalk'
+import columnify from 'columnify'
+import * as stackTrace from 'stack-trace'
+import { log as logUtil } from './log.js'
 const warned = new Map()
 const warnings = new Set()
-const noop = function() {}
+
+const noop = function () { }
 
 const callSiteLocation = callSite => {
   const line = callSite.getLineNumber()
   const colm = callSite.getColumnNumber()
-
   let file = callSite.getFileName() || '<anonymous>'
 
   if (callSite.isEval()) {
@@ -33,9 +32,7 @@ const convertDataDescriptorToAccessor = (obj, prop) => {
 
   delete descriptor.value
   delete descriptor.writable
-
   Object.defineProperty(obj, prop, descriptor)
-
   return descriptor
 }
 
@@ -87,11 +84,9 @@ const wrapProperty = namespace => {
 
 const log = (namespace, message, options = {}) => {
   const { stackIndex = 2, customCaller, url } = options
-
   const stack = stackTrace.get()
   const depSite = callSiteLocation(stack[stackIndex])
   const depFile = depSite[0]
-
   let seen = false
   let caller = null
   let callFile = null
@@ -103,9 +98,11 @@ const log = (namespace, message, options = {}) => {
 
     if (callFile === file) {
       seen = true
-    } else if (callFile === depFile) {
+    }
+    else if (callFile === depFile) {
       file = depFile
-    } else if (seen) {
+    }
+    else if (seen) {
       break
     }
   }
@@ -119,11 +116,10 @@ const log = (namespace, message, options = {}) => {
   }
 
   warned.set(key, true)
-
   warnings.add({ namespace, message, caller, customCaller, url })
 }
 
-exports.createDeprecator = namespace => {
+export const createDeprecator = namespace => {
   if (!namespace) {
     throw new TypeError('Namespace is required')
   }
@@ -138,17 +134,15 @@ exports.createDeprecator = namespace => {
   }
 
   deprecate.property = wrapProperty(namespace)
-
   return deprecate
 }
 
-exports.hasWarnings = () => {
+export const hasWarnings = () => {
   return warnings.size > 0
 }
 
-exports.logAllWarnings = context => {
+export const logAllWarnings = context => {
   const columns = []
-
   warnings.forEach(warning => {
     const { caller, customCaller, url } = warning
     let { message } = warning
@@ -162,24 +156,19 @@ exports.logAllWarnings = context => {
       const [fileName, line, column] = currentCaller
       const relativePath = path.relative(context, fileName)
       const location = line && column ? `:${line}:${column}` : ''
-
       message += `\n${chalk.gray(`./${relativePath}${location}`)}`
     }
 
     message += '\n'
-
     columns.push({ message })
     columns.push({}) // empty line between messages
   })
-
   const renderedColumns = columnify(columns, {
     maxWidth: Math.min(80, process.stdout.columns || Infinity),
     preserveNewLines: true,
     showHeaders: false
   })
-
   logUtil(renderedColumns)
 }
 
-exports.deprecate = exports.createDeprecator('gridsome')
-
+export const deprecate = createDeprecator('gridsome')

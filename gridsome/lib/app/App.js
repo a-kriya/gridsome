@@ -1,15 +1,23 @@
-const path = require('path')
-const autoBind = require('auto-bind')
-const hirestime = require('hirestime')
-const { info, log } = require('../utils/log')
-const isRelative = require('is-relative')
-const { version } = require('../../package.json')
-const { AsyncSeriesHook, SyncWaterfallHook } = require('tapable')
-
-const { BOOTSTRAP_FULL } = require('../utils/constants')
+import path from 'path'
+import autoBind from 'auto-bind'
+import hirestime from 'hirestime'
+import { info, log } from '../utils/log.js'
+import isRelative from 'is-relative'
+import packageJson from '../../package.json'
+import { AsyncSeriesHook, SyncWaterfallHook } from 'tapable'
+import { BOOTSTRAP_FULL } from '../utils/constants.js'
+import loadConfig from './loadConfig.js'
+import Plugins from './Plugins.js'
+import Store from '../store/Store.js'
+import Schema from './Schema.js'
+import AssetsQueue from './queue/AssetsQueue.js'
+import Codegen from './codegen/index.js'
+import Pages from '../pages/pages.js'
+import Compiler from './Compiler.js'
+const { version } = packageJson
 
 class App {
-  constructor (context, options = {}) {
+  constructor(context, options = {}) {
     process.GRIDSOME = this
 
     this.clients = {}
@@ -27,8 +35,7 @@ class App {
 
     autoBind(this)
   }
-
-  async bootstrap (phase = BOOTSTRAP_FULL) {
+  async bootstrap(phase = BOOTSTRAP_FULL) {
     const timer = hirestime()
 
     info(`Gridsome v${version}\n`)
@@ -40,7 +47,7 @@ class App {
       register: hook => ({
         type: hook.type,
         name: hook.name,
-        fn (app, callback) {
+        fn(app, callback) {
           if (hook.phase && hook.phase > phase) {
             return hook.type === 'promise'
               ? Promise.resolve()
@@ -51,7 +58,8 @@ class App {
 
           const done = () => {
             log(`${hook.label || hook.name} - ${timer.s()}s`)
-            if (callback) callback()
+            if (callback)
+              callback()
           }
 
           switch (hook.type) {
@@ -80,17 +88,7 @@ class App {
   //
   // bootstrap phases
   //
-
-  async init () {
-    const loadConfig = require('./loadConfig')
-    const Plugins = require('./Plugins')
-    const Store = require('../store/Store')
-    const Schema = require('./Schema')
-    const AssetsQueue = require('./queue/AssetsQueue')
-    const Codegen = require('./codegen')
-    const Pages = require('../pages/pages')
-    const Compiler = require('./Compiler')
-
+  async init() {
     this.config = await loadConfig(this.context, this.options)
     this.plugins = new Plugins(this)
     this.store = new Store(this)
@@ -133,30 +131,27 @@ class App {
   //
   // helpers
   //
-
-  resolve (...args) {
+  resolve(...args) {
     const value = path.join(...args)
-
     return isRelative(value)
       ? path.join(this.context, value)
       : value
   }
-
-  slugify (value = '') {
+  slugify(value = '') {
     if (this.config && this.config.permalinks) {
       const { slugify } = this.config.permalinks
+
       if (typeof slugify.use === 'function') {
         return slugify.use(value, slugify.options)
       }
     }
+
     return value
   }
-
-  graphql (docOrQuery, variables = {}) {
+  graphql(docOrQuery, variables = {}) {
     return this.schema.runQuery(docOrQuery, variables)
   }
-
-  broadcast (message, hotReload = true) {
+  broadcast(message, hotReload = true) {
     for (const client in this.clients) {
       this.clients[client].write(JSON.stringify(message))
     }
@@ -167,4 +162,4 @@ class App {
   }
 }
 
-module.exports = App
+export default App

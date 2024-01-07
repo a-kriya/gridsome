@@ -54,14 +54,12 @@ const allOperators = {
     description: 'Filter nodes that contain the field, including nodes where the field value is null.'
   }
 }
-
 const listOperators = [
   'size',
   'contains',
   'containsAny',
   'containsNone'
 ]
-
 const listFields = [
   'in',
   'nin',
@@ -70,9 +68,7 @@ const listFields = [
   'containsAny',
   'containsNone'
 ]
-
 const defaultOperators = ['eq', 'ne', 'in', 'nin', 'exists']
-
 const scalarOperators = {
   ID: defaultOperators,
   Enum: defaultOperators,
@@ -86,21 +82,10 @@ const scalarOperators = {
   Date: [...defaultOperators, 'gt', 'gte', 'lt', 'lte', 'dteq', 'between']
 }
 
-exports.defaultOperators = defaultOperators
-exports.scalarOperators = scalarOperators
-exports.listOperators = listOperators
-
-exports.toOperatorConfig = function ({
-  operators,
-  typeName,
-  extensions,
-  directives,
-  deprecationReason
-}) {
+export const toOperatorConfig = function ({ operators, typeName, extensions, directives, deprecationReason }) {
   return operators.reduce((fields, name) => {
     const op = allOperators[name]
     const type = op.type || typeName
-
     fields[name] = {
       type: listFields.includes(name) ? [type] : type,
       extensions: { ...op.extensions, ...extensions },
@@ -108,7 +93,10 @@ exports.toOperatorConfig = function ({
       directives,
       deprecationReason
     }
-
     return fields
   }, {})
 }
+
+export { defaultOperators }
+export { scalarOperators }
+export { listOperators }

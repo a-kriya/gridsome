@@ -1,46 +1,43 @@
-const path = require('path')
-const fs = require('fs-extra')
-const { LRUCache } = require('lru-cache')
-const crypto = require('crypto')
-const invariant = require('invariant')
-const initWatcher = require('./watch')
-const { Collection } = require('lokijs')
-const { FSWatcher } = require('chokidar')
-const { parseQuery } = require('../graphql')
-const { pathToRegexp, compile } = require('path-to-regexp')
-const createPageQuery = require('./createPageQuery')
-const { HookMap, SyncWaterfallHook, SyncBailHook } = require('tapable')
-const { snakeCase, trimEnd } = require('lodash')
-const validateInput = require('./schemas')
-
+import path$0 from 'path'
+import fs from 'fs-extra'
+import { LRUCache } from 'lru-cache'
+import crypto from 'crypto'
+import invariant from 'invariant'
+import initWatcher from './watch.js'
+import lokijs from 'lokijs'
+import { FSWatcher } from 'chokidar'
+import { parseQuery } from '../graphql/index.js'
+import { pathToRegexp, compile } from 'path-to-regexp'
+import createPageQuery from './createPageQuery.js'
+import { HookMap, SyncWaterfallHook, SyncBailHook } from 'tapable'
+import lodash from 'lodash'
+import validateInput from './schemas.js'
+let path = path$0
+const { Collection } = lokijs
+const { snakeCase, trimEnd } = lodash
 const TYPE_STATIC = 'static'
 const TYPE_DYNAMIC = 'dynamic'
-
 const createHash = value => crypto.createHash('md5').update(value).digest('hex')
 const getRouteType = value => /:/.test(value) ? TYPE_DYNAMIC : TYPE_STATIC
 
 class Pages {
-  constructor (app) {
+  constructor(app) {
     this.app = app
-
     this.hooks = {
       parseComponent: new HookMap(() => new SyncBailHook(['source', 'resource'])),
       createRoute: new SyncWaterfallHook(['options']),
       createPage: new SyncWaterfallHook(['options']),
       pageContext: new SyncWaterfallHook(['context', 'data'])
     }
-
     this._componentCache = new LRUCache({ max: 100 })
     this._queryCache = new LRUCache({ max: 100 })
     this._watcher = null
-
     this._routes = new Collection('routes', {
       indices: ['id', 'internal.priority', 'internal.dependencies'],
       unique: ['id', 'path'],
       disableMeta: true,
       adaptiveBinaryIndices: false
     })
-
     this._pages = new Collection('pages', {
       indices: ['id', 'internal.route'],
       unique: ['id', 'path'],
@@ -52,7 +49,6 @@ class Pages {
       this.createWatcher()
     }
   }
-
   createWatcher() {
     this._watcher = new FSWatcher({
       disableGlobbing: true
@@ -64,14 +60,12 @@ class Pages {
 
     return this._watcher
   }
-
   closeWatcher() {
     return this._watcher.close().then(() => {
       this._watcher = null
     })
   }
-
-  routes () {
+  routes() {
     return this._routes
       .chain()
       .compoundsort([
@@ -83,22 +77,18 @@ class Pages {
         return new Route(route, this)
       })
   }
-
-  pages () {
+  pages() {
     return this._pages.data.slice()
   }
-
-  clearCache () {
+  clearCache() {
     this._componentCache.clear()
     this._queryCache.clear()
   }
-
-  clearComponentCache (component) {
+  clearComponentCache(component) {
     this._componentCache.delete(component)
     this._queryCache.delete(component)
   }
-
-  createRoute (input, meta = {}) {
+  createRoute(input, meta = {}) {
     const validated = validateInput('route', input)
     const options = this._createRouteOptions(validated, meta)
     const oldRoute = this._routes.by('id', options.id)
@@ -108,69 +98,52 @@ class Pages {
         $loki: oldRoute.$loki,
         meta: oldRoute.meta
       })
-
       this._routes.update(newOptions)
-
       return new Route(newOptions, this)
     }
 
     this._routes.insert(options)
     this._watchFiles(options.internal.dependencies)
-
     return new Route(options, this)
   }
-
-  updateRoute (input, meta = {}) {
+  updateRoute(input, meta = {}) {
     const validated = validateInput('route', input)
-
-    this.clearComponentCache(
-      this.app.resolve(validated.component)
-    )
-
+    this.clearComponentCache(this.app.resolve(validated.component))
     const options = this._createRouteOptions(validated, meta)
     const oldOptions = this._routes.by('id', options.id)
     const newOptions = Object.assign({}, options, {
       $loki: oldOptions.$loki,
       meta: oldOptions.meta
     })
-
     const prevFiles = oldOptions.internal.dependencies.filter(file => {
       return !newOptions.internal.dependencies.includes(file)
     })
-
     this._routes.update(newOptions)
     this._unwatchFiles(prevFiles)
     this._watchFiles(newOptions.internal.dependencies)
-
     const route = new Route(newOptions, this)
 
     if (options.internal.query.source !== oldOptions.internal.query.source) {
       for (const page of route.pages()) {
         const vars = page.internal.queryVariables || page.context || {}
         const { paginate, variables, filters } = this._createPageQuery(route.internal.query, vars)
-
         const newOptions = { ...page }
         newOptions.internal.query = { paginate, variables, filters }
-
         this._pages.update(newOptions)
       }
     }
 
     return route
   }
-
-  removeRoute (id) {
+  removeRoute(id) {
     const options = this._routes.by('id', id)
-
     this._pages.findAndRemove({ 'internal.route': id })
     this._routes.findAndRemove({ id })
     this._unwatchFiles(options.internal.dependencies)
   }
-
-  createPage (input, meta = {}) {
+  createPage(input, meta = {}) {
     const options = validateInput('page', input)
     const type = getRouteType(options.path)
-
     const route = this.createRoute({
       type,
       path: options.path,
@@ -178,7 +151,6 @@ class Pages {
       name: options.route.name,
       meta: options.route.meta
     }, meta)
-
     return route.addPage({
       id: options.id,
       path: options.path,
@@ -186,11 +158,9 @@ class Pages {
       queryVariables: options.queryVariables
     })
   }
-
-  updatePage (input, meta = {}) {
+  updatePage(input, meta = {}) {
     const options = validateInput('page', input)
     const type = getRouteType(options.path)
-
     const route = this.updateRoute({
       type,
       name: options.name,
@@ -198,7 +168,6 @@ class Pages {
       component: options.component,
       meta: options.route.meta
     }, meta)
-
     return route.updatePage({
       id: options.id,
       path: options.path,
@@ -206,74 +175,62 @@ class Pages {
       queryVariables: options.queryVariables
     })
   }
-
-  removePage (id) {
+  removePage(id) {
     const page = this.getPage(id)
-    if (!page) return
+    if (!page)
+      return
     const route = this.getRoute(page.internal.route)
 
     if (route.internal.isDynamic) {
       route.removePage(id)
-    } else {
+    }
+    else {
       this.removeRoute(route.id)
     }
   }
-
-  removePageByPath (path) {
+  removePageByPath(path) {
     const query = {
       path: trimEnd(path, '/') || '/'
     }
-
     this._pages
       .find(query)
       .forEach(page => this.removePage(page.id))
   }
-
-  removePagesByComponent (path) {
+  removePagesByComponent(path) {
     const component = this.app.resolve(path)
-
     this._routes
       .find({ component })
       .forEach(options => {
         this.removeRoute(options.id)
       })
   }
-
-  findAndRemovePages (query) {
+  findAndRemovePages(query) {
     this._pages.find(query).forEach(page => {
       this.removePage(page.id)
     })
   }
-
-  findPages (query) {
+  findPages(query) {
     const matchingPages = this._pages.find(query)
     return matchingPages
   }
-
-  findPage (query) {
-    const [ matchingPage ] = this._pages.find(query)
+  findPage(query) {
+    const [matchingPage] = this._pages.find(query)
     return matchingPage
   }
-
-  getRoute (id) {
+  getRoute(id) {
     const options = this._routes.by('id', id)
     return options ? new Route(options, this) : null
   }
-
-  getRouteByPath (path) {
+  getRouteByPath(path) {
     const options = this._routes.by('path', path)
     return options ? new Route(options, this) : null
   }
-
-  getMatch (path) {
+  getMatch(path) {
     let route = this._routes.by('path', path)
 
     if (typeof route !== 'object') {
       const chain = this._routes.chain().simplesort('internal.priority', true)
-
-      route = chain.data().find(route =>
-        route.internal.regexp.test(path)
-      )
+      route = chain.data().find(route => route.internal.regexp.test(path))
     }
 
     if (typeof route !== 'object') {
@@ -288,9 +245,8 @@ class Pages {
     for (let i = 0; i < length; i++) {
       const key = internal.keys[i]
       const param = m[i + 1]
-
-      if (!param) continue
-
+      if (!param)
+        continue
       params[key.name] = decodeURIComponent(param)
 
       if (key.repeat) {
@@ -303,20 +259,16 @@ class Pages {
       params
     }
   }
-
-  getPage (id) {
+  getPage(id) {
     return this._pages.by('id', id)
   }
-
-  _createRouteOptions (options, meta = {}) {
+  _createRouteOptions(options, meta = {}) {
     const component = this.app.resolve(options.component)
     const { pageQuery, watchFiles = [] } = this._parseComponent(component)
     const query = this._parseQuery(pageQuery, component)
-    const { permalinks: { trailingSlash }} = this.app.config
-
+    const { permalinks: { trailingSlash } } = this.app.config
     let path = options.path.replace(/\/+/g, '/')
     let name = options.name
-
     const type = options.type
     const prettyPath = trimEnd(path, '/') || '/'
     const hasTrailingSlash = /\/$/.test(options.path)
@@ -328,7 +280,8 @@ class Pages {
 
     if (type === TYPE_STATIC && trailingSlash) {
       path = trimEnd(path, '/') + '/'
-    } else if (type === TYPE_DYNAMIC) {
+    }
+    else if (type === TYPE_DYNAMIC) {
       path = trimEnd(path, '/') || '/'
       name = name || `__${snakeCase(path)}`
     }
@@ -337,7 +290,6 @@ class Pages {
     const regexp = pathToRegexp(trimEnd(path, '/') || '/', keys)
     const id = options.id || createHash(`route-${prettyPath}`)
     const priority = this._resolvePriority(path)
-
     return this.hooks.createRoute.call({
       id,
       type,
@@ -356,56 +308,50 @@ class Pages {
       })
     })
   }
-
-  _parseQuery (query, component) {
+  _parseQuery(query, component) {
     if (this._queryCache.has(component)) {
       return this._queryCache.get(component)
     }
 
     const schema = this.app.schema.getSchema()
     const res = parseQuery(schema, query, component)
-
     this._queryCache.set(component, res)
-
     return res
   }
-
-  _createPageQuery (parsedQuery, vars = {}) {
+  _createPageQuery(parsedQuery, vars = {}) {
     return createPageQuery(parsedQuery, vars)
   }
-
-  _createPageContext (page, queryVariables = {}) {
+  _createPageContext(page, queryVariables = {}) {
     const route = this.getRoute(page.internal.route)
     return this.hooks.pageContext.call({ ...page.context }, {
       pageQuery: route.internal.query.source,
       queryVariables
     })
   }
-
-  _resolvePriority (path) {
+  _resolvePriority(path) {
     const segments = path.split('/').filter(Boolean)
     const scores = segments.map(segment => {
       let score = Math.max(segment.charCodeAt(0) || 0, 90)
       const parts = (segment.match(/-/g) || []).length
-
-      if (/^:/.test(segment)) score -= 10
-      if (/:/.test(segment)) score -= 10
-      if (/\(.*\)/.test(segment)) score += 5
-      if (/\/[^:]$/.test(segment)) score += 3
-      if (/(\?|\+|\*)$/.test(segment)) score -= 3
-      if (/\(\.\*\)/.test(segment)) score -= 10
-      if (parts) score += parts
-
+      if (/^:/.test(segment))
+        score -= 10
+      if (/:/.test(segment))
+        score -= 10
+      if (/\(.*\)/.test(segment))
+        score += 5
+      if (/\/[^:]$/.test(segment))
+        score += 3
+      if (/(\?|\+|\*)$/.test(segment))
+        score -= 3
+      if (/\(\.\*\)/.test(segment))
+        score -= 10
+      if (parts)
+        score += parts
       return score
     })
-
-    return scores.reduce(
-      (sum, score) => sum + score,
-      segments.length * 100
-    )
+    return scores.reduce((sum, score) => sum + score, segments.length * 100)
   }
-
-  _parseComponent (component) {
+  _parseComponent(component) {
     if (this._componentCache.has(component)) {
       return this._componentCache.get(component)
     }
@@ -424,17 +370,14 @@ class Pages {
     }
 
     this._componentCache.set(component, validateInput('component', results || {}))
-
     return results
   }
-
-  _watchFiles (files) {
+  _watchFiles(files) {
     if (this._watcher) {
       this._watcher.add(files)
     }
   }
-
-  _unwatchFiles (files) {
+  _unwatchFiles(files) {
     if (this._watcher) {
       for (const filePath of files) {
         const query = { 'internal.dependencies': { $contains: filePath } }
@@ -448,7 +391,7 @@ class Pages {
 }
 
 class Route {
-  constructor (options, factory) {
+  constructor(options, factory) {
     this.type = options.type
     this.id = options.id
     this.name = options.name
@@ -456,74 +399,60 @@ class Route {
     this.component = options.component
     this.internal = options.internal
     this.options = options
-
     this.createPath = compile(options.path, { encode: encodeURIComponent })
-
     Object.defineProperty(this, '_factory', { value: factory })
     Object.defineProperty(this, '_pages', { value: factory._pages })
     Object.defineProperty(this, '_createPage', { value: factory.hooks.createPage })
   }
-
-  pages () {
+  pages() {
     return this._pages
       .chain()
       .find({ 'internal.route': this.id })
       .simplesort('path', false)
       .data()
   }
-
-  addPage (input) {
+  addPage(input) {
     const options = this._createPageOptions(input)
     const oldPage = this._pages.by('id', options.id)
 
     if (oldPage) {
       options.$loki = oldPage.$loki
       options.meta = oldPage.meta
-
       this._pages.update(options)
-    } else {
+    }
+    else {
       this._pages.insert(options)
     }
 
     return options
   }
-
-  updatePage (input) {
+  updatePage(input) {
     const options = this._createPageOptions(input)
     const oldOptions = this._pages.by('id', options.id)
 
     if (!oldOptions) {
-      throw new Error(
-        `Cannot update page "${options.path}". ` +
-        `Existing page with id "${options.id}" could not be found.`
-      )
+      throw new Error(`Cannot update page "${options.path}". ` +
+                `Existing page with id "${options.id}" could not be found.`)
     }
 
     const newOptions = Object.assign({}, options, {
       $loki: oldOptions.$loki,
       meta: oldOptions.meta
     })
-
     this._pages.update(newOptions)
-
     return newOptions
   }
-
-  removePage (id) {
+  removePage(id) {
     this._pages.findAndRemove({ id, 'internal.route': this.id })
   }
-
-  _createPageOptions (input) {
-    const { permalinks: { trailingSlash }} = this._factory.app.config
+  _createPageOptions(input) {
+    const { permalinks: { trailingSlash } } = this._factory.app.config
     const { regexp, digest, isManaged, query } = this.internal
     const { id: _id, path: _path, context, queryVariables } = validateInput('routePage', input)
-
     let path = trimEnd(_path.replace(/\/+/g, '/'), '/') || '/'
-
-    if (path[0] !== '/') path = '/' + path
-
+    if (path[0] !== '/')
+      path = '/' + path
     let publicPath = path
-
     const isDynamic = /:/.test(path)
     const id = _id || createHash(`page-${path}`)
 
@@ -533,23 +462,16 @@ class Route {
       }
 
       if (this.internal.path !== path) {
-        invariant(
-          regexp.test(path),
-          `The path ${path} does not match ${regexp}`
-        )
+        invariant(regexp.test(path), `The path ${path} does not match ${regexp}`)
       }
     }
 
     if (this.type === TYPE_DYNAMIC) {
-      invariant(
-        this.internal.path === path,
-        `Dynamic page must equal the route path: ${this.internal.path}`
-      )
+      invariant(this.internal.path === path, `Dynamic page must equal the route path: ${this.internal.path}`)
     }
 
     const vars = queryVariables || context || {}
     const { paginate, variables, filters } = this._factory._createPageQuery(query, vars)
-
     return this._createPage.call({
       id,
       path,
@@ -571,4 +493,4 @@ class Route {
   }
 }
 
-module.exports = Pages
+export default Pages

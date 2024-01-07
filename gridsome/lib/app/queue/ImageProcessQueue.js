@@ -1,25 +1,26 @@
-const path = require('path')
-const fs = require('fs-extra')
-const sharp = require('sharp')
-const crypto = require('crypto')
-const mime = require('mime-types')
-const colorString = require('color-string')
-const md5File = require('md5-file')
-const { forwardSlash } = require('../../utils')
-const { reject, pickBy } = require('lodash')
+import path from 'path'
+import fs from 'fs-extra'
+import sharp from 'sharp'
+import crypto from 'crypto'
+import * as mime from 'mime-types'
+import colorString from 'color-string'
+import md5File from 'md5-file'
+import { forwardSlash } from '../../utils/index.js'
+import lodash from 'lodash'
+import { optimize } from 'svgo'
+import potrace from 'potrace'
+const { reject, pickBy } = lodash
 
 class ImageProcessQueue {
-  constructor ({ context, config }) {
+  constructor({ context, config }) {
     this.context = context
     this.config = config
     this._queue = new Map()
   }
-
-  get queue () {
+  get queue() {
     return Array.from(this._queue.values())
   }
-
-  async add (filePath, options = {}) {
+  async add(filePath, options = {}) {
     const asset = await this.preProcess(filePath, options)
 
     if (process.env.GRIDSOME_MODE === 'serve') {
@@ -40,11 +41,9 @@ class ImageProcessQueue {
         })
       }
     })
-
     return asset
   }
-
-  async preProcess (filePath, options = {}) {
+  async preProcess(filePath, options = {}) {
     const { imageExtensions, outputDir, pathPrefix, maxImageWidth } = this.config
     const { minSizeDistance = 300 } = this.config.images || {}
     const imagesDir = path.relative(outputDir, this.config.imagesDir)
@@ -53,10 +52,8 @@ class ImageProcessQueue {
     const mimeType = mime.lookup(filePath)
 
     if (!imageExtensions.includes(ext.toLowerCase())) {
-      throw new Error(
-        `${ext} is not a supported image format. ` +
-        `Supported extensions are ${imageExtensions.join(', ')}.`
-      )
+      throw new Error(`${ext} is not a supported image format. ` +
+                `Supported extensions are ${imageExtensions.join(', ')}.`)
     }
 
     if (!await fs.exists(filePath)) {
@@ -65,7 +62,6 @@ class ImageProcessQueue {
 
     const hash = await md5File(filePath)
     const fileBuffer = await fs.readFile(filePath)
-
     let pipeline
     let metadata
 
@@ -73,7 +69,8 @@ class ImageProcessQueue {
       // Rotate based on EXIF Orientation tag
       pipeline = sharp(fileBuffer).rotate()
       metadata = await pipeline.metadata()
-    } catch (err) {
+    }
+    catch (err) {
       throw new Error(`Failed to process image ${relPath}. ${err.message}`)
     }
 
@@ -89,7 +86,6 @@ class ImageProcessQueue {
     }
 
     const { imageWidth, imageHeight } = computeScaledImageSize(originalSize, options, maxImageWidth)
-
     let imageWidths = options.imageWidths || [480, 1024, 1920, 2560]
 
     if (typeof imageWidths === 'string') {
@@ -112,7 +108,8 @@ class ImageProcessQueue {
     // validate color string
     if (options.background && !colorString.get(options.background)) {
       options.background = this.config.imageBackgroundColor
-    } else if (this.config.imageBackgroundColor) {
+    }
+    else if (this.config.imageBackgroundColor) {
       options.background = this.config.imageBackgroundColor
     }
 
@@ -140,10 +137,8 @@ class ImageProcessQueue {
       const relPath = createDestPath(filename, arr)
       const destPath = path.join(this.config.outputDir, relPath)
       const src = encodeURI(forwardSlash(path.join(pathPrefix || '/', relPath)))
-
       return { filename, destPath, src, width, height }
     })
-
     const results = {
       src: sets.length != 0 ? sets[sets.length - 1].src : '',
       size: { width: imageWidth, height: imageHeight },
@@ -158,7 +153,6 @@ class ImageProcessQueue {
       hash,
       sets
     }
-
     const classNames = (options.classNames || []).concat(['g-image'])
     const isSrcset = options.srcset !== false
     const isLazy = options.immediate !== true
@@ -170,40 +164,28 @@ class ImageProcessQueue {
 
     if (isLazy && isSrcset) {
       classNames.push('g-image--lazy')
-
-      results.dataUri = await createPlaceholder(
-        this.config.images.placeholder,
-        pipeline,
-        mimeType,
-        imageWidth,
-        imageHeight,
-        options
-      )
-
+      results.dataUri = await createPlaceholder(this.config.images.placeholder, pipeline, mimeType, imageWidth, imageHeight, options)
       results.noscriptHTML = '' +
-        `<noscript>` +
-        `<img class="${classNames.join(' ')} g-image--loaded" ` +
-        `src="${results.src}" width="${results.size.width}" height="${results.size.height}"` +
-        (options.alt ? ` alt="${options.alt}">` : '>') +
-        `</noscript>`
-
+                `<noscript>` +
+                `<img class="${classNames.join(' ')} g-image--loaded" ` +
+                `src="${results.src}" width="${results.size.width}" height="${results.size.height}"` +
+                (options.alt ? ` alt="${options.alt}">` : '>') +
+                `</noscript>`
       classNames.push('g-image--loading')
     }
 
     results.imageHTML = '' +
-      `<img class="${classNames.join(' ')}" ` +
-      `src="${isLazy ? results.dataUri || results.src : results.src}" ` +
-      `width="${results.size.width}" ` +
-      `height="${results.size.height}"` +
-      (options.alt ? ` alt="${options.alt}"` : '') +
-      (isLazy && isSrcset ? ` data-srcset="${results.srcset.join(', ')}"` : '') +
-      (isLazy && isSrcset ? ` data-sizes="${results.sizes}"` : '') +
-      (isLazy && isSrcset ? ` data-src="${results.src}">` : '>')
-
+            `<img class="${classNames.join(' ')}" ` +
+            `src="${isLazy ? results.dataUri || results.src : results.src}" ` +
+            `width="${results.size.width}" ` +
+            `height="${results.size.height}"` +
+            (options.alt ? ` alt="${options.alt}"` : '') +
+            (isLazy && isSrcset ? ` data-srcset="${results.srcset.join(', ')}"` : '') +
+            (isLazy && isSrcset ? ` data-sizes="${results.sizes}"` : '') +
+            (isLazy && isSrcset ? ` data-src="${results.src}">` : '>')
     return results
   }
-
-  createImageOptions (options) {
+  createImageOptions(options) {
     const imageOptions = []
 
     if (options.width) {
@@ -236,21 +218,17 @@ class ImageProcessQueue {
 
     return imageOptions
   }
-
-  createFileName (relPath, arr, hash) {
+  createFileName(relPath, arr, hash) {
     const { name, ext } = path.parse(relPath)
     const string = arr.length ? createOptionsQuery(arr) : ''
-
     const optionsHash = genHash(string).substr(0, 7)
     const contentHash = !process.env.GRIDSOME_TEST ? hash : 'test'
-
     return `${name}.${optionsHash}.${contentHash}${ext}`
   }
 }
 
-function computeScaledImageSize (originalSize, options, maxImageWidth) {
+function computeScaledImageSize(originalSize, options, maxImageWidth) {
   const { width, height, fit = 'cover' } = options
-
   const targetWidth = width || originalSize.width
   const targetHeight = height || originalSize.height
 
@@ -268,28 +246,21 @@ function computeScaledImageSize (originalSize, options, maxImageWidth) {
   if (['inside', 'outside'].includes(fit)) {
     const xFactor = originalSize.width / targetWidth
     const yFactor = originalSize.height / targetHeight
-
     let imageWidth = targetWidth
     let imageHeight = targetHeight
 
-    if (
-      (fit === 'inside' && xFactor > yFactor) ||
-      (fit === 'outside' && xFactor < yFactor)
-    ) {
+    if ((fit === 'inside' && xFactor > yFactor) ||
+            (fit === 'outside' && xFactor < yFactor)) {
       imageHeight = Math.round(originalSize.height / xFactor)
-    } else {
+    }
+    else {
       imageWidth = Math.round(originalSize.width / yFactor)
     }
 
     return { imageWidth, imageHeight }
   }
 
-  const imageWidth = Math.min(
-    width || originalSize.width,
-    maxImageWidth,
-    originalSize.width
-  )
-
+  const imageWidth = Math.min(width || originalSize.width, maxImageWidth, originalSize.width)
   let imageHeight = height !== undefined
     ? height
     : Math.ceil(originalSize.height * (imageWidth / originalSize.width))
@@ -303,34 +274,33 @@ function computeScaledImageSize (originalSize, options, maxImageWidth) {
 
 ImageProcessQueue.uid = 0
 
-function genHash (string) {
+function genHash(string) {
   return crypto.createHash('md5').update(string).digest('hex')
 }
 
-function createOptionsQuery (arr) {
+function createOptionsQuery(arr) {
   return arr.reduce((values, { key, value }) => {
     return (values.push(`${key}=${encodeURIComponent(value)}`), values)
   }, []).join('&')
 }
 
-function createSvgDataURI (svg) {
-  const { optimize } = require('svgo')
+function createSvgDataURI(svg) {
   const { data } = optimize(svg, {
     multipass: true,
     floatPrecision: 0,
     datauri: 'base64'
   })
-
   return data
 }
 
-async function createPlaceholder (placeholder, pipeline, mimeType, width, height, options = {}) {
+async function createPlaceholder(placeholder, pipeline, mimeType, width, height, options = {}) {
   const resizeOptions = {}
-
-  if (options.fit) resizeOptions.fit = sharp.fit[options.fit]
-  if (options.position) resizeOptions.position = sharp.position[options.position]
-  if (options.background) resizeOptions.background = options.background
-
+  if (options.fit)
+    resizeOptions.fit = sharp.fit[options.fit]
+  if (options.position)
+    resizeOptions.position = sharp.position[options.position]
+  if (options.background)
+    resizeOptions.background = options.background
   const placeholderWidth = Math.min(24, Math.floor(width / 10))
   const placeholderHeight = Math.floor(height * (placeholderWidth / width))
   const params = {
@@ -357,30 +327,23 @@ async function createPlaceholder (placeholder, pipeline, mimeType, width, height
   throw new Error(`Unknown placeholder type: ${placeholder.type}`)
 }
 
-async function createBlurPlaceholder ({
-  width,
-  height,
-  options,
-  pipeline,
-  resizeOptions,
-  placeholder,
-  placeholderWidth,
-  placeholderHeight
-}) {
+async function createBlurPlaceholder({ width, height, options, pipeline, resizeOptions, placeholder, placeholderWidth, placeholderHeight }) {
   const blur = options.blur !== undefined ? parseInt(options.blur, 10) : placeholder.defaultBlur
-
   return new Promise((resolve, reject) => {
     pipeline
       .resize(placeholderWidth, placeholderHeight, resizeOptions)
       .png({ quality: 25 })
       .toBuffer(async (err, buffer) => {
-        if (err) return reject(err)
+        if (err)
+          return reject(err)
         const base64 = buffer.toString('base64')
         const id = `__svg-blur-${genHash(base64)}`
         const filter = []
+
         if (blur > 0) {
           filter.push(`<filter id="${id}"><feGaussianBlur in="SourceGraphic" stdDeviation="${blur}" /></filter>`)
         }
+
         const placeholder = [
           `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`,
           ...filter,
@@ -395,57 +358,44 @@ async function createBlurPlaceholder ({
   })
 }
 
-async function createTracePlaceholder ({
-  width,
-  height,
-  pipeline,
-  options,
-  resizeOptions,
-  placeholder,
-  placeholderWidth,
-  placeholderHeight
-}) {
-  const potrace = require('potrace')
-
+async function createTracePlaceholder({ width, height, pipeline, options, resizeOptions, placeholder, placeholderWidth, placeholderHeight }) {
   const resizeWidth = Math.min(placeholderWidth * 10, width)
   const resizeHeight = Math.min(placeholderHeight * 10, height)
-
   return new Promise((resolve, reject) => {
     pipeline
-    .resize(resizeWidth, resizeHeight, resizeOptions)
-    .toBuffer(async (err, buffer) => {
-      if (err) return reject(err)
+      .resize(resizeWidth, resizeHeight, resizeOptions)
+      .toBuffer(async (err, buffer) => {
+        if (err)
+          return reject(err)
+        const potraceOptions = pickBy({
+          ...placeholder,
+          type: undefined,
+          background: options.background || placeholder.background
+        }, (value) => typeof value !== 'undefined')
 
-      const potraceOptions = pickBy({
-        ...placeholder,
-        type: undefined,
-        background: options.background || placeholder.background
-      }, (value) => typeof value !== 'undefined')
+        if (potraceOptions.background === 'auto') {
+          const { dominant } = await pipeline.stats()
+          potraceOptions.background = `rgb(${dominant.r},${dominant.g},${dominant.b})`
+        }
 
-      if (potraceOptions.background === 'auto') {
-        const { dominant } = await pipeline.stats()
-        potraceOptions.background = `rgb(${dominant.r},${dominant.g},${dominant.b})`
-      }
-
-      potrace.trace(buffer, potraceOptions, (err, svg) => {
-        if (err) return reject(err)
-        resolve(createSvgDataURI(svg))
+        potrace.trace(buffer, potraceOptions, (err, svg) => {
+          if (err)
+            return reject(err)
+          resolve(createSvgDataURI(svg))
+        })
       })
-    })
   })
 }
 
 async function createDominantPlaceholder({ width, height, pipeline }) {
   const { dominant } = await pipeline.stats()
   const rgbStr = `rgb(${dominant.r},${dominant.g},${dominant.b})`
-
-  const svg =  '' +
-    `<svg fill="${rgbStr}" viewBox="0 0 ${width} ${height}" ` +
-    `xmlns="http://www.w3.org/2000/svg">` +
-    `<rect width="${width}" height="${height}"></rect>` +
-    `</svg>`
-
+  const svg = '' +
+        `<svg fill="${rgbStr}" viewBox="0 0 ${width} ${height}" ` +
+        `xmlns="http://www.w3.org/2000/svg">` +
+        `<rect width="${width}" height="${height}"></rect>` +
+        `</svg>`
   return createSvgDataURI(svg)
 }
 
-module.exports = ImageProcessQueue
+export default ImageProcessQueue

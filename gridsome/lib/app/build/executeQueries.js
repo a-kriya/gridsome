@@ -1,14 +1,14 @@
-const path = require('path')
-const pMap = require('p-map')
-const fs = require('fs-extra')
-const invariant = require('invariant')
-const hirestime = require('hirestime')
-const { validate, specifiedRules } = require('graphql')
-const { createQueryVariables } = require('../../graphql/utils')
-const sysinfo = require('../../utils/sysinfo')
-const { error, log } = require('../../utils/log')
+import path from 'path'
+import pMap from 'p-map'
+import fs from 'fs-extra'
+import invariant from 'invariant'
+import hirestime from 'hirestime'
+import { validate, specifiedRules } from 'graphql'
+import { createQueryVariables } from '../../graphql/utils.js'
+import sysinfo from '../../utils/sysinfo.js'
+import { error, log } from '../../utils/log.js'
 
-async function executeQueries (renderQueue, { context, pages, schema, graphql }, hash) {
+async function executeQueries(renderQueue, { context, pages, schema, graphql }, hash) {
   const validated = new Set()
   const withErrors = new Set()
   const timer = hirestime()
@@ -23,22 +23,15 @@ async function executeQueries (renderQueue, { context, pages, schema, graphql },
     }
   }
 
-  await pMap(renderQueue, async entry => {
+  await pMap(renderQueue, async (entry) => {
     const route = pages.getRoute(entry.routeId)
     const page = pages.getPage(entry.pageId)
-
     invariant(route, `Could not find a route for: ${entry.path}`)
     invariant(page, `Could not find a page for: ${entry.path}`)
-
     const document = route.internal.query.document
     const queryVariables = document
-      ? createQueryVariables(
-        entry.currentPath,
-        page.internal.query.variables,
-        entry.currentPage
-      )
+      ? createQueryVariables(entry.currentPath, page.internal.query.variables, entry.currentPage)
       : {}
-
     const context = pages._createPageContext(page, queryVariables)
     const result = { hash, data: null, context }
 
@@ -63,11 +56,9 @@ async function executeQueries (renderQueue, { context, pages, schema, graphql },
     }
 
     const content = JSON.stringify(result)
-
     await fs.outputFile(entry.dataOutput, content)
   }, { concurrency: sysinfo.cpus.physical })
-
   log(`Execute GraphQL (${renderQueue.length} queries) - ${timer.s()}s`)
 }
 
-module.exports = executeQueries
+export default executeQueries

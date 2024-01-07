@@ -1,6 +1,7 @@
-const { template } = require('lodash')
+import lodash from 'lodash'
+const { template } = lodash
 
-function createHTMLRenderer (htmlTemplate) {
+function createHTMLRenderer(htmlTemplate) {
   const render = template(htmlTemplate)
 
   return variables => {
@@ -24,4 +25,4 @@ function createHTMLRenderer (htmlTemplate) {
   }
 }
 
-module.exports = createHTMLRenderer
+export default createHTMLRenderer

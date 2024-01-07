@@ -1,20 +1,18 @@
-const path = require('path')
-const fs = require('fs-extra')
-const compiler = require('vue/compiler-sfc')
+import path from 'path'
+import fs from 'fs-extra'
+import * as compiler from 'vue/compiler-sfc'
+import { getDirname } from 'cross-dirname'
 
 class VueComponents {
-  static defaultOptions () {
+  static defaultOptions() {
     return {}
   }
-
-  constructor (api) {
-    api.transpileDependencies([path.resolve(__dirname, 'lib', 'loaders')])
-
+  constructor(api) {
+    api.transpileDependencies([path.resolve(getDirname(), 'lib', 'loaders')])
     api.chainWebpack(config => {
       this.createGraphQLRule(config, 'page-query', './lib/loaders/page-query')
       this.createGraphQLRule(config, 'static-query', './lib/loaders/static-query')
     })
-
     api._app.pages.hooks.parseComponent.for('vue')
       .tap('VueComponentsPlugin', (source, { resourcePath }) => {
         const filename = path.parse(resourcePath).name
@@ -22,26 +20,20 @@ class VueComponents {
         const pageQuery = customBlocks.find(block => block.type === 'page-query')
 
         if (pageQuery && pageQuery.attrs && pageQuery.attrs.src) {
-          const queryPath = api._app.compiler._resolveSync(
-            path.dirname(resourcePath),
-            pageQuery.attrs.src
-          )
-
+          const queryPath = api._app.compiler._resolveSync(path.dirname(resourcePath), pageQuery.attrs.src)
           return {
             pageQuery: fs.readFileSync(queryPath, 'utf8'),
             watchFiles: [queryPath]
           }
         }
 
-       return {
+        return {
           pageQuery: pageQuery ? pageQuery.content : null
         }
       })
   }
-
-  createGraphQLRule (config, type, loader) {
+  createGraphQLRule(config, type, loader) {
     const re = new RegExp(`blockType=(${type})`)
-
     config.module.rule(type)
       .resourceQuery(re)
       .use('babel-loader')
@@ -57,4 +49,4 @@ class VueComponents {
   }
 }
 
-module.exports = VueComponents
+export default VueComponents

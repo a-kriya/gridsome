@@ -1,10 +1,6 @@
-const { snakeCase } = require('lodash')
-const slugify = require('@sindresorhus/slugify')
-
-exports.normalizePath = value => {
-  return '/' + value.split('/').filter(Boolean).join('/')
-}
-
+import lodash from 'lodash'
+import slugify from '@sindresorhus/slugify'
+const { snakeCase } = lodash
 const hasDynamicParam = value => /:|\(/.test(value)
 
 const processRexExp = value => {
@@ -25,7 +21,8 @@ const replacements = [
 ]
 
 const processPathSegment = segment => {
-  if (!hasDynamicParam(segment)) return segment
+  if (!hasDynamicParam(segment))
+    return segment
 
   for (const [regexp, handler] of replacements) {
     segment = segment.replace(regexp, handler)
@@ -38,22 +35,22 @@ function generateDynamicPath(segments, ext) {
   const processedSegments = segments
     .map(segment => processPathSegment(segment))
     .map(segment => decodeURIComponent(segment))
-
   const filename = processedSegments.pop() + `.${ext}`
-
   return `/${processedSegments.concat(filename).join('/')}`
 }
 
-function generateStaticPath (segments, ext) {
+function generateStaticPath(segments, ext) {
   const processedSegments = segments
     .map(segment => decodeURIComponent(segment))
-
   return `/${processedSegments.concat(`index.${ext}`).join('/')}`
 }
 
-exports.pathToFilePath = (value, ext = 'html') => {
-  const segments = value.split('/').filter(Boolean)
+export const normalizePath = value => {
+  return '/' + value.split('/').filter(Boolean).join('/')
+}
 
+export const pathToFilePath = (value, ext = 'html') => {
+  const segments = value.split('/').filter(Boolean)
   return hasDynamicParam(value)
     ? generateDynamicPath(segments, ext)
     : generateStaticPath(segments, ext)

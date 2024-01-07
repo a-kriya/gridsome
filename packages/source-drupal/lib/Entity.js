@@ -46,6 +46,7 @@ class Entity {
           requestConfig = {}
         } = {}
       } = this.source
+
       const fetchRecurse = async (url) => {
         url = typeof url === 'object' ? url.href : url
 

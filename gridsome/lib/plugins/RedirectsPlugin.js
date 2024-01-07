@@ -1,10 +1,9 @@
-const path = require('path')
-const slash = require('slash')
+import path from 'path'
+import slash from 'slash'
 
 class RedirectsPlugin {
-  constructor ({ _app: { hooks, config } }) {
+  constructor({ _app: { hooks, config } }) {
     const { outputDir, redirects = [] } = config
-
     hooks.redirects.tap('RedirectsPlugin', (res, renderQueue) => {
       for (const entry of renderQueue) {
         if (path.extname(entry.path)) {
@@ -29,4 +28,4 @@ class RedirectsPlugin {
   }
 }
 
-module.exports = RedirectsPlugin
+export default RedirectsPlugin

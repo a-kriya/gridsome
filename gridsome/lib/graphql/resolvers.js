@@ -1,13 +1,12 @@
-const { dateType } = require('./types/date')
-const { fileType } = require('./types/file')
-const { imageType } = require('./types/image')
-
+import { dateType } from './types/date.js'
+import { fileType } from './types/file.js'
+import { imageType } from './types/image.js'
 const scalarTypeResolvers = {
   Date: dateType,
   File: fileType,
   Image: imageType
 }
-
-module.exports = {
+export { scalarTypeResolvers }
+export default {
   scalarTypeResolvers
 }

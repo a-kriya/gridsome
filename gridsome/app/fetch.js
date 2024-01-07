@@ -129,6 +129,7 @@ function fetchJSON (jsonPath) {
 
           return resolve(results)
         }
+
         case 404: {
           return reject(createError(req.statusText, req.status))
         }

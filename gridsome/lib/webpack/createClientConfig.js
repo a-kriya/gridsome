@@ -1,44 +1,46 @@
-const path = require('path')
-const createBaseConfig = require('./createBaseConfig')
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+import path from 'path'
+import createBaseConfig from './createBaseConfig.js'
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import { EsbuildPlugin } from 'esbuild-loader'
+import providePlugin from 'webpack/lib/ProvidePlugin'
+import vuessrclientPlugin from './plugins/VueSSRClientPlugin.js'
+import esbuild from 'esbuild'
+import noEmitOnErrorsPlugin from 'webpack/lib/NoEmitOnErrorsPlugin'
+import friendlyErrorsWebpackPlugin from '@soda/friendly-errors-webpack-plugin'
+import { getDirname } from 'cross-dirname'
+const resolve = p => path.resolve(getDirname(), p)
 
-const resolve = p => path.resolve(__dirname, p)
-
-module.exports = async app => {
-  const { EsbuildPlugin } = require('esbuild-loader')
-
+export default async (app) => {
   const isProd = process.env.NODE_ENV === 'production'
   const config = createBaseConfig(app, { isProd, isServer: false })
   const { outputDir, clientManifestPath, css } = app.config
-
   config.entry('app').add(resolve('../../app/entry.client.js'))
-
   config.resolve.merge({
     fallback: {
       process: require.resolve('process/browser')
     }
   })
-
   config.plugin('provide')
-    .use(require('webpack/lib/ProvidePlugin'), [{
+    .use(providePlugin, [{
       process: require.resolve('process/browser')
     }])
 
   if (isProd) {
     config.plugin('vue-server-renderer')
-      .use(require('./plugins/VueSSRClientPlugin'), [{
+      .use(vuessrclientPlugin, [{
         filename: path.relative(outputDir, clientManifestPath)
       }])
-
     const cacheGroups = {
       vendor: {
         test(mod) {
           if (!mod.context) {
             return true
           }
+
           if (mod.context.startsWith(app.config.appCacheDir)) {
             return false
           }
+
           return mod.context.includes('node_modules')
         },
         name: 'vendors',
@@ -60,23 +62,21 @@ module.exports = async app => {
       .runtimeChunk('single')
       .splitChunks({ cacheGroups })
       .minimizer('esbuild')
-        .use(EsbuildPlugin, [{
-          implementation: require('esbuild')
-        }])
-        .end()
+      .use(EsbuildPlugin, [{
+        implementation: esbuild
+      }])
+      .end()
       .minimizer('css-minimizer-webpack-plugin')
-        .use(CssMinimizerPlugin)
-        .end()
+      .use(CssMinimizerPlugin)
+      .end()
       .merge({ moduleIds: 'deterministic' })
-  } else {
+  }
+  else {
     config.entry('app').add(resolve('../../app/entry.sockjs.js'))
-
     config.plugin('no-emit-on-errors')
-      .use(require('webpack/lib/NoEmitOnErrorsPlugin'))
-
+      .use(noEmitOnErrorsPlugin)
     config.plugin('friendly-errors')
-      .use(require('@soda/friendly-errors-webpack-plugin'))
-
+      .use(friendlyErrorsWebpackPlugin)
     config.stats('none') // `@soda/friendly-errors-webpack-plugin` shows the errors
   }
 

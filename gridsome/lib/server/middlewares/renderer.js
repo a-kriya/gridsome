@@ -1,14 +1,13 @@
-const { LRUCache } = require('lru-cache')
-const createRenderFn = require('../createRenderFn')
-const { createQueryVariables } = require('../../graphql/utils')
+import { LRUCache } from 'lru-cache'
+import createRenderFn from '../createRenderFn.js'
+import { createQueryVariables } from '../../graphql/utils.js'
 
-module.exports = (app, routes) => {
+export default (app, routes) => {
   const render = createRenderFn({
     htmlTemplate: app.config.htmlTemplate,
     clientManifestPath: app.config.clientManifestPath,
     serverBundlePath: app.config.serverBundlePath
   })
-
   const cache = new LRUCache({
     ttl: app.config.maxCacheAge,
     max: 100
@@ -23,9 +22,8 @@ module.exports = (app, routes) => {
     }
 
     const route = routes.find(({ regex }) => regex.test(url))
-
-    if (!route) return next()
-
+    if (!route)
+      return next()
     const { page: currentPage, ...params } = route.toParams(url)
     const page = app.pages.findPage({ path: route.toPath(params) })
 
@@ -53,7 +51,8 @@ module.exports = (app, routes) => {
       const html = await render(page.path, state)
       cache.set(url, html)
       res.end(html)
-    } catch (err) {
+    }
+    catch (err) {
       next(err)
     }
   }

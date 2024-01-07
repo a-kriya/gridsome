@@ -1,11 +1,13 @@
-const path = require('path')
-const sysinfo = require('../utils/sysinfo')
-const Worker = require('jest-worker').default
+import path from 'path'
+import sysinfo from '../utils/sysinfo.js'
+import jestWorker from 'jest-worker'
+import { getDirname } from 'cross-dirname'
 
-function createWorker (filename) {
-  const filepath = path.join(__dirname, filename)
+const Worker = jestWorker.default
+
+function createWorker(filename) {
+  const filepath = path.join(getDirname(), filename)
   const workerPath = require.resolve(filepath)
-
   return new Worker(workerPath, {
     numWorkers: sysinfo.cpus.physical,
     forkOptions: {
@@ -14,6 +16,4 @@ function createWorker (filename) {
   })
 }
 
-module.exports = {
-  createWorker
-}
+export { createWorker }

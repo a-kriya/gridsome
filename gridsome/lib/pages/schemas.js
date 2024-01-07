@@ -1,5 +1,4 @@
-const Joi = require('@hapi/joi')
-
+import Joi from '@hapi/joi'
 const schemas = {
   route: Joi.object()
     .label('Route options')
@@ -13,7 +12,6 @@ const schemas = {
       component: Joi.string().required(),
       meta: Joi.object().default(null).allow(null)
     }),
-
   page: Joi.object()
     .label('Page options')
     .keys({
@@ -26,11 +24,9 @@ const schemas = {
         name: Joi.string().allow(null),
         meta: Joi.object().default({}).allow(null)
       }),
-
       name: Joi.string().allow(null),
       chunkName: Joi.string().allow(null)
     }),
-
   routePage: Joi.object()
     .label('Page options')
     .keys({
@@ -39,7 +35,6 @@ const schemas = {
       context: Joi.object().default({}),
       queryVariables: Joi.object().default(null).allow(null)
     }),
-
   component: Joi.object()
     .label('Parsed component results')
     .keys({
@@ -48,7 +43,7 @@ const schemas = {
     })
 }
 
-function validate (schema, options) {
+function validate(schema, options) {
   const { error, value } = Joi.validate(options, schemas[schema])
 
   if (error) {
@@ -58,4 +53,4 @@ function validate (schema, options) {
   return value
 }
 
-module.exports = validate
+export default validate

@@ -1,47 +1,47 @@
-const path = require('path')
-const slash = require('slash')
-const crypto = require('crypto')
-const slugify = require('@sindresorhus/slugify')
+import importSync from 'import-sync'
+import path from 'path'
+import slash from 'slash'
+import crypto from 'crypto'
+import slugify from '@sindresorhus/slugify'
 
-exports.requireEsModule = (filename) => {
-  const module = require(filename)
+export const requireEsModule = (filename) => {
+  const module = importSync(filename)
   return module.__esModule ? module.default : module
 }
 
-exports.hashString = function (string) {
+export const hashString = function (string) {
   return crypto.createHash('md5')
     .update(string)
     .digest('hex')
 }
 
-exports.pipe = function (funcs, res, ...args) {
+export const pipe = function (funcs, res, ...args) {
   return funcs.reduce(async (res, fn) => {
     return fn(await res, ...args)
   }, Promise.resolve(res))
 }
 
-exports.forwardSlash = function (input) {
+export const forwardSlash = function (input) {
   return slash(input)
 }
 
-exports.slugify = function (value) {
+const slugify$0 = function (value) {
   return slugify(String(value), { separator: '-' })
 }
 
-exports.safeKey = function (value) {
+export const safeKey = function (value) {
   return String(value).replace(/\./g, '-')
 }
 
-exports.createPath = function (value, page = 1, isIndex = true) {
+export const createPath = function (value, page = 1, isIndex = true) {
   const _segments = value.split('/').filter(v => !!v)
-
-  if (page > 1) _segments.push(page)
-
+  if (page > 1)
+    _segments.push(page)
   return {
-    toUrlPath () {
+    toUrlPath() {
       return `/${_segments.join('/')}`
     },
-    toFilePath (context, ext) {
+    toFilePath(context, ext) {
       const segments = _segments.map(s => decodeURIComponent(s))
       const fileName = isIndex ? `index.${ext}` : `${segments.pop() || 'index'}.${ext}`
       return path.join(context, ...segments, fileName)
@@ -49,14 +49,12 @@ exports.createPath = function (value, page = 1, isIndex = true) {
   }
 }
 
-exports.isResolvablePath = function (value) {
-  return (
-    typeof value === 'string' &&
-    path.extname(value).length > 1 &&
-    (value.startsWith('.') || path.isAbsolute(value))
-  )
+export const isResolvablePath = function (value) {
+  return (typeof value === 'string' &&
+        path.extname(value).length > 1 &&
+        (value.startsWith('.') || path.isAbsolute(value)))
 }
 
-exports.isMailtoLink = string => String(string).startsWith('mailto:')
-
-exports.isTelLink = string => String(string).startsWith('tel:')
+export const isMailtoLink = string => String(string).startsWith('mailto:')
+export const isTelLink = string => String(string).startsWith('tel:')
+export { slugify$0 as slugify }

@@ -3,6 +3,7 @@ const pluralize = require('pluralize')
 
 module.exports = async ({ apiURL, resourceName, jwtToken, queryLimit, isSingleType }) => {
   let resource
+
   if (isSingleType) {
     resource = resourceName
   } else {
@@ -14,6 +15,7 @@ module.exports = async ({ apiURL, resourceName, jwtToken, queryLimit, isSingleTy
 
   // Set authorization token
   const fetchRequestConfig = {}
+
   if (jwtToken !== null) {
     fetchRequestConfig.headers = {
       Authorization: `Bearer ${jwtToken}`

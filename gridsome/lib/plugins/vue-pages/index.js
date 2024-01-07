@@ -1,17 +1,17 @@
-const path = require('path')
-const fs = require('fs-extra')
-const glob = require('globby')
-const slash = require('slash')
-const chokidar = require('chokidar')
-const { trimEnd } = require('lodash')
-const { createPagePath } = require('./lib/utils')
+import path from 'path'
+import fs from 'fs-extra'
+import glob from 'globby'
+import slash from 'slash'
+import * as chokidar from 'chokidar'
+import lodash from 'lodash'
+import { createPagePath } from './lib/utils.js'
+const { trimEnd } = lodash
 
 class VuePages {
-  static defaultOptions () {
+  static defaultOptions() {
     return {}
   }
-
-  constructor (api) {
+  constructor(api) {
     this.api = api
     this.pagesDir = api.config.pagesDir
 
@@ -19,8 +19,7 @@ class VuePages {
       api.createManagedPages(args => this.createPages(args))
     }
   }
-
-  async createPages ({ slugify, createPage, removePagesByComponent }) {
+  async createPages({ slugify, createPage, removePagesByComponent }) {
     const files = await glob('**/*.vue', {
       cwd: this.pagesDir,
       absolute: true
@@ -37,13 +36,11 @@ class VuePages {
         disableGlobbing: true,
         ignoreInitial: true
       })
-
       watcher.on('add', file => {
         if (/\.vue$/.test(file)) {
           createPage(this.createPageOptions(slash(file), slugify))
         }
       })
-
       watcher.on('unlink', file => {
         if (/\.vue$/.test(file)) {
           removePagesByComponent(slash(file))
@@ -51,12 +48,10 @@ class VuePages {
       })
     }
   }
-
-  createPageOptions (absolutePath, slugify) {
+  createPageOptions(absolutePath, slugify) {
     const { trailingSlash } = this.api.config.permalinks
     const relativePath = path.relative(this.pagesDir, absolutePath)
     const pagePath = createPagePath(relativePath, slugify)
-
     return {
       path: trailingSlash ? trimEnd(pagePath, '/') + '/' : pagePath,
       name: /^[iI]ndex\.vue$/.test(relativePath) ? 'home' : undefined,
@@ -65,4 +60,4 @@ class VuePages {
   }
 }
 
-module.exports = VuePages
+export default VuePages

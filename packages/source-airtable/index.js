@@ -10,6 +10,7 @@ class AirtableSource {
     api.loadSource(async ({ addCollection, store }) => {
       this.store = store
       this.addCollection = addCollection
+
       // to avoid breaking changes when someone is using old config options
       // convert to new format and show deprecation warning
       if (!!options.tableName && !options.tables) {
@@ -22,6 +23,7 @@ class AirtableSource {
         deprecate(`@gridsome/airtable-source: "tableName" option in config will be deprecated.
           You should switch to "tables" array config instead`)
       }
+
       await this.loadRecordsToCollections(options)
     })
   }
@@ -60,6 +62,7 @@ class AirtableSource {
       if (!item.fields[link.fieldName]) {
         return item
       }
+
       // when relation is set to "linkToFirst"
       // we just want the first id in the array
       // and return an object
@@ -68,6 +71,7 @@ class AirtableSource {
         item.fields[link.fieldName] = this.store.createReference(link.typeName, id)
         return item
       }
+
       // create reference for each id in the array that Airtable api returns
       item.fields[link.fieldName] = item.fields[link.fieldName].map(id => {
         return this.store.createReference(link.typeName, id)
@@ -76,4 +80,5 @@ class AirtableSource {
     return item
   }
 }
+
 module.exports = AirtableSource

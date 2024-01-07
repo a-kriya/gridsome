@@ -1,82 +1,32 @@
-const graphql = require('../graphql')
-const camelCase = require('camelcase')
-const { createBelongsTo } = require('./belongsTo')
-const { PER_PAGE } = require('../../utils/constants')
-const { createFilterInput } = require('../filters/input')
-const createFieldDefinitions = require('../createFieldDefinitions')
-const { createFieldTypes } = require('../createFieldTypes')
-const { isRefFieldDefinition, createTypeName, validateTypeName } = require('../utils')
-const { isRefField } = require('../../store/utils')
+import graphql from '../graphql.js'
+import camelCase from 'camelcase'
+import { createBelongsTo } from './belongsTo.js'
+import { PER_PAGE } from '../../utils/constants.js'
+import { createFilterInput } from '../filters/input.js'
+import createFieldDefinitions from '../createFieldDefinitions.js'
+import { createFieldTypes } from '../createFieldTypes.js'
+import { isRefFieldDefinition, createTypeName, validateTypeName } from '../utils.js'
+import { isRefField } from '../../store/utils.js'
+import * as graphqlCompose from 'graphql-compose'
+import lodash from 'lodash'
+import { createFindOneResolver, createFindManyPaginatedResolver, createReferenceOneResolver, createReferenceManyResolver, createReferenceManyAdvancedResolver } from './resolvers.js'
+const { ObjectTypeComposer, NonNullComposer, ThunkComposer, ListComposer, unwrapTC } = graphqlCompose
+const { omit, mapValues, isEmpty, isPlainObject } = lodash
 
-const {
-  ObjectTypeComposer,
-  NonNullComposer,
-  ThunkComposer,
-  ListComposer,
-  unwrapTC
-} = require('graphql-compose')
-
-const { omit, mapValues, isEmpty, isPlainObject } = require('lodash')
-
-module.exports = function createNodesSchema (schemaComposer, store) {
-  const typeNames = Object.keys(store.collections)
-  const schema = {}
-
-  try {
-    typeNames.forEach(validateTypeName)
-  } catch (err) {
-    throw new Error(
-      `Failed to generate GraphQL types for collection. ${err.message}`
-    )
-  }
-
-  schemaComposer.createEnumTC({
-    name: 'TypeName',
-    values: typeNames.reduce((acc, value) => (acc[value] = { value } && acc), {})
-  })
-
-  createTypeComposers(schemaComposer, store)
-  createResolvers(schemaComposer, store)
-  createFields(schemaComposer, store)
-
-  for (const typeName of typeNames) {
-    const collection = store.getCollection(typeName)
-    const typeComposer = schemaComposer.get(typeName)
-
-    createFilterInput(schemaComposer, typeComposer)
-    createThirdPartyFields(typeComposer, collection)
-
-    const fieldName = camelCase(typeName)
-    const allFieldName = camelCase(`all ${typeName}`)
-
-    schemaComposer.Query.addFields({
-      [fieldName]: typeComposer.getResolver('findOne'),
-      [allFieldName]: typeComposer.getResolver('findManyPaginated')
-    })
-  }
-
-  createBelongsTo(schemaComposer, store)
-
-  return schema
-}
-
-function createTypeComposers (schemaComposer, store) {
+function createTypeComposers(schemaComposer, store) {
   for (const typeName in store.collections) {
     if (schemaComposer.has(typeName)) {
       if (!schemaComposer.get(typeName).hasInterface('Node')) {
-        throw new Error(
-          `The '${typeName}' GraphQL type must implement the 'Node' interface. Example:\n\n` +
-          `type ${typeName} implements Node {\n` +
-          `  title: String!\n` +
-          `}\n`
-        )
+        throw new Error(`The '${typeName}' GraphQL type must implement the 'Node' interface. Example:\n\n` +
+                    `type ${typeName} implements Node {\n` +
+                    `  title: String!\n` +
+                    `}\n`)
       }
     }
 
     const typeComposer = schemaComposer.getOrCreateOTC(typeName)
     const connectionTypeName = `${typeName}Connection`
     const edgeTypeName = `${typeName}Edge`
-
     schemaComposer.createObjectTC({
       name: edgeTypeName,
       interfaces: ['NodeConnectionEdge'],
@@ -86,7 +36,6 @@ function createTypeComposers (schemaComposer, store) {
         previous: typeName
       }
     })
-
     schemaComposer.createObjectTC({
       name: connectionTypeName,
       interfaces: ['NodeConnection'],
@@ -96,29 +45,24 @@ function createTypeComposers (schemaComposer, store) {
         edges: [edgeTypeName]
       }
     })
-
     typeComposer.addInterface('Node')
-    typeComposer.setIsTypeOf(node =>
-      node.internal && node.internal.typeName === typeName
-    )
-
+    typeComposer.setIsTypeOf(node => node.internal && node.internal.typeName === typeName)
     typeComposer.setField('id', 'ID!')
   }
 }
 
-function createFields (schemaComposer, store) {
+function createFields(schemaComposer, store) {
   for (const typeName in store.collections) {
     const collection = store.getCollection(typeName)
     const typeComposer = schemaComposer.get(typeName)
     const fieldDefs = inferFields(typeComposer, collection)
     const fieldTypes = createFieldTypes(schemaComposer, fieldDefs, typeName)
-
     createInferredFields(typeComposer, fieldDefs, fieldTypes)
     createReferenceFields(schemaComposer, typeComposer, collection)
   }
 }
 
-function inferFields (typeComposer, collection) {
+function inferFields(typeComposer, collection) {
   const extensions = typeComposer.getExtensions()
 
   // user defined schemas must enable inference
@@ -131,7 +75,7 @@ function inferFields (typeComposer, collection) {
   })
 }
 
-function createInferredFields (typeComposer, fieldDefs, fieldTypes) {
+function createInferredFields(typeComposer, fieldDefs, fieldTypes) {
   for (const key in fieldDefs) {
     const options = fieldDefs[key]
     const fieldType = fieldTypes[options.fieldName]
@@ -148,14 +92,13 @@ function createInferredFields (typeComposer, fieldDefs, fieldTypes) {
   }
 }
 
-function addFieldExtensions (typeComposer, fieldName, fieldDefs) {
+function addFieldExtensions(typeComposer, fieldName, fieldDefs) {
   const fieldTypeComposer = typeComposer.getFieldTC(fieldName)
 
   if (fieldTypeComposer instanceof ObjectTypeComposer) {
     for (const key in fieldDefs) {
       const { fieldName, extensions, directives, value } = fieldDefs[key]
       const fieldDirectives = fieldTypeComposer.getFieldDirectives(fieldName)
-
       fieldTypeComposer.extendFieldExtensions(fieldName, extensions)
       fieldTypeComposer.setFieldDirectives(fieldName, [...fieldDirectives, ...directives])
 
@@ -166,7 +109,7 @@ function addFieldExtensions (typeComposer, fieldName, fieldDefs) {
   }
 }
 
-function createThirdPartyFields (typeComposer, collection) {
+function createThirdPartyFields(typeComposer, collection) {
   const context = { collection, graphql, contentType: collection }
   const fields = {}
 
@@ -190,34 +133,22 @@ function createThirdPartyFields (typeComposer, collection) {
     const extensions = typeComposer.hasField(fieldName)
       ? typeComposer.getFieldExtensions(fieldName)
       : {}
-
     typeComposer.setField(fieldName, fields[fieldName])
     typeComposer.extendFieldExtensions(fieldName, extensions)
   }
 }
 
-const {
-  createFindOneResolver,
-  createFindManyPaginatedResolver,
-  createReferenceOneResolver,
-  createReferenceManyResolver,
-  createReferenceManyAdvancedResolver
-} = require('./resolvers')
-
-function createResolvers (schemaComposer, store) {
+function createResolvers(schemaComposer, store) {
   for (const typeName in store.collections) {
     const typeComposer = schemaComposer.get(typeName)
     const collection = store.getCollection(typeName)
-
     createTypeResolvers(typeComposer, collection)
   }
 }
 
-function createTypeResolvers (typeComposer, collection) {
+function createTypeResolvers(typeComposer, collection) {
   const typeName = typeComposer.getTypeName()
-
   const { _defaultSortBy, _defaultSortOrder } = collection
-
   typeComposer.addResolver({
     name: 'findOne',
     type: typeName,
@@ -227,7 +158,6 @@ function createTypeResolvers (typeComposer, collection) {
     },
     resolve: createFindOneResolver(typeComposer)
   })
-
   typeComposer.addResolver({
     name: 'findManyPaginated',
     type: `${typeName}Connection`,
@@ -246,19 +176,16 @@ function createTypeResolvers (typeComposer, collection) {
     },
     resolve: createFindManyPaginatedResolver(typeComposer)
   })
-
   typeComposer.addResolver({
     name: 'referenceOne',
     type: typeName,
     resolve: createReferenceOneResolver(typeComposer)
   })
-
   typeComposer.addResolver({
     name: 'referenceMany',
     type: [typeName],
     resolve: createReferenceManyResolver(typeComposer)
   })
-
   typeComposer.addResolver({
     name: 'referenceManyAdvanced',
     type: [typeName],
@@ -273,9 +200,9 @@ function createTypeResolvers (typeComposer, collection) {
   })
 }
 
-function createReferenceFields (schemaComposer, typeComposer, collection) {
-  if (isEmpty(collection._refs)) return
-
+function createReferenceFields(schemaComposer, typeComposer, collection) {
+  if (isEmpty(collection._refs))
+    return
   const fields = mapValues(collection._refs, ({ typeName }, fieldName) => {
     const isList = typeComposer.hasField(fieldName)
       ? typeComposer.isFieldPlural(fieldName)
@@ -288,7 +215,6 @@ function createReferenceFields (schemaComposer, typeComposer, collection) {
         interfaces: ['Node'],
         types: () => typeName
       })
-
       return {
         type: isList
           ? [unionTypeComposer]
@@ -297,14 +223,14 @@ function createReferenceFields (schemaComposer, typeComposer, collection) {
           ? createReferenceManyUnionResolver(typeName)
           : createReferenceOneUnionResolver(typeName)
       }
-    } else {
+    }
+    else {
       const { typeMapper } = schemaComposer
       const refTypeComposer = typeMapper.convertSDLWrappedTypeName(typeName)
       const otherTypeComposer = unwrapTC(refTypeComposer)
       const resolver = isList || isListTC(refTypeComposer)
         ? otherTypeComposer.getResolver('referenceManyAdvanced')
         : otherTypeComposer.getResolver('referenceOne')
-
       const clonedResolver = resolver.clone()
 
       // TODO: warn if inferred field type is a list but the typeName is not.
@@ -315,10 +241,8 @@ function createReferenceFields (schemaComposer, typeComposer, collection) {
       return clonedResolver
     }
   })
-
   typeComposer.addFields(fields)
-
-  mapValues(collection._refs, ({ extensions = {}, directives = []}, fieldName) => {
+  mapValues(collection._refs, ({ extensions = {}, directives = [] }, fieldName) => {
     if (typeComposer.hasField(fieldName)) {
       const fieldDirectives = typeComposer.getFieldDirectives(fieldName)
       typeComposer.extendFieldExtensions(fieldName, extensions)
@@ -327,38 +251,35 @@ function createReferenceFields (schemaComposer, typeComposer, collection) {
   })
 }
 
-function isListTC (anyTC) {
-  if (
-    anyTC instanceof NonNullComposer ||
-    anyTC instanceof ThunkComposer
-  ) {
+function isListTC(anyTC) {
+  if (anyTC instanceof NonNullComposer ||
+        anyTC instanceof ThunkComposer) {
     return isListTC(anyTC.ofType)
   }
 
   return anyTC instanceof ListComposer
 }
 
-function createReferenceManyUnionResolver (typeNames) {
-    return (src, args, ctx, info) => {
-      const fieldValue = src[info.fieldName] || []
+function createReferenceManyUnionResolver(typeNames) {
+  return (src, args, ctx, info) => {
+    const fieldValue = src[info.fieldName] || []
 
-      if (fieldValue.length && isRefField(fieldValue[0])) {
-        return fieldValue.map(value => {
-          return ctx.store.getNode(value.typeName, value.id)
-        }).filter(Boolean)
-      }
-
-      const query = { typeName: { $in: typeNames } }
-      const chain = ctx.store.chainIndex(query, false)
-      const results = chain.find({ id: { $in: fieldValue }}).map(entry => {
-        return omit(ctx.store.getNodeByUid(entry.uid), ['$loki'])
-      })
-
-      return results.data().filter(Boolean)
+    if (fieldValue.length && isRefField(fieldValue[0])) {
+      return fieldValue.map(value => {
+        return ctx.store.getNode(value.typeName, value.id)
+      }).filter(Boolean)
     }
+
+    const query = { typeName: { $in: typeNames } }
+    const chain = ctx.store.chainIndex(query, false)
+    const results = chain.find({ id: { $in: fieldValue } }).map(entry => {
+      return omit(ctx.store.getNodeByUid(entry.uid), ['$loki'])
+    })
+    return results.data().filter(Boolean)
+  }
 }
 
-function createReferenceOneUnionResolver (typeNames) {
+function createReferenceOneUnionResolver(typeNames) {
   return (src, args, ctx, info) => {
     const fieldValue = src[info.fieldName] || null
 
@@ -371,7 +292,42 @@ function createReferenceOneUnionResolver (typeNames) {
     const results = chain.find({ id: { $in: fieldValue } }).map(entry => {
       return omit(ctx.store.getNodeByUid(entry.uid), ['$loki'])
     })
-
     return results.data().shift()
   }
 }
+
+export default (function createNodesSchema(schemaComposer, store) {
+  const typeNames = Object.keys(store.collections)
+  const schema = {}
+
+  try {
+    typeNames.forEach(validateTypeName)
+  }
+  catch (err) {
+    throw new Error(`Failed to generate GraphQL types for collection. ${err.message}`)
+  }
+
+  schemaComposer.createEnumTC({
+    name: 'TypeName',
+    values: typeNames.reduce((acc, value) => (acc[value] = { value } && acc), {})
+  })
+  createTypeComposers(schemaComposer, store)
+  createResolvers(schemaComposer, store)
+  createFields(schemaComposer, store)
+
+  for (const typeName of typeNames) {
+    const collection = store.getCollection(typeName)
+    const typeComposer = schemaComposer.get(typeName)
+    createFilterInput(schemaComposer, typeComposer)
+    createThirdPartyFields(typeComposer, collection)
+    const fieldName = camelCase(typeName)
+    const allFieldName = camelCase(`all ${typeName}`)
+    schemaComposer.Query.addFields({
+      [fieldName]: typeComposer.getResolver('findOne'),
+      [allFieldName]: typeComposer.getResolver('findManyPaginated')
+    })
+  }
+
+  createBelongsTo(schemaComposer, store)
+  return schema
+})

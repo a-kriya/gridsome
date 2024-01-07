@@ -45,6 +45,7 @@ async function installWithYarn (cwd, task) {
 
         try {
           const { type, data } = JSON.parse(str)
+
           if (type === 'step') {
             const { message, current, total } = data
 

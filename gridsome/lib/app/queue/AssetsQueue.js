@@ -1,23 +1,21 @@
-const path = require('path')
-const isUrl = require('is-url')
-const mime = require('mime-types')
-const FileProcessQueue = require('./FileProcessQueue')
-const ImageProcessQueue = require('./ImageProcessQueue')
-
+import path from 'path'
+import isUrl from 'is-url'
+import * as mime from 'mime-types'
+import FileProcessQueue from './FileProcessQueue.js'
+import ImageProcessQueue from './ImageProcessQueue.js'
 const isDev = process.env.NODE_ENV === 'development'
+
 class AssetsQueue {
-  constructor (app) {
+  constructor(app) {
     this.app = app
     this.index = new Map()
     this.files = new FileProcessQueue(app)
     this.images = new ImageProcessQueue(app)
   }
-
-  async add (filePath, options) {
+  async add(filePath, options) {
     const { config, context } = this.app
     const { ext } = path.parse(filePath)
     const isImage = config.imageExtensions.includes(ext.toLowerCase())
-
     const data = {
       type: isImage ? 'image' : 'file',
       mimeType: mime.lookup(filePath),
@@ -29,30 +27,28 @@ class AssetsQueue {
     if (isUrl(filePath) || !filePath.startsWith(context)) {
       data.isUrl = true
       data.src = filePath
-
       return data
     }
 
     const asset = isImage
       ? await this.images.add(filePath, options)
       : await this.files.add(filePath, options)
-
     const entry = { ...data, ...asset }
 
     if (isDev) {
       if (asset.cacheKey) {
         this.index.set(asset.cacheKey, entry)
-      } else {
+      }
+      else {
         this.index.set(asset.src, entry)
       }
     }
 
     return entry
   }
-
-  get (key) {
+  get(key) {
     return this.index.get(key)
   }
 }
 
-module.exports = AssetsQueue
+export default AssetsQueue

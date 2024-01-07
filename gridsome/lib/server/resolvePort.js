@@ -1,9 +1,6 @@
-const portfinder = require('portfinder')
+import * as portfinder from 'portfinder'
 
-module.exports = port => {
+export default (port) => {
   if (port) return Promise.resolve(port)
-
-  portfinder.basePort = 8080
-
-  return portfinder.getPortPromise()
+  return portfinder.getPortPromise({ basePort: 8080 })
 }

@@ -1,13 +1,32 @@
-const path = require('path')
-
+import path from 'path'
 const indexRE = /^[iI]ndex$/
 const dynamicValuesRE = /\[([^\]]+)\]/g
 const dynamicSplitRE = /(?=:)/g
 const dynamicParamRE = /^:/
 
-exports.dynamicPathRE = dynamicValuesRE
+function processSegment(value, slugify) {
+  if (dynamicParamRE.test(value))
+    return value
+  if (!value)
+    return value
 
-exports.createPagePath = function (filePath, slugify = false) {
+  if (dynamicValuesRE.test(value)) {
+    return processDynamicSegment(value)
+  }
+
+  return typeof slugify === 'function'
+    ? slugify(value)
+    : value
+}
+
+function processDynamicSegment(value) {
+  return value
+    .replace(dynamicValuesRE, ':$1')
+    .split(dynamicSplitRE)
+    .join('')
+}
+
+export const createPagePath = function (filePath, slugify = false) {
   const { dir, name } = path.parse(filePath)
   const segments = dir.split('/')
 
@@ -21,22 +40,4 @@ exports.createPagePath = function (filePath, slugify = false) {
     .join('/')
 }
 
-function processSegment (value, slugify) {
-  if (dynamicParamRE.test(value)) return value
-  if (!value) return value
-
-  if (dynamicValuesRE.test(value)) {
-    return processDynamicSegment(value)
-  }
-
-  return typeof slugify === 'function'
-    ? slugify(value)
-    : value
-}
-
-function processDynamicSegment (value) {
-  return value
-    .replace(dynamicValuesRE, ':$1')
-    .split(dynamicSplitRE)
-    .join('')
-}
+export { dynamicValuesRE as dynamicPathRE }

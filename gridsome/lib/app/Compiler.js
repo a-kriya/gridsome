@@ -1,14 +1,16 @@
-const fs = require('fs-extra')
-const webpack = require('webpack')
-const enhancedResolve = require('enhanced-resolve')
-const { SyncHook, SyncWaterfallHook, AsyncSeriesHook } = require('tapable')
-const createClientConfig = require('../webpack/createClientConfig')
-const createServerConfig = require('../webpack/createServerConfig')
+import fs from 'fs-extra'
+import importSync from 'import-sync'
+import webpack from 'webpack'
+import enhancedResolve from 'enhanced-resolve'
+import { SyncHook, SyncWaterfallHook, AsyncSeriesHook } from 'tapable'
+import { merge } from 'webpack-merge'
+import createClientConfig from '../webpack/createClientConfig.js'
+import createServerConfig from '../webpack/createServerConfig.js'
 
 const isProd = process.env.NODE_ENV === 'production'
 
 class Compiler {
-  constructor (app) {
+  constructor(app) {
     this._app = app
     this._serverConfig = null
     this._clientConfig = null
@@ -16,21 +18,18 @@ class Compiler {
     this._resolveSync
     this._compiler = null
     this._buildDependencies = []
-
     this.hooks = {
       cacheIdentifier: new SyncWaterfallHook(['identifier']),
       chainWebpack: new AsyncSeriesHook(['chain', 'env']),
       done: new SyncHook(['columns', 'env'])
     }
   }
-
-  addBuildDependency (path) {
+  addBuildDependency(path) {
     if (!this._buildDependencies.includes(path)) {
       this._buildDependencies.push(path)
     }
   }
-
-  async initialize () {
+  async initialize() {
     if (this._resolve) {
       return
     }
@@ -64,37 +63,37 @@ class Compiler {
       const configs = this.getConfigs()
       this._compiler = webpack(configs.length === 1 ? configs[0] : configs)
     }
+
     return this._compiler
   }
 
   resolve(context, path) {
     try {
       return this._resolve(context, path)
-    } catch(err) {
+    }
+    catch (err) {
       return undefined
     }
   }
-
   resolveSync(context, path) {
     try {
       return this._resolveSync(context, path)
-    } catch(err) {
+    }
+    catch (err) {
       return undefined
     }
   }
-
   run() {
     return new Promise((resolve, reject) => {
       this.getCompiler().run((err, stats) => {
         delete this._compiler
-
-        if (err) return reject(err)
+        if (err)
+          return reject(err)
 
         if (stats.hasErrors()) {
           const errors = stats.stats
             .flatMap(stats => stats.compilation.errors)
             .map(err => err.error || err)
-
           return reject(errors[0])
         }
 
@@ -102,29 +101,23 @@ class Compiler {
       })
     })
   }
-
-  async resolveChainableWebpackConfig (isServer = false) {
+  async resolveChainableWebpackConfig(isServer = false) {
     const context = this.createContext(isServer)
     const createChainableConfig = isServer
       ? createServerConfig
       : createClientConfig
-
     const chain = await createChainableConfig(this._app, context)
-
     await this.hooks.chainWebpack.promise(chain, context)
-
     return chain
   }
-
-  async resolveWebpackConfig (isServer = false, chain = null) {
+  async resolveWebpackConfig(isServer = false, chain = null) {
     const context = this.createContext(isServer)
     const resolvedChain = chain || await this.resolveChainableWebpackConfig(isServer)
     const configureWebpack = (this._app.plugins._listeners.configureWebpack || []).slice()
     const configFilePath = this._app.resolve('webpack.config.js')
-    const { merge } = require('webpack-merge')
 
     if (fs.existsSync(configFilePath)) {
-      configureWebpack.push(require(configFilePath))
+      configureWebpack.push(importSync(configFilePath))
     }
 
     const config = await configureWebpack.reduce(async (acc, { handler }) => {
@@ -142,18 +135,14 @@ class Compiler {
     }, Promise.resolve(resolvedChain.toConfig()))
 
     if (config.output.publicPath !== this._app.config.publicPath) {
-      throw new Error(
-        `Do not modify webpack output.publicPath directly. ` +
-        `Use the "pathPrefix" option in gridsome.config.js instead.`
-      )
+      throw new Error(`Do not modify webpack output.publicPath directly. ` +
+                `Use the "pathPrefix" option in gridsome.config.js instead.`)
     }
 
     return config
   }
-
-  createContext (isServer = false) {
+  createContext(isServer = false) {
     const isProd = process.env.NODE_ENV === 'production'
-
     return {
       context: this._app.context,
       isServer,
@@ -164,4 +153,4 @@ class Compiler {
   }
 }
 
-module.exports = Compiler
+export default Compiler

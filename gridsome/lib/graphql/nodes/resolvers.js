@@ -1,28 +1,20 @@
-const { isRefField } = require('../../store/utils')
-const { toFilterArgs } = require('../filters/query')
-const { trimEnd } = require('lodash')
+import { isRefField } from '../../store/utils.js'
+import { toFilterArgs } from '../filters/query.js'
+import lodash from 'lodash'
+import { applyChainArgs, createSortOptions, createPagedNodeEdges } from './utils.js'
+const { trimEnd } = lodash
 
-const {
-  applyChainArgs,
-  createSortOptions,
-  createPagedNodeEdges
-} = require('./utils')
-
-exports.createFindOneResolver = function (typeComposer) {
+export const createFindOneResolver = function (typeComposer) {
   const typeName = typeComposer.getTypeName()
 
-  return function findOneResolver ({ args, context }) {
-    const {
-      collection,
-      _defaultSortBy,
-      _defaultSortOrder
-    } = context.store.getCollection(typeName)
-
+  return function findOneResolver({ args, context }) {
+    const { collection, _defaultSortBy, _defaultSortOrder } = context.store.getCollection(typeName)
     let node = null
 
     if (args.id) {
       node = collection.by('id', args.id)
-    } else if (args.path) {
+    }
+    else if (args.path) {
       const path = trimEnd(args.path, '/') + '/'
       const path2 = trimEnd(args.path, '/') || '/'
       node = collection.findOne({
@@ -31,9 +23,9 @@ exports.createFindOneResolver = function (typeComposer) {
           { path: path2 }
         ]
       })
-    } else if (Object.keys(args).length < 1) {
+    }
+    else if (Object.keys(args).length < 1) {
       collection.ensureIndex(_defaultSortBy)
-
       // Returns the last node if no arguments are provided.
       node = collection
         .chain()
@@ -45,10 +37,10 @@ exports.createFindOneResolver = function (typeComposer) {
   }
 }
 
-exports.createFindManyPaginatedResolver = function (typeComposer) {
+export const createFindManyPaginatedResolver = function (typeComposer) {
   const typeName = typeComposer.getTypeName()
 
-  return function findManyPaginatedResolver ({ args, context }) {
+  return function findManyPaginatedResolver({ args, context }) {
     const { collection } = context.store.getCollection(typeName)
     const sort = createSortOptions(args)
     const query = {}
@@ -63,37 +55,36 @@ exports.createFindManyPaginatedResolver = function (typeComposer) {
     }
 
     const chain = collection.chain().find(query)
-
     return createPagedNodeEdges(chain, args, sort)
   }
 }
 
-exports.createReferenceOneResolver = function (typeComposer) {
+export const createReferenceOneResolver = function (typeComposer) {
   const typeName = typeComposer.getTypeName()
 
-  return function referenceOneResolver ({ source, args, context, info }) {
+  return function referenceOneResolver({ source, args, context, info }) {
     const collection = context.store.getCollection(typeName)
     const fieldValue = source[info.fieldName]
     const referenceValue = isRefField(fieldValue)
       ? fieldValue.id
       : fieldValue
-
-    if (!fieldValue) return null
-
+    if (!fieldValue)
+      return null
     const { by = 'id' } = args
 
     if (by === 'id') {
       return collection.getNodeById(referenceValue)
-    } else {
+    }
+    else {
       return collection.findNode({ [by]: referenceValue })
     }
   }
 }
 
-exports.createReferenceManyResolver = function (typeComposer) {
+export const createReferenceManyResolver = function (typeComposer) {
   const typeName = typeComposer.getTypeName()
 
-  return function referenceManyResolver ({ source, args, context, info }) {
+  return function referenceManyResolver({ source, args, context, info }) {
     const collection = context.store.getCollection(typeName)
     const fieldValue = source[info.fieldName]
     let referenceValues = Array.isArray(fieldValue)
@@ -105,20 +96,19 @@ exports.createReferenceManyResolver = function (typeComposer) {
       referenceValues = fieldValue.id
     }
 
-    if (referenceValues.length < 1) return []
-
+    if (referenceValues.length < 1)
+      return []
     const { by = 'id' } = args
-
     return collection.findNodes({
       [by]: { $in: referenceValues }
     })
   }
 }
 
-exports.createReferenceManyAdvancedResolver = function (typeComposer) {
+export const createReferenceManyAdvancedResolver = function (typeComposer) {
   const typeName = typeComposer.getTypeName()
 
-  return function referenceManyAdvancedResolver ({ source, args, context, info }) {
+  return function referenceManyAdvancedResolver({ source, args, context, info }) {
     const { collection } = context.store.getCollection(typeName)
     const fieldValue = source[info.fieldName]
     let referenceValues = Array.isArray(fieldValue)
@@ -130,8 +120,8 @@ exports.createReferenceManyAdvancedResolver = function (typeComposer) {
       referenceValues = fieldValue.id
     }
 
-    if (referenceValues.length < 1) return []
-
+    if (referenceValues.length < 1)
+      return []
     const sort = createSortOptions(args)
     const { by = 'id' } = args
 
@@ -142,29 +132,26 @@ exports.createReferenceManyAdvancedResolver = function (typeComposer) {
     const chain = collection.chain().find({
       [by]: { $in: referenceValues }
     })
-
     return applyChainArgs(chain, args, sort).data()
   }
 }
 
-exports.createReferenceOneUnionResolver = function () {
-  return function referenceOneUnionResolver (source, args, context, info) {
+export const createReferenceOneUnionResolver = function () {
+  return function referenceOneUnionResolver(source, args, context, info) {
     const fieldValue = source[info.fieldName]
-
-    if (!fieldValue) return null
-
+    if (!fieldValue)
+      return null
     return isRefField(fieldValue)
       ? context.store.getNode(fieldValue.typeName, fieldValue.id)
       : context.store.getNodeByUid(fieldValue)
   }
 }
 
-exports.createReferenceManyUnionResolver = function () {
-  return function referenceManyUnionResolver (source, args, context, info) {
+export const createReferenceManyUnionResolver = function () {
+  return function referenceManyUnionResolver(source, args, context, info) {
     const fieldValue = source[info.fieldName] || []
-
-    if (fieldValue.length < 1) return []
-
+    if (fieldValue.length < 1)
+      return []
     return fieldValue.map(fieldValue => {
       return isRefField(fieldValue)
         ? context.store.getNode(fieldValue.typeName, fieldValue.id)

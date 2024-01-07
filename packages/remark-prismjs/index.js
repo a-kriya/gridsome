@@ -48,14 +48,17 @@ function createLineNumberWrapper (code) {
   const numberOfLines = code.length !== 0
     ? code.split('\n').length
     : 0
+
   const generateRows = numberOfLines => {
     const row = []
+
     for (let i = 0; i < numberOfLines; i++) {
       row.push(h('span'))
     }
 
     return row
   }
+
   const wrapper = h(
     'span',
     {

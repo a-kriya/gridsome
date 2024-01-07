@@ -1,10 +1,9 @@
-const path = require('path')
+import path from 'path'
 
 class CoreJSResolver {
   constructor(options = {}) {
     this.options = options
   }
-
   apply(resolver) {
     const target = resolver.ensureHook('resolve')
     const { includePaths = [] } = this.options
@@ -16,17 +15,9 @@ class CoreJSResolver {
         const issuer = req.context.issuer || ''
         const context = path.dirname(issuer)
 
-        if (
-          includePaths.some((path) => issuer.startsWith(path)) ||
-          !this.doesResolve(context, request)
-        ) {
-          return resolver.doResolve(
-            target,
-            { ...req, request: require.resolve(request) },
-            `resolve gridsome's core-js package`,
-            resolveContext,
-            callback
-          )
+        if (includePaths.some((path) => issuer.startsWith(path)) ||
+                    !this.doesResolve(context, request)) {
+          return resolver.doResolve(target, { ...req, request: require.resolve(request) }, `resolve gridsome's core-js package`, resolveContext, callback)
         }
       }
 
@@ -36,14 +27,14 @@ class CoreJSResolver {
     resolver.getHook('describedResolve').tapAsync('CoreJSResolver', resolve)
     resolver.getHook('file').tapAsync('CoreJSResolver', resolve)
   }
-
   doesResolve(context, request) {
     try {
       return Boolean(require.resolve(request, { paths: [context] }))
-    } catch (err) {
+    }
+    catch (err) {
       return false
     }
   }
 }
 
-module.exports = CoreJSResolver
+export default CoreJSResolver

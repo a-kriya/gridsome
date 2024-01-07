@@ -6,6 +6,7 @@ exports.hasYarn = async function () {
     const { stdout: version } = await execa('yarn', ['--version'])
     return semver.satisfies(version, '>= 1.4.0', { includePrerelease: true })
   } catch (err) {}
+
   return false
 }
 
@@ -14,5 +15,6 @@ exports.hasPnpm = async function () {
     const { stdout: version } = await execa('pnpm', ['--version'])
     return semver.satisfies(version, '>= 5.9.3', { includePrerelease: true })
   } catch (err) {}
+
   return false
 }

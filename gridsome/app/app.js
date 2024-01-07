@@ -51,6 +51,7 @@ export function runPlugins(plugins) {
 
 export function runMain() {
   const defaultExport = 'default'
+
   if (main && typeof main[defaultExport] === 'function') {
     main[defaultExport](Vue, context)
   }

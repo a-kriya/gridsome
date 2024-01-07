@@ -1,8 +1,8 @@
-const Hook = require('tapable/lib/Hook')
-const HookCodeFactory = require('tapable/lib/HookCodeFactory')
+import Hook from 'tapable/lib/Hook'
+import HookCodeFactory from 'tapable/lib/HookCodeFactory'
 
 class SyncBailWaterfallHookCodeFactory extends HookCodeFactory {
-  content ({ onError, onResult, resultReturns, rethrowIfPossible }) {
+  content({ onError, onResult, resultReturns, rethrowIfPossible }) {
     return this.callTapsSeries({
       onError: (i, err) => onError(err),
       onResult: (i, result, next) => {
@@ -25,24 +25,21 @@ class SyncBailWaterfallHookCodeFactory extends HookCodeFactory {
 const factory = new SyncBailWaterfallHookCodeFactory()
 
 class SyncBailWaterfallHook extends Hook {
-  constructor (args) {
+  constructor(args) {
     super(args)
     if (args.length < 1)
       throw new Error('Waterfall hooks must have at least one argument')
   }
-
-  tapAsync () {
+  tapAsync() {
     throw new Error('tapAsync is not supported on a SyncBailWaterfallHook')
   }
-
-  tapPromise () {
+  tapPromise() {
     throw new Error('tapPromise is not supported on a SyncBailWaterfallHook')
   }
-
-  compile (options) {
+  compile(options) {
     factory.setup(this, options)
     return factory.create(options)
   }
 }
 
-module.exports = SyncBailWaterfallHook
+export default SyncBailWaterfallHook

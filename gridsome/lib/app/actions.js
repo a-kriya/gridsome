@@ -1,24 +1,28 @@
-const crypto = require('crypto')
-const { pick } = require('lodash')
-const { specifiedDirectives } = require('graphql')
-const PluginStore = require('../store/PluginStore')
-const { deprecate } = require('../utils/deprecate')
+import crypto from 'crypto'
+import lodash from 'lodash'
+import { specifiedDirectives } from 'graphql'
+import PluginStore from '../store/PluginStore.js'
+import { deprecate } from '../utils/deprecate.js'
+import { createEnumType, createObjectType, createUnionType, createScalarType, createInterfaceType, createInputType } from '../graphql/utils.js'
+import * as graphqlCompose from 'graphql-compose'
+import * as graphql from 'graphql'
+const { pick } = lodash
 
-function createBaseActions (api, app) {
+function createBaseActions(api, app) {
   return {
-    graphql (docOrQuery, variables = {}, operationName) {
+    graphql(docOrQuery, variables = {}, operationName) {
       return app.schema.runQuery(docOrQuery, variables, operationName)
     },
-    resolve (...args) {
+    resolve(...args) {
       return app.resolve(...args)
     },
-    slugify (...args) {
+    slugify(...args) {
       return app.slugify(...args)
     }
   }
 }
 
-function createStoreActions (api, app) {
+function createStoreActions(api, app) {
   const baseActions = createBaseActions(api, app)
   const store = new PluginStore(app, api._entry.options, {
     transformers: api._transformers
@@ -34,13 +38,10 @@ function createStoreActions (api, app) {
     }
 
     if (options.route && !app.config.templates[options.typeName]) {
-      deprecate(
-        `The route option in addCollection() ` +
-        `is deprecated. Use templates instead.`,
-        {
-          url: 'https://gridsome.org/docs/templates/'
-        }
-      )
+      deprecate(`The route option in addCollection() ` +
+                `is deprecated. Use templates instead.`, {
+        url: 'https://gridsome.org/docs/templates/'
+      })
     }
 
     return app.store.addCollection(options, store)
@@ -54,76 +55,57 @@ function createStoreActions (api, app) {
     ...baseActions,
     addCollection,
     getCollection,
-
-    getNodeByUid (uid) {
+    getNodeByUid(uid) {
       return app.store.getNodeByUid(uid)
     },
-
-    getNode (typeName, id) {
+    getNode(typeName, id) {
       return app.store.getNode(typeName, id)
     },
-
-    addMetadata (key, data) {
+    addMetadata(key, data) {
       return app.store.addMetadata(key, data)
     },
-
     store: {
-      createUniqueId (id) {
+      createUniqueId(id) {
         const { name, index } = api._entry
         return crypto.createHash('md5').update(name + index + id).digest('hex')
       },
-      createReference (typeName, id) {
+      createReference(typeName, id) {
         return store.createReference(typeName, id)
       }
     },
-
     // deprecated actions
-
-    addContentType (options) {
+    addContentType(options) {
       deprecate('The addContentType() action has been renamed to addCollection().')
       return addCollection(options)
     },
-
-    getContentType (typeName) {
+    getContentType(typeName) {
       deprecate('The getContentType() action has been renamed to getCollection().')
       return getCollection(typeName)
     },
-
-    addMetaData (key, data) {
+    addMetaData(key, data) {
       deprecate(`The addMetaData() action is deprecated. Use addMetadata() instead.`)
       return store.addMetadata(key, data)
     },
-    createTypeName (typeName) {
+    createTypeName(typeName) {
       deprecate(`The createTypeName() action is deprecated. Type names should be generated manually instead.`)
       return store.createTypeName(typeName)
     },
-    createReference (typeName, id) {
+    createReference(typeName, id) {
       return store.createReference(typeName, id)
     },
-    makeUid (orgId) {
+    makeUid(orgId) {
       return crypto.createHash('md5').update(orgId).digest('hex')
     },
-    makeTypeName (string = '') {
+    makeTypeName(string = '') {
       deprecate(`The makeTypeName() action is deprecated. Type names should be generated manually instead.`)
       return store.createTypeName(string)
     }
   }
 }
 
-const {
-  createEnumType,
-  createObjectType,
-  createUnionType,
-  createScalarType,
-  createInterfaceType,
-  createInputType
-} = require('../graphql/utils')
-
-function createSchemaActions (api, app) {
+function createSchemaActions(api, app) {
   const baseActions = createStoreActions(api, app)
-  const { GraphQLJSON } = require('graphql-compose')
-  const graphql = require('graphql')
-
+  const { GraphQLJSON } = graphqlCompose
   // TODO: these should just be imported from gridsome/graphql instead
   const graphqlTypes = pick(graphql, [
     // Definitions
@@ -146,45 +128,40 @@ function createSchemaActions (api, app) {
     'GraphQLBoolean',
     'GraphQLID'
   ])
-
   const directiveNames = specifiedDirectives.map(directive => directive.name)
-
   return {
     ...baseActions,
     ...graphqlTypes,
-
     GraphQLJSON,
-
-    addSchema (schema) {
+    addSchema(schema) {
       app.schema._schemas.push(schema)
     },
-
-    addSchemaTypes (typesOrSDL) {
+    addSchemaTypes(typesOrSDL) {
       if (Array.isArray(typesOrSDL)) {
         app.schema._types.push(...typesOrSDL)
-      } else {
+      }
+      else {
         app.schema._types.push(typesOrSDL)
       }
     },
-
-    addSchemaResolvers (resolvers) {
+    addSchemaResolvers(resolvers) {
       app.schema._resolvers.push(resolvers)
     },
-
-    addSchemaFieldExtension (options) {
+    addSchemaFieldExtension(options) {
       if (directiveNames.includes(options.name)) {
         throw new Error(`Cannot override GraphQL directive: @${options.name}`)
       }
+
       if (['paginate', 'proxy', 'reference'].includes(options.name)) {
         throw new Error(`Cannot override built-in directive: @${options.name}`)
       }
+
       if (app.schema._extensions[options.name]) {
         throw new Error(`Field extension already exist: @${options.name}`)
       }
 
       app.schema._extensions[options.name] = options
     },
-
     schema: {
       createEnumType,
       createObjectType,
@@ -196,23 +173,19 @@ function createSchemaActions (api, app) {
   }
 }
 
-function createPagesActions (api, app, { digest }) {
+function createPagesActions(api, app, { digest }) {
   const baseActions = createBaseActions(api, app)
   const internals = { digest, isManaged: false }
-
   return {
     ...baseActions,
-
-    getCollection (typeName) {
+    getCollection(typeName) {
       return app.store.getCollection(typeName)
     },
-
-    getContentType (typeName) {
+    getContentType(typeName) {
       deprecate('The getContentType() action has been renamed to getCollection().')
       return app.store.getCollection(typeName)
     },
-
-    createPage (options) {
+    createPage(options) {
       if (options.name) {
         deprecate(`The name option for createPage() is moved to route.name.`)
         options.route = options.route || {}
@@ -222,21 +195,18 @@ function createPagesActions (api, app, { digest }) {
 
       return app.pages.createPage(options, internals)
     },
-
-    createRoute (options) {
+    createRoute(options) {
       return app.pages.createRoute(options, internals)
     }
   }
 }
 
-function createManagedPagesActions (api, app, { digest }) {
+function createManagedPagesActions(api, app, { digest }) {
   const baseActions = createPagesActions(api, app, { digest })
   const internals = { digest, isManaged: true }
-
   return {
     ...baseActions,
-
-    createPage (options) {
+    createPage(options) {
       if (options.name) {
         options.route = options.route || {}
         options.route.name = options.name
@@ -245,7 +215,7 @@ function createManagedPagesActions (api, app, { digest }) {
 
       return app.pages.createPage(options, internals)
     },
-    updatePage (options) {
+    updatePage(options) {
       if (options.name) {
         deprecate(`The name option in createPage() has moved to route.name.`)
         options.route = options.route || {}
@@ -255,34 +225,39 @@ function createManagedPagesActions (api, app, { digest }) {
 
       return app.pages.updatePage(options, internals)
     },
-    removePage (page) {
+    removePage(page) {
       return app.pages.removePage(page)
     },
-    removePageByPath (path) {
+    removePageByPath(path) {
       return app.pages.removePageByPath(path)
     },
-    removePagesByComponent (component) {
+    removePagesByComponent(component) {
       return app.pages.removePagesByComponent(component)
     },
-    findAndRemovePages (query) {
+    findAndRemovePages(query) {
       return app.pages.findAndRemovePages(query)
     },
-    findPage (query) {
+    findPage(query) {
       return app.pages.findPage(query)
     },
-    findPages (query) {
+    findPages(query) {
       return app.pages.findPages(query)
     },
-    createRoute (options) {
+    createRoute(options) {
       return app.pages.createRoute(options, internals)
     },
-    removeRoute (id) {
+    removeRoute(id) {
       app.pages.removeRoute(id)
     }
   }
 }
 
-module.exports = {
+export { createBaseActions }
+export { createStoreActions }
+export { createSchemaActions }
+export { createPagesActions }
+export { createManagedPagesActions }
+export default {
   createBaseActions,
   createStoreActions,
   createSchemaActions,

@@ -8,6 +8,7 @@
   "license": "MIT",
   "main": "index.js",
   "types": "types.d.ts",
+  "type": "module",
   "browser": "app/index.js",
   "bin": {
     "gridsome": "./bin/gridsome.js"
@@ -38,6 +39,7 @@
     "color-string": "^1.9.1",
     "columnify": "^1.6.0",
     "core-js": "^3.34.0",
+    "cross-dirname": "^0.1.0",
     "css-loader": "~5.2.7",
     "css-minimizer-webpack-plugin": "^5.0.1",
     "dotenv": "^16.3.1",
@@ -55,6 +57,7 @@
     "hash-sum": "^2.0.0",
     "hirestime": "^7.0.3",
     "html-webpack-plugin": "^5.6.0",
+    "import-sync": "^2.2.0",
     "invariant": "^2.2.4",
     "is-relative": "^1.0.0",
     "is-url": "^1.2.4",

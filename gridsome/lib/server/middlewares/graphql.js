@@ -1,11 +1,11 @@
-const { print } = require('graphql')
-const { trimEnd } = require('lodash')
-const { createQueryVariables } = require('../../graphql/utils')
+import { print } from 'graphql'
+import lodash from 'lodash'
+import { createQueryVariables } from '../../graphql/utils.js'
+const { trimEnd } = lodash
 
-module.exports = ({ pages }) => {
-  return async function graphqlMiddleware (req, res, next) {
+export default ({ pages }) => {
+  return async function graphqlMiddleware(req, res, next) {
     const { body = {}, query = {} } = req
-
     const notFound = () => res
       .status(404)
       .send({ code: 404, message: `Could not find ${body.path}` })
@@ -25,14 +25,15 @@ module.exports = ({ pages }) => {
 
     if (body.dynamic) {
       route = pages.getRouteByPath(body.path)
-    } else {
+    }
+    else {
       const match = pages.getMatch(body.path)
-
       route = match.route
       params = match.params
     }
 
-    if (!route) return notFound()
+    if (!route)
+      return notFound()
 
     if (route.internal.query.directives.paginate) {
       const pageParam = parseInt(params.page, 10)
@@ -44,17 +45,15 @@ module.exports = ({ pages }) => {
       }
 
       currentPage = Math.max(pageParam || 0, 1)
-
       delete params.page
     }
 
     const path = !body.dynamic
       ? trimEnd(route.createPath(params), '/') || '/'
       : body.path
-
     const page = pages._pages.by('path', path)
-
-    if (!page) return notFound()
+    if (!page)
+      return notFound()
 
     if (!route.internal.query.document) {
       return res.json({
@@ -67,13 +66,8 @@ module.exports = ({ pages }) => {
 
     req.body = {
       query: print(route.internal.query.document),
-      variables: createQueryVariables(
-        page.path,
-        page.internal.query.variables,
-        currentPage
-      )
+      variables: createQueryVariables(page.path, page.internal.query.variables, currentPage)
     }
-
     next()
   }
 }

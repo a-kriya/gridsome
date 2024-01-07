@@ -1,36 +1,24 @@
-const { safeKey } = require('../utils')
-const { omit, isPlainObject } = require('lodash')
-const { isRefField } = require('./utils')
-const { NODE_FIELDS } = require('../utils/constants')
-
-module.exports = function processNodeReferences (entry, node, collection) {
-  const obj = omit(node, NODE_FIELDS)
-
-  for (const fieldName in collection._refs) {
-    const ref = collection._refs[fieldName]
-
-    obj[fieldName] = {
-      typeName: ref.typeName,
-      id: node[fieldName]
-    }
-  }
-
-  return { ...entry, belongsTo: getBelongsTo(obj) }
-}
+import { safeKey } from '../utils/index.js'
+import lodash from 'lodash'
+import { isRefField } from './utils.js'
+import { NODE_FIELDS } from '../utils/constants.js'
+const { omit, isPlainObject } = lodash
 
 function getBelongsTo(obj, res = {}) {
   for (const key in obj) {
     const value = obj[key]
-
-    if (!value) continue
+    if (!value)
+      continue
 
     if (isPlainObject(value)) {
       if (isRefField(value) && value.id) {
         processValue(value, res)
-      } else {
+      }
+      else {
         getBelongsTo(value, res)
       }
-    } else if (Array.isArray(value)) {
+    }
+    else if (Array.isArray(value)) {
       const length = value.length
 
       for (let i = 0; i < length; i++) {
@@ -48,10 +36,12 @@ function processValue(value, res = {}) {
       value.typeName.forEach(typeName => {
         createBelongsTo({ typeName, id: value.id }, res)
       })
-    } else {
+    }
+    else {
       createBelongsTo(value, res)
     }
-  } else if (isPlainObject(value)) {
+  }
+  else if (isPlainObject(value)) {
     getBelongsTo(value, res)
   }
 }
@@ -63,9 +53,24 @@ function createBelongsTo({ typeName, id }, res = {}) {
     id.forEach(id => {
       res[typeName][safeKey(id)] = true
     })
-  } else if (id) {
+  }
+  else if (id) {
     res[typeName][safeKey(id)] = true
   }
 
   return res
 }
+
+export default (function processNodeReferences(entry, node, collection) {
+  const obj = omit(node, NODE_FIELDS)
+
+  for (const fieldName in collection._refs) {
+    const ref = collection._refs[fieldName]
+    obj[fieldName] = {
+      typeName: ref.typeName,
+      id: node[fieldName]
+    }
+  }
+
+  return { ...entry, belongsTo: getBelongsTo(obj) }
+})

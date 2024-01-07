@@ -97,9 +97,9 @@ function createPagePath (path, page) {
 }
 
 function resolveRange ({
-   currentPage: current = 1,
-   totalPages: total = 1
-  }, range) {
+  currentPage: current = 1,
+  totalPages: total = 1
+}, range) {
   const offset = Math.ceil(range / 2)
 
   let start = Math.floor(current - offset)

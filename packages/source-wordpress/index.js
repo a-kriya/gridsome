@@ -167,6 +167,7 @@ class WordPressSource {
         typeName: endpoint.typeName
       })
       const { data } = await this.fetch(endpoint.route, {}, {})
+
       for (let item of data) {
         if (endpoint.normalize) {
           item = this.normalizeFields(item)
@@ -252,6 +253,7 @@ class WordPressSource {
       if (!endpoint.typeName) {
         throw Error('Please provide a typeName option for all customEndpoints\n')
       }
+
       if (!endpoint.route) {
         throw Error(`No route option in endpoint: ${endpoint.typeName}\n Ex: 'apiName/versionNumber/endpointObject'`)
       }
@@ -316,6 +318,7 @@ function ensureArrayData (url, data) {
       )
     }
   }
+
   return data
 }
 

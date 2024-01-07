@@ -1,32 +1,20 @@
-const { hasNodeReference } = require('../utils')
-const { without } = require('lodash')
+import { hasNodeReference } from '../utils.js'
+import lodash from 'lodash'
+import * as graphqlCompose from 'graphql-compose'
+import { listOperators, scalarOperators, defaultOperators, toOperatorConfig } from './operators.js'
+const { without } = lodash
+const { EnumTypeComposer, ObjectTypeComposer, InputTypeComposer } = graphqlCompose
 
-const {
-  EnumTypeComposer,
-  ObjectTypeComposer,
-  InputTypeComposer
-} = require('graphql-compose')
-
-const {
-  listOperators,
-  scalarOperators,
-  defaultOperators,
-  toOperatorConfig
-} = require('./operators')
-
-function createFilterInput (schemaComposer, typeComposer) {
+function createFilterInput(schemaComposer, typeComposer) {
   const inputTypeName = `${typeComposer.getTypeName()}FilterInput`
   const inputTypeComposer = typeComposer.getInputTypeComposer({
     fallbackType: null // Skip fields with union types.
   })
   const filterTypeComposer = schemaComposer.getOrCreateITC(inputTypeName)
-
   typeComposer.setInputTypeComposer(filterTypeComposer)
 
-  if (
-    typeComposer.hasInterface('Node') &&
-    inputTypeComposer.hasField('id')
-  ) {
+  if (typeComposer.hasInterface('Node') &&
+        inputTypeComposer.hasField('id')) {
     filterTypeComposer.setField('id', inputTypeComposer.getField('id'))
   }
 
@@ -34,7 +22,6 @@ function createFilterInput (schemaComposer, typeComposer) {
     const fieldTypeComposer = typeComposer.getFieldTC(fieldName)
     const extensions = typeComposer.getFieldExtensions(fieldName)
     const directives = typeComposer.getFieldDirectives(fieldName)
-
     let type
 
     if (fieldTypeComposer instanceof ObjectTypeComposer) {
@@ -47,7 +34,8 @@ function createFilterInput (schemaComposer, typeComposer) {
           fieldName
         })
         : createFilterInput(schemaComposer, fieldTypeComposer)
-    } else {
+    }
+    else {
       type = createInputTypeComposer({
         inputTypeComposer,
         schemaComposer,
@@ -62,36 +50,29 @@ function createFilterInput (schemaComposer, typeComposer) {
       filterTypeComposer.setFieldDirectives(fieldName, directives)
     }
   })
-
   return removeEmptyTypes(filterTypeComposer)
 }
 
-function removeEmptyTypes (typeComposer, done = new Set()) {
-  if (done.has(typeComposer)) return typeComposer
-
+function removeEmptyTypes(typeComposer, done = new Set()) {
+  if (done.has(typeComposer))
+    return typeComposer
   done.add(typeComposer)
-
   typeComposer.getFieldNames().forEach(fieldName => {
     const fieldTypeComposer = typeComposer.getFieldTC(fieldName)
 
     if (fieldTypeComposer instanceof InputTypeComposer) {
       if (fieldTypeComposer.getFieldNames().length > 0) {
         removeEmptyTypes(fieldTypeComposer, done)
-      } else {
+      }
+      else {
         typeComposer.removeField(fieldName)
       }
     }
   })
-
   return typeComposer
 }
 
-function createReferenceInputTypeComposer({
-  schemaComposer,
-  fieldTypeComposer,
-  typeComposer,
-  fieldName
-}) {
+function createReferenceInputTypeComposer({ schemaComposer, fieldTypeComposer, typeComposer, fieldName }) {
   const inputTypeName = createInputTypeName(typeComposer, fieldName)
 
   if (schemaComposer.has(inputTypeName)) {
@@ -101,7 +82,6 @@ function createReferenceInputTypeComposer({
   const operatorTypeComposer = schemaComposer.createInputTC(inputTypeName)
   const fieldExtensions = typeComposer.getFieldExtensions(fieldName)
   const isPlural = typeComposer.isFieldPlural(fieldName)
-
   // TODO: filter by all fields on referenced type
   operatorTypeComposer.setField('id', createInputTypeComposer({
     inputTypeComposer: fieldTypeComposer.getInputTypeComposer(),
@@ -109,45 +89,36 @@ function createReferenceInputTypeComposer({
     schemaComposer,
     fieldName: 'id'
   }))
-
   operatorTypeComposer.setFieldExtension('id', 'isReference', true)
   operatorTypeComposer.setFieldExtension('id', 'isPlural', isPlural)
-
   // TODO: remove these before 1.0
   // Mark field as deprecated if not created by `store.addReference()`.
   const extensions = {
     isInferredReference: !fieldExtensions.isDefinedReference
   }
   const deprecationReason = 'Use the id field instead.'
+
   if (isPlural) {
-    operatorTypeComposer.addFields(
-      toOperatorConfig({
-        typeName: 'ID',
-        operators: listOperators,
-        extensions,
-        deprecationReason
-      })
-    )
-  } else {
-    operatorTypeComposer.addFields(
-      toOperatorConfig({
-        typeName: 'ID',
-        operators: without(scalarOperators.ID, 'exists'),
-        extensions,
-        deprecationReason
-      })
-    )
+    operatorTypeComposer.addFields(toOperatorConfig({
+      typeName: 'ID',
+      operators: listOperators,
+      extensions,
+      deprecationReason
+    }))
+  }
+  else {
+    operatorTypeComposer.addFields(toOperatorConfig({
+      typeName: 'ID',
+      operators: without(scalarOperators.ID, 'exists'),
+      extensions,
+      deprecationReason
+    }))
   }
 
   return operatorTypeComposer
 }
 
-function createInputTypeComposer({
-  inputTypeComposer,
-  schemaComposer,
-  typeComposer,
-  fieldName
-}) {
+function createInputTypeComposer({ inputTypeComposer, schemaComposer, typeComposer, fieldName }) {
   const inputTypeName = createInputTypeName(typeComposer, fieldName)
 
   if (schemaComposer.has(inputTypeName)) {
@@ -171,9 +142,11 @@ function createInputTypeComposer({
 
   if (scalarOperators[typeName]) {
     operators = scalarOperators[typeName]
-  } else if (hasNodeReference(fieldTypeComposer)) {
+  }
+  else if (hasNodeReference(fieldTypeComposer)) {
     fieldType = 'ID'
-  } else if (fieldInputTypeComposer instanceof EnumTypeComposer) {
+  }
+  else if (fieldInputTypeComposer instanceof EnumTypeComposer) {
     operators = scalarOperators.Enum
   }
 
@@ -181,23 +154,14 @@ function createInputTypeComposer({
     operators = listOperators
   }
 
-  operatorTypeComposer.addFields(
-    createInputFields(
-      typeComposer,
-      fieldName,
-      fieldType,
-      operators
-    )
-  )
-
+  operatorTypeComposer.addFields(createInputFields(typeComposer, fieldName, fieldType, operators))
   return operatorTypeComposer
 }
 
-function createInputTypeName (typeComposer, fieldName) {
+function createInputTypeName(typeComposer, fieldName) {
   const { isInferred = false } = typeComposer.getFieldExtensions(fieldName)
   const fieldTypeComposer = typeComposer.getFieldTC(fieldName)
   const isList = typeComposer.isFieldPlural(fieldName)
-
   let typeName = fieldTypeComposer.getTypeName()
 
   if (hasNodeReference(fieldTypeComposer)) {
@@ -207,9 +171,8 @@ function createInputTypeName (typeComposer, fieldName) {
   return `${typeName}${isList ? 'List' : ''}QueryOperatorInput`
 }
 
-function createInputFields (typeComposer, fieldName, typeName, operators) {
+function createInputFields(typeComposer, fieldName, typeName, operators) {
   const fieldTypeComposer = typeComposer.getFieldTC(fieldName)
-
   return toOperatorConfig({
     typeName,
     operators,
@@ -221,6 +184,7 @@ function createInputFields (typeComposer, fieldName, typeName, operators) {
   })
 }
 
-module.exports = {
+export { createFilterInput }
+export default {
   createFilterInput
 }

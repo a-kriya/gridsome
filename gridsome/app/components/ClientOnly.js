@@ -6,6 +6,7 @@ export default {
     if (parent._isMounted) {
       return children
     }
+
     parent.$once('hook:mounted', () => {
       parent.$forceUpdate()
     })

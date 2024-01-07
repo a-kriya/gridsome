@@ -1,22 +1,11 @@
-const isUrl = require('is-url')
-const camelcase = require('camelcase')
-const isRelative = require('is-relative')
-const {isMailtoLink, isTelLink} = require('../../utils')
-
-module.exports = () => ({
-  postTransformNode(node) {
-    if (['GLink', 'g-link'].includes(node.tag)) {
-      transformNodeAttr(node, 'to', 'g-link')
-    }
-
-    if (['GImage', 'g-image'].includes(node.tag)) {
-      transformNodeAttr(node, 'src', 'g-image')
-    }
-  }
-})
+import isUrl from 'is-url'
+import camelcase from 'camelcase'
+import isRelative from 'is-relative'
+import { isMailtoLink, isTelLink } from '../../utils/index.js'
 
 function transformNodeAttr(node, attrName, type) {
-  if (!Array.isArray(node.attrs)) return
+  if (!Array.isArray(node.attrs))
+    return
 
   for (const attr of node.attrs) {
     if (attr.name === attrName) {
@@ -51,7 +40,19 @@ function createOptionsQuery(attrs) {
   return attrs
     .filter(attr => attr.name !== 'src')
     .filter(attr => isStatic(attr.value))
-    .map(attr => ({name: camelcase(attr.name), value: extractValue(attr.value)}))
+    .map(attr => ({ name: camelcase(attr.name), value: extractValue(attr.value) }))
     .map(attr => `${attr.name}=${encodeURIComponent(attr.value)}`)
     .join('&')
 }
+
+export default () => ({
+  postTransformNode(node) {
+    if (['GLink', 'g-link'].includes(node.tag)) {
+      transformNodeAttr(node, 'to', 'g-link')
+    }
+
+    if (['GImage', 'g-image'].includes(node.tag)) {
+      transformNodeAttr(node, 'src', 'g-image')
+    }
+  }
+})

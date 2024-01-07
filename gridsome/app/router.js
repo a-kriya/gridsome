@@ -28,13 +28,16 @@ const router = new Router({
 function customRoute (options) {
   const meta = { ...options.meta, __custom: true }
   const route = { ...options, meta }
+
   if (Array.isArray(options.children)) {
     route.children = options.children.map(customRoute)
   }
+
   return route
 }
 
 const addRoutes = router.addRoutes
+
 router.addRoutes = routes => {
   return addRoutes.call(router, routes.map(customRoute))
 }

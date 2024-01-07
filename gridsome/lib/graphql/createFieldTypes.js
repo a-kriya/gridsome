@@ -1,11 +1,14 @@
-const { isEmpty } = require('lodash')
-const { isFile, fileType } = require('./types/file')
-const { isImage, imageType } = require('./types/image')
-const { isDate, dateType } = require('./types/date')
-const { ObjectTypeComposer } = require('graphql-compose')
-const { is32BitInt, isRefFieldDefinition, createTypeName } = require('./utils')
+import lodash from 'lodash'
+import { isFile, fileType } from './types/file.js'
+import { isImage, imageType } from './types/image.js'
+import { isDate, dateType } from './types/date.js'
+import * as graphqlCompose from 'graphql-compose'
+import { is32BitInt, isRefFieldDefinition, createTypeName } from './utils.js'
+import { createReferenceOneUnionResolver, createReferenceManyUnionResolver } from './nodes/resolvers.js'
+const { isEmpty } = lodash
+const { ObjectTypeComposer } = graphqlCompose
 
-function createFieldTypes (schemaComposer, fields, prefix = '') {
+function createFieldTypes(schemaComposer, fields, prefix = '') {
   const res = {}
 
   for (const key in fields) {
@@ -20,18 +23,16 @@ function createFieldTypes (schemaComposer, fields, prefix = '') {
   return res
 }
 
-function createFieldType (schemaComposer, value, key, prefix) {
+function createFieldType(schemaComposer, value, key, prefix) {
   if (Array.isArray(value)) {
     const type = createFieldType(schemaComposer, value[0], key, prefix)
-
     return type !== null ? {
       type: [type.type],
       args: type.args,
       resolve: (obj, args, context, info) => {
         const arr = obj[key]
-
-        if (!Array.isArray(arr)) return []
-
+        if (!Array.isArray(arr))
+          return []
         return arr.map((_, i) => {
           return typeof type.resolve === 'function'
             ? type.resolve(arr, args, context, { ...info, fieldName: i })
@@ -47,12 +48,13 @@ function createFieldType (schemaComposer, value, key, prefix) {
 
   switch (typeof value) {
     case 'string':
-      if (isImage(value)) return imageType
-      if (isFile(value)) return fileType
-
+      if (isImage(value))
+        return imageType
+      if (isFile(value))
+        return fileType
       return {
         type: 'String',
-        resolve (obj, args, ctx, info) {
+        resolve(obj, args, ctx, info) {
           return obj[info.fieldName] || ''
         }
       }
@@ -67,7 +69,7 @@ function createFieldType (schemaComposer, value, key, prefix) {
   }
 }
 
-function createObjectType (schemaComposer, value, fieldName, prefix) {
+function createObjectType(schemaComposer, value, fieldName, prefix) {
   const name = createTypeName(prefix, fieldName)
   const fields = {}
 
@@ -85,12 +87,7 @@ function createObjectType (schemaComposer, value, fieldName, prefix) {
     : null
 }
 
-const {
-  createReferenceOneUnionResolver,
-  createReferenceManyUnionResolver
-} = require('./nodes/resolvers')
-
-function createRefType (schemaComposer, ref, fieldName, fieldTypeName) {
+function createRefType(schemaComposer, ref, fieldName, fieldTypeName) {
   const typeNames = Array.isArray(ref.typeName) ? ref.typeName : [ref.typeName]
 
   if (typeNames.length > 1) {
@@ -100,7 +97,6 @@ function createRefType (schemaComposer, ref, fieldName, fieldTypeName) {
       interfaces: ['Node'],
       types: () => typeNames
     })
-
     return {
       type: ref.isList
         ? [typeComposer]
@@ -113,11 +109,12 @@ function createRefType (schemaComposer, ref, fieldName, fieldTypeName) {
 
   const typeComposer = schemaComposer.get(typeNames[0])
   const resolverName = ref.isList ? 'referenceManyAdvanced' : 'referenceOne'
-
   return typeComposer.getResolver(resolverName)
 }
 
-module.exports = {
+export { createFieldTypes }
+export { createRefType }
+export default {
   createFieldTypes,
   createRefType
 }

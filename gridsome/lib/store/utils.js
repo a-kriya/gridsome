@@ -1,38 +1,59 @@
-const url = require('url')
-const path = require('path')
-const isUrl = require('is-url')
-const mime = require('mime-types')
-const camelCase = require('camelcase')
-const isRelative = require('is-relative')
-const { isPlainObject } = require('lodash')
-const { isResolvablePath } = require('../utils')
-
+import url from 'url'
+import path from 'path'
+import isUrl from 'is-url'
+import * as mime from 'mime-types'
+import camelCase from 'camelcase'
+import isRelative from 'is-relative'
+import lodash from 'lodash'
+import { isResolvablePath } from '../utils/index.js'
+const { isPlainObject } = lodash
 const nonValidCharsRE = new RegExp('[^a-zA-Z0-9_]', 'g')
 const leadingNumberRE = new RegExp('^([0-9])')
 
-exports.createFieldName = function (key, camelCased = false) {
-  key = key.replace(nonValidCharsRE, '_')
-  if (camelCased) key = camelCase(key)
-  key = key.replace(leadingNumberRE, '_$1')
+function parsePath(string) {
+  let rootPath = ''
+  let basePath = string
 
+  if (isUrl(string)) {
+    const info = exports.parseUrl(string)
+    rootPath = info.baseUrl
+    basePath = info.basePath
+  }
+  else {
+    if (path.extname(basePath).length) {
+      basePath = path.join(path.dirname(basePath), '/')
+    }
+    else {
+      basePath = path.join(basePath, '/')
+    }
+  }
+
+  return {
+    rootPath,
+    basePath
+  }
+}
+
+export const createFieldName = function (key, camelCased = false) {
+  key = key.replace(nonValidCharsRE, '_')
+  if (camelCased)
+    key = camelCase(key)
+  key = key.replace(leadingNumberRE, '_$1')
   return key
 }
 
-exports.isRefField = function (field) {
-  return (
-    isPlainObject(field) &&
-    Object.keys(field).length === 2 &&
-    Object.hasOwn(field, 'typeName') &&
-    Object.hasOwn(field, 'id')
-  )
+export const isRefField = function (field) {
+  return (isPlainObject(field) &&
+        Object.keys(field).length === 2 &&
+        Object.hasOwn(field, 'typeName') &&
+        Object.hasOwn(field, 'id'))
 }
 
-exports.parseUrl = function (input) {
+export const parseUrl = function (input) {
   const { protocol, host, path: pathName } = url.parse(input)
   const basePath = pathName.endsWith('/') ? pathName : path.dirname(pathName)
   const baseUrl = `${protocol}//${host}`
   const fullUrl = `${baseUrl}${path.posix.join(basePath, '/')}`
-
   return {
     baseUrl,
     basePath,
@@ -40,19 +61,21 @@ exports.parseUrl = function (input) {
   }
 }
 
-exports.resolvePath = function (origin, toPath, options = {}) {
+export const resolvePath = function (origin, toPath, options = {}) {
   const { context = null, resolveAbsolute = false } = options
-
-  if (typeof toPath !== 'string') return toPath
-  if (typeof origin !== 'string') return toPath
-  if (isUrl(toPath)) return toPath
-  if (!isResolvablePath(toPath)) return toPath
-
+  if (typeof toPath !== 'string')
+    return toPath
+  if (typeof origin !== 'string')
+    return toPath
+  if (isUrl(toPath))
+    return toPath
+  if (!isResolvablePath(toPath))
+    return toPath
   const mimeType = mime.lookup(toPath)
-
-  if (!mimeType) return toPath
-  if (mimeType === 'application/x-msdownload') return toPath
-
+  if (!mimeType)
+    return toPath
+  if (mimeType === 'application/x-msdownload')
+    return toPath
   const url = isUrl(origin) ? exports.parseUrl(origin) : null
   const contextPath = url && resolveAbsolute === true ? url.baseUrl : context
   const fromPath = url ? url.fullUrl : origin
@@ -63,7 +86,8 @@ exports.resolvePath = function (origin, toPath, options = {}) {
   }
 
   if (isRelative(toPath)) {
-    if (!fromPath) return toPath
+    if (!fromPath)
+      return toPath
     const { rootPath, basePath } = parsePath(fromPath)
     return rootPath + resolver.resolve(basePath, toPath)
   }
@@ -73,30 +97,9 @@ exports.resolvePath = function (origin, toPath, options = {}) {
       const { rootPath, basePath } = parsePath(contextPath)
       return rootPath + resolver.join(basePath, toPath)
     }
+
     return resolver.join(contextPath, toPath)
   }
 
   return toPath
-}
-
-function parsePath (string) {
-  let rootPath = ''
-  let basePath = string
-
-  if (isUrl(string)) {
-    const info = exports.parseUrl(string)
-    rootPath = info.baseUrl
-    basePath = info.basePath
-  } else {
-    if (path.extname(basePath).length) {
-      basePath = path.join(path.dirname(basePath), '/')
-    } else {
-      basePath = path.join(basePath, '/')
-    }
-  }
-
-  return {
-    rootPath,
-    basePath
-  }
 }

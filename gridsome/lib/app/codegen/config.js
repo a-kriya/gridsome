@@ -1,7 +1,8 @@
-function genConfig ({ config }) {
-  const { version } = require('../../../package.json')
-  const { permalinks, titleTemplate, _pathPrefix, siteUrl, catchLinks } = config
+import packageJson from '../../../package.json'
 
+function genConfig({ config }) {
+  const { version } = packageJson
+  const { permalinks, titleTemplate, _pathPrefix, siteUrl, catchLinks } = config
   return `export default ${JSON.stringify({
     trailingSlash: permalinks.trailingSlash,
     pathPrefix: _pathPrefix,
@@ -12,4 +13,4 @@ function genConfig ({ config }) {
   }, null, 2)}`
 }
 
-module.exports = genConfig
+export default genConfig

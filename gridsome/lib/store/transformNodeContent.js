@@ -1,7 +1,7 @@
-const { omit } = require('lodash')
-const normalizeNodeOptions = require('./normalizeNodeOptions')
-
-module.exports = function transformNodeContent (node, collection) {
+import lodash from 'lodash'
+import normalizeNodeOptions from './normalizeNodeOptions.js'
+const { omit } = lodash
+export default (function transformNodeContent(node, collection) {
   const { mimeType, content } = node.internal
   const { _mimeTypes } = collection
 
@@ -30,4 +30,4 @@ module.exports = function transformNodeContent (node, collection) {
   }
 
   return node
-}
+})

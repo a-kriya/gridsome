@@ -1,16 +1,13 @@
-const path = require('path')
-const { LRUCache } = require('lru-cache')
-const hash = require('hash-sum')
-const validate = require('../validate')
-const { parse, NoDeprecatedCustomRule } = require('graphql')
-const { deprecate } = require('../../../../utils/deprecate')
-
+import path from 'path'
+import { LRUCache } from 'lru-cache'
+import hash from 'hash-sum'
+import validate from '../validate.js'
+import { parse, NoDeprecatedCustomRule } from 'graphql'
+import { deprecate } from '../../../../utils/deprecate.js'
 const cache = new LRUCache({ max: 1000 })
-
-module.exports = async function (source, map) {
+export default (async function (source, map) {
   const { config, store, schema } = process.GRIDSOME
   const resourcePath = this.resourcePath
-
   this.cacheable(false)
 
   // add dependency to now.js to re-run
@@ -40,7 +37,8 @@ module.exports = async function (source, map) {
       this.callback(new Error(errors[0]), source, map)
       return
     }
-  } catch (err) {
+  }
+  catch (err) {
     this.callback(err, source, map)
     return
   }
@@ -49,7 +47,8 @@ module.exports = async function (source, map) {
 
   try {
     ast = parse(source)
-  } catch (err) {
+  }
+  catch (err) {
     callback(err, source, map)
     return
   }
@@ -80,9 +79,7 @@ module.exports = async function (source, map) {
       }, options.computed)
     }
   `
-
   cache.set(cacheKey, res)
-
   validate(schema.getSchema(), ast, [NoDeprecatedCustomRule]).forEach(err => {
     let line = 0
     let column = 0
@@ -95,6 +92,5 @@ module.exports = async function (source, map) {
       customCaller: [resourcePath, line, column]
     })
   })
-
   callback(null, res, map)
-}
+})

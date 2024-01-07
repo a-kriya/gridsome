@@ -1,8 +1,9 @@
-const { createFilterInput } = require('./filters/input')
-const { toFilterArgs } = require('./filters/query')
-const { trimEnd } = require('lodash')
+import { createFilterInput } from './filters/input.js'
+import { toFilterArgs } from './filters/query.js'
+import lodash from 'lodash'
+const { trimEnd } = lodash
 
-module.exports = schemaComposer => {
+export default schemaComposer => {
   const typeComposer = schemaComposer.createObjectTC({
     name: 'Page',
     fields: {
@@ -10,22 +11,19 @@ module.exports = schemaComposer => {
       context: 'JSON!'
     }
   })
-
   const inputTypeComposer = createFilterInput(schemaComposer, typeComposer)
-
   schemaComposer.Query.addFields({
     page: {
       type: () => typeComposer,
       args: {
         path: 'String!'
       },
-      resolve (_, { path }, { pages }) {
+      resolve(_, { path }, { pages }) {
         const page = pages.findPage({
           path: trimEnd(path, '/') || '/'
         })
-
-        if (!page) return null
-
+        if (!page)
+          return null
         return {
           path: page.publicPath,
           context: page.context
@@ -40,7 +38,7 @@ module.exports = schemaComposer => {
           description: 'Filter pages.'
         }
       },
-      resolve (_, { filter }, { pages }) {
+      resolve(_, { filter }, { pages }) {
         const query = {}
 
         if (filter) {

@@ -1,25 +1,26 @@
-const utils = require('loader-utils')
-
-module.exports = async function (source, map) {
+import * as utils from 'loader-utils'
+export default (async function (source, map) {
   const callback = this.async()
-
   this.cacheable(false)
-
   const { assets } = utils.getOptions(this)
   const options = utils.parseQuery(this.resourceQuery || '?')
 
   if (typeof options.imageWidths === 'string') {
     options.imageWidths = options.imageWidths.split(',').map(Number)
   }
+
   if (typeof options.blur !== 'undefined') {
     options.blur = parseInt(options.blur, 10)
   }
+
   if (typeof options.width !== 'undefined') {
     options.width = parseInt(options.width, 10)
   }
+
   if (typeof options.height !== 'undefined') {
     options.height = parseInt(options.height, 10)
   }
+
   if (typeof options.quality !== 'undefined') {
     options.quality = parseInt(options.quality, 10)
   }
@@ -28,13 +29,13 @@ module.exports = async function (source, map) {
 
   try {
     asset = await assets.add(this.resourcePath, options)
-  } catch (err) {
+  }
+  catch (err) {
     callback(err, source, map)
     return
   }
 
   this.dependency(this.resourcePath)
-
   const res = {
     type: asset.type,
     mimeType: asset.mimeType,
@@ -50,4 +51,4 @@ module.exports = async function (source, map) {
   }
 
   callback(null, `module.exports = ${JSON.stringify(res)}`)
-}
+})

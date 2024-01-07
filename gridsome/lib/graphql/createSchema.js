@@ -1,74 +1,20 @@
-const directives = require('./directives')
-const initMustHaveTypes = require('./types')
-const createPagesSchema = require('./pages')
-const createNodesSchema = require('./nodes')
-const createMetadataSchema = require('./metadata')
-const { scalarTypeResolvers } = require('./resolvers')
-const { addDirectives, applyFieldExtensions } = require('./extensions')
-const { isEmpty, isPlainObject, findLastIndex, get } = require('lodash')
-const { isRefField } = require('../store/utils')
-const { validateTypeName } = require('./utils')
+import lodash from 'lodash'
+import { parse, isType, getNamedType, isSpecifiedScalarType, isIntrospectionType, defaultFieldResolver } from 'graphql'
+import * as graphqlCompose from 'graphql-compose'
+import directives from './directives/index.js'
+import initMustHaveTypes from './types/index.js'
+import createPagesSchema from './pages.js'
+import createNodesSchema from './nodes/index.js'
+import createMetadataSchema from './metadata.js'
+import { scalarTypeResolvers } from './resolvers.js'
+import { addDirectives, applyFieldExtensions } from './extensions/index.js'
+import { isRefField } from '../store/utils.js'
+import { isCreatedType, hasNodeReference, CreatedGraphQLType, validateTypeName } from './utils.js'
+import { createReferenceOneUnionResolver, createReferenceManyUnionResolver } from './nodes/resolvers.js'
+const { isEmpty, isPlainObject, findLastIndex, get } = lodash
+const { SchemaComposer, EnumTypeComposer, InputTypeComposer, UnionTypeComposer, ScalarTypeComposer, ObjectTypeComposer, InterfaceTypeComposer } = graphqlCompose
 
-const {
-  parse,
-  isType,
-  getNamedType,
-  isSpecifiedScalarType,
-  isIntrospectionType,
-  defaultFieldResolver
-} = require('graphql')
-
-const {
-  SchemaComposer,
-  EnumTypeComposer,
-  InputTypeComposer,
-  UnionTypeComposer,
-  ScalarTypeComposer,
-  ObjectTypeComposer,
-  InterfaceTypeComposer
-} = require('graphql-compose')
-
-const {
-  isCreatedType,
-  hasNodeReference,
-  CreatedGraphQLType
-} = require('./utils')
-
-const {
-  createReferenceOneUnionResolver,
-  createReferenceManyUnionResolver
-} = require('./nodes/resolvers')
-
-module.exports = function createSchema (store, options = {}) {
-  const { types = [], schemas = [], resolvers = [], extensions = [] } = options
-  const schemaComposer = new SchemaComposer()
-
-  initMustHaveTypes(schemaComposer).forEach(typeComposer => {
-    schemaComposer.addSchemaMustHaveType(typeComposer)
-  })
-
-  addDirectives(schemaComposer, extensions)
-
-  directives.forEach(directive => {
-    schemaComposer.addDirective(directive)
-  })
-
-  types.forEach(typeOrSDL => {
-    addTypes(schemaComposer, typeOrSDL)
-  })
-
-  createNodesSchema(schemaComposer, store)
-  createMetadataSchema(schemaComposer, store)
-  createPagesSchema(schemaComposer)
-  addSchemas(schemaComposer, schemas)
-  addResolvers(schemaComposer, resolvers)
-  processTypes(schemaComposer, extensions)
-  setupBelongsTo(schemaComposer, store)
-
-  return schemaComposer
-}
-
-function setupBelongsTo (schemaComposer, store) {
+function setupBelongsTo(schemaComposer, store) {
   const typeNames = Object.keys(store.collections)
 
   for (const typeName of typeNames) {
@@ -76,7 +22,6 @@ function setupBelongsTo (schemaComposer, store) {
     const typeComposer = schemaComposer.get(typeName)
     const nodes = collection.data()
     const length = nodes.length
-
     const references = getNodeReferenceFields(typeComposer)
     typeComposer.setExtension('references', references)
 
@@ -86,16 +31,13 @@ function setupBelongsTo (schemaComposer, store) {
 
       for (const item of references) {
         const fieldValue = get(node, item.path)
-
-        if (!fieldValue) continue
-
+        if (!fieldValue)
+          continue
         const values = Array.isArray(fieldValue)
           ? fieldValue
           : [fieldValue]
-
         values.forEach(value => {
           const id = isRefField(value) ? value.id : value
-
           store.setBelongsTo(node, item.typeName, id)
         })
       }
@@ -103,7 +45,7 @@ function setupBelongsTo (schemaComposer, store) {
   }
 }
 
-function getNodeReferenceFields (typeComposer, currentPath = []) {
+function getNodeReferenceFields(typeComposer, currentPath = []) {
   let res = []
 
   if (typeComposer instanceof ObjectTypeComposer) {
@@ -124,13 +66,9 @@ function getNodeReferenceFields (typeComposer, currentPath = []) {
           if (dir && dir.args && dir.args.by === 'id') {
             res.push({ typeName, path })
           }
-        } else {
-          res = res.concat(
-            getNodeReferenceFields(
-              fieldTypeComposer,
-              currentPath.concat(fieldName)
-            )
-          )
+        }
+        else {
+          res = res.concat(getNodeReferenceFields(fieldTypeComposer, currentPath.concat(fieldName)))
         }
       }
     }
@@ -139,73 +77,78 @@ function getNodeReferenceFields (typeComposer, currentPath = []) {
   return res
 }
 
-function addTypes (schemaComposer, typeOrSDL) {
+function addTypes(schemaComposer, typeOrSDL) {
   if (typeof typeOrSDL === 'string') {
     parse(typeOrSDL).definitions.forEach(typeNode => {
       addTypeDefNode(schemaComposer, typeNode)
     })
-  } else if (isCreatedType(typeOrSDL)) {
+  }
+  else if (isCreatedType(typeOrSDL)) {
     addCreatedType(schemaComposer, typeOrSDL)
-  } else if (isType(typeOrSDL)) {
+  }
+  else if (isType(typeOrSDL)) {
     // TODO: addGraphQLType(schemaComposer, typeOrSDL)
   }
 }
 
-function addTypeDefNode (schemaComposer, typeNode) {
+function addTypeDefNode(schemaComposer, typeNode) {
   validateTypeName(typeNode.name.value)
-
   const { value: typeName } = typeNode.name
   const existingTypeComposer = getTypeComposer(schemaComposer, typeName)
   const typeComposer = schemaComposer.typeMapper.makeSchemaDef(typeNode)
-
   typeComposer.getDirectives().forEach(directive => {
     typeComposer.setExtension(directive.name, directive.args)
   })
 
   if (existingTypeComposer) {
     mergeTypes(schemaComposer, existingTypeComposer, typeComposer)
-  } else {
+  }
+  else {
     addType(schemaComposer, typeComposer)
   }
 }
 
-function addCreatedType (schemaComposer, { type, options }) {
+function addCreatedType(schemaComposer, { type, options }) {
   const existingTypeComposer = getTypeComposer(schemaComposer, options.name)
   const typeComposer = createType(schemaComposer, type, options)
 
   if (existingTypeComposer) {
     mergeTypes(schemaComposer, existingTypeComposer, typeComposer)
-  } else {
+  }
+  else {
     addType(schemaComposer, typeComposer)
   }
 }
 
-function addType (schemaComposer, typeComposer) {
+function addType(schemaComposer, typeComposer) {
   typeComposer.setExtension('isCustomType', true)
-
   schemaComposer.add(typeComposer)
   schemaComposer.addSchemaMustHaveType(typeComposer)
 }
 
-function convertExtensionsToDirectives (options) {
+function convertExtensionsToDirectives(options) {
   if (isPlainObject(options.fields)) {
     for (const fieldName in options.fields) {
       const fieldConfig = options.fields[fieldName]
+
       if (isPlainObject(fieldConfig.extensions)) {
         const fieldExtensions = []
+
         for (const name in fieldConfig.extensions) {
           fieldExtensions.push({ name, args: fieldConfig.extensions[name] })
           delete fieldConfig.extensions[name]
         }
+
         fieldConfig.directives = fieldExtensions
-      } else {
+      }
+      else {
         fieldConfig.directives = fieldConfig.extensions
       }
     }
   }
 }
 
-function createType (schemaComposer, type, options) {
+function createType(schemaComposer, type, options) {
   validateTypeName(options.name)
 
   switch (type) {
@@ -213,38 +156,37 @@ function createType (schemaComposer, type, options) {
       convertExtensionsToDirectives(options)
       return ObjectTypeComposer.createTemp(options, schemaComposer)
     }
+
     case CreatedGraphQLType.Union:
       return UnionTypeComposer.createTemp(options, schemaComposer)
-
     case CreatedGraphQLType.Input:
       return InputTypeComposer.createTemp(options, schemaComposer)
-
     case CreatedGraphQLType.Scalar:
       return ScalarTypeComposer.createTemp(options, schemaComposer)
-
     case CreatedGraphQLType.Interface:
       return InterfaceTypeComposer.createTemp(options, schemaComposer)
-
     case CreatedGraphQLType.Enum:
       return EnumTypeComposer.createTemp(options, schemaComposer)
   }
 }
 
-function mergeTypes (schemaComposer, typeA, typeB) {
+function mergeTypes(schemaComposer, typeA, typeB) {
   const typeName = typeA.getTypeName()
-
   typeA.merge(typeB)
   typeA.extendExtensions(typeB.getExtensions())
   schemaComposer.set(typeName, typeA)
 }
 
-function processTypes (schemaComposer, extensions) {
+function processTypes(schemaComposer, extensions) {
   const seen = new Set()
 
   for (const typeComposer of schemaComposer.values()) {
-    if (typeof typeComposer.getTypeName !== 'function') continue
-    else if (seen.has(typeComposer.getTypeName())) continue
-    else seen.add(typeComposer.getTypeName())
+    if (typeof typeComposer.getTypeName !== 'function')
+      continue
+    else if (seen.has(typeComposer.getTypeName()))
+      continue
+    else
+      seen.add(typeComposer.getTypeName())
 
     switch (typeComposer.constructor) {
       case ObjectTypeComposer:
@@ -256,7 +198,7 @@ function processTypes (schemaComposer, extensions) {
   seen.clear()
 }
 
-function processObjectTypeFields (schemaComposer, typeComposer, extensions) {
+function processObjectTypeFields(schemaComposer, typeComposer, extensions) {
   const fields = typeComposer.getFields()
 
   for (const fieldName in fields) {
@@ -266,44 +208,37 @@ function processObjectTypeFields (schemaComposer, typeComposer, extensions) {
     const directives = typeComposer.getFieldDirectives(fieldName)
     const typeName = fieldTypeComposer.getTypeName()
 
-    if (
-      !typeComposer.getExtension('isCustomType') ||
-      // already has a custom resolver
-      typeof fieldConfig.resolve === 'function' ||
-      // field has custom arguments, expecting custom resolver
-      !isEmpty(fieldConfig.args)
-    ) {
+    if (!typeComposer.getExtension('isCustomType') ||
+            // already has a custom resolver
+            typeof fieldConfig.resolve === 'function' ||
+            // field has custom arguments, expecting custom resolver
+            !isEmpty(fieldConfig.args)) {
       continue
     }
 
-    if (
-      fieldTypeComposer instanceof UnionTypeComposer &&
-      fieldTypeComposer !== typeComposer &&
-      hasNodeReference(fieldTypeComposer)
-    ) {
+    if (fieldTypeComposer instanceof UnionTypeComposer &&
+            fieldTypeComposer !== typeComposer &&
+            hasNodeReference(fieldTypeComposer)) {
       typeComposer.extendField(fieldName, {
         resolve: typeComposer.isFieldPlural(fieldName)
           ? createReferenceManyUnionResolver(fieldTypeComposer)
           : createReferenceOneUnionResolver(fieldTypeComposer)
       })
-    } else if (
-      fieldTypeComposer instanceof ObjectTypeComposer &&
-      fieldTypeComposer.hasInterface('Node')
-    ) {
+    }
+    else if (fieldTypeComposer instanceof ObjectTypeComposer &&
+            fieldTypeComposer.hasInterface('Node')) {
       const isPlural = typeComposer.isFieldPlural(fieldName)
       const resolverName = isPlural ? 'referenceMany' : 'referenceOne'
 
       if (!fieldTypeComposer.hasResolver(resolverName)) {
-        throw new Error(
-          `The ${typeComposer.getTypeName()}.${fieldName} field is ` +
-          `referencing a node type, but no "${typeName}" collection exists. `
-        )
+        throw new Error(`The ${typeComposer.getTypeName()}.${fieldName} field is ` +
+                    `referencing a node type, but no "${typeName}" collection exists. `)
       }
 
       const resolver = fieldTypeComposer.getResolver(resolverName)
-
       typeComposer.setField(fieldName, resolver)
-    } else if (scalarTypeResolvers[typeName]) {
+    }
+    else if (scalarTypeResolvers[typeName]) {
       typeComposer.setField(fieldName, scalarTypeResolvers[typeName])
     }
 
@@ -314,7 +249,7 @@ function processObjectTypeFields (schemaComposer, typeComposer, extensions) {
   applyFieldExtensions(typeComposer, extensions)
 }
 
-function addSchemas (schemaComposer, schemas) {
+function addSchemas(schemaComposer, schemas) {
   schemas.forEach(schema => {
     const typeMap = schema.getTypeMap()
     const queryType = schema.getQueryType()
@@ -333,21 +268,21 @@ function addSchemas (schemaComposer, schemas) {
 
     for (const typeName in typeMap) {
       const typeDef = typeMap[typeName]
-
-      if (typeDef === queryType) continue
-      if (typeDef.name === 'JSON') continue
-      if (typeDef.name === 'Date') continue
-      if (isIntrospectionType(typeDef)) continue
-      if (isSpecifiedScalarType(typeDef)) continue
-
+      if (typeDef === queryType)
+        continue
+      if (typeDef.name === 'JSON')
+        continue
+      if (typeDef.name === 'Date')
+        continue
+      if (isIntrospectionType(typeDef))
+        continue
+      if (isSpecifiedScalarType(typeDef))
+        continue
       const typeComposer = schemaComposer.createTC(typeDef)
-
       typeComposer.setExtension('isExternalType', true)
 
-      if (
-        typeComposer instanceof ObjectTypeComposer ||
-        typeComposer instanceof InterfaceTypeComposer
-      ) {
+      if (typeComposer instanceof ObjectTypeComposer ||
+                typeComposer instanceof InterfaceTypeComposer) {
         renameRootTypeName(typeComposer, queryType, 'Query')
       }
 
@@ -356,11 +291,9 @@ function addSchemas (schemaComposer, schemas) {
   })
 }
 
-function renameRootTypeName (typeComposer, rootTypeDef, rootTypeName) {
-  if (
-    typeComposer instanceof ObjectTypeComposer ||
-    typeComposer instanceof InterfaceTypeComposer
-  ) {
+function renameRootTypeName(typeComposer, rootTypeDef, rootTypeName) {
+  if (typeComposer instanceof ObjectTypeComposer ||
+        typeComposer instanceof InterfaceTypeComposer) {
     typeComposer.getFieldNames().forEach(fieldName => {
       const fieldType = typeComposer.getFieldType(fieldName)
 
@@ -373,7 +306,7 @@ function renameRootTypeName (typeComposer, rootTypeDef, rootTypeName) {
   }
 }
 
-function addResolvers (schemaComposer, resolvers = {}) {
+function addResolvers(schemaComposer, resolvers = {}) {
   resolvers.forEach(typeMap => {
     for (const typeName in typeMap) {
       const fields = typeMap[typeName]
@@ -391,7 +324,6 @@ function addResolvers (schemaComposer, resolvers = {}) {
         if (typeComposer.hasField(fieldName)) {
           const fieldConfig = typeComposer.getFieldConfig(fieldName)
           const originalResolver = fieldConfig.resolve || defaultFieldResolver
-
           typeComposer.setField(fieldName, {
             type: fieldOptions.type || fieldConfig.type,
             args: fieldOptions.args || fieldConfig.args,
@@ -400,7 +332,8 @@ function addResolvers (schemaComposer, resolvers = {}) {
               return fieldOptions.resolve(obj, args, ctx, { ...info, originalResolver })
             }
           })
-        } else {
+        }
+        else {
           if (!fieldOptions.type) {
             throw new Error(`Resolver for ${typeName}.${fieldName} must have a "type" property.`)
           }
@@ -412,8 +345,31 @@ function addResolvers (schemaComposer, resolvers = {}) {
   })
 }
 
-function getTypeComposer (schemaComposer, typeName) {
+function getTypeComposer(schemaComposer, typeName) {
   return schemaComposer.has(typeName)
     ? schemaComposer.get(typeName)
     : null
 }
+
+export default (function createSchema(store, options = {}) {
+  const { types = [], schemas = [], resolvers = [], extensions = [] } = options
+  const schemaComposer = new SchemaComposer()
+  initMustHaveTypes(schemaComposer).forEach(typeComposer => {
+    schemaComposer.addSchemaMustHaveType(typeComposer)
+  })
+  addDirectives(schemaComposer, extensions)
+  directives.forEach(directive => {
+    schemaComposer.addDirective(directive)
+  })
+  types.forEach(typeOrSDL => {
+    addTypes(schemaComposer, typeOrSDL)
+  })
+  createNodesSchema(schemaComposer, store)
+  createMetadataSchema(schemaComposer, store)
+  createPagesSchema(schemaComposer)
+  addSchemas(schemaComposer, schemas)
+  addResolvers(schemaComposer, resolvers)
+  processTypes(schemaComposer, extensions)
+  setupBelongsTo(schemaComposer, store)
+  return schemaComposer
+})

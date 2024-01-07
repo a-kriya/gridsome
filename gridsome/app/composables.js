@@ -20,10 +20,12 @@ export function useMetaInfo(metaInfo) {
   if (!instance.proxy._vueMeta) {
     instance.proxy._vueMeta = true
     let parent = instance.proxy.$parent
+
     while (parent && parent !== $root) {
       if (parent._vueMeta === undefined) {
         parent._vueMeta = false
       }
+
       parent = parent.$parent
     }
   }
@@ -36,6 +38,7 @@ export function useMetaInfo(metaInfo) {
 
   watch(metaInfoRef, (nextValue) => {
     instance.proxy.$metaInfo = nextValue
+
     if (process.isClient) {
       $root.$meta().refresh()
     }

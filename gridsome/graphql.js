@@ -1,4 +1,7 @@
-const graphql = require('graphql')
-const { GraphQLJSON } = require('graphql-compose')
-
-module.exports = { ...graphql, GraphQLJSON }
+import * as graphql from 'graphql'
+import { GraphQLJSON } from 'graphql-compose'
+export { GraphQLJSON }
+export default {
+  ...graphql,
+  GraphQLJSON
+}

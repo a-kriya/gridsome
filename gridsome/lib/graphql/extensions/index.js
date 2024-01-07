@@ -1,18 +1,18 @@
-const { GraphQLDirective, DirectiveLocation, defaultFieldResolver } = require('graphql')
-
+import { GraphQLDirective, DirectiveLocation, defaultFieldResolver } from 'graphql'
+import reference from './reference.js'
+import proxy from './proxy.js'
 const objectExtensions = {
   infer: {
     description: 'Add fields from field values.'
   }
 }
-
 const fieldExtensions = {
-  reference: require('./reference'),
-  proxy: require('./proxy')
+  reference: reference,
+  proxy: proxy
 }
 
 // TODO: validate allowed field types for custom extensions
-function addDirectives (schemaComposer, customExtensions = {}) {
+function addDirectives(schemaComposer, customExtensions = {}) {
   const { OBJECT, FIELD_DEFINITION } = DirectiveLocation
 
   for (const key in customExtensions) {
@@ -25,27 +25,24 @@ function addDirectives (schemaComposer, customExtensions = {}) {
     ...customExtensions,
     ...fieldExtensions
   }
-
   addExtensionDirectives(schemaComposer, objectExtensions, OBJECT)
   addExtensionDirectives(schemaComposer, allFieldExtensions, FIELD_DEFINITION)
 }
 
-function addExtensionDirectives (schemaComposer, extensions, location) {
+function addExtensionDirectives(schemaComposer, extensions, location) {
   for (const name in extensions) {
     const extension = extensions[name]
-
     const directive = new GraphQLDirective({
       name,
       description: extension.description,
       locations: [location],
       args: normalizeArgs(schemaComposer, extension.args)
     })
-
     schemaComposer.addDirective(directive)
   }
 }
 
-function normalizeArgs (schemaComposer, args = {}) {
+function normalizeArgs(schemaComposer, args = {}) {
   const res = {}
 
   for (const key in args) {
@@ -66,17 +63,15 @@ function normalizeArgs (schemaComposer, args = {}) {
   return res
 }
 
-function applyFieldExtensions (typeComposer, customExtensions = {}) {
+function applyFieldExtensions(typeComposer, customExtensions = {}) {
   const allFieldExtensions = {
     ...customExtensions,
     ...fieldExtensions
   }
-
   typeComposer.getFieldNames().forEach(fieldName => {
     const directives = typeComposer
       .getFieldDirectives(fieldName)
       .filter(({ name }) => Object.hasOwn(allFieldExtensions, name))
-
     directives.forEach(({ name, args }) => {
       const { apply } = allFieldExtensions[name] || {}
 
@@ -96,7 +91,9 @@ function applyFieldExtensions (typeComposer, customExtensions = {}) {
   })
 }
 
-module.exports = {
+export { addDirectives }
+export { applyFieldExtensions }
+export default {
   addDirectives,
   applyFieldExtensions
 }

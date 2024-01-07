@@ -1,5 +1,4 @@
-const paginate = require('./paginate')
-
-module.exports = [
+import paginate from './paginate.js'
+export default [
   paginate
 ]

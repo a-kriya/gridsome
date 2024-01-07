@@ -8,6 +8,6 @@
     "explore": "gridsome explore"
   },
   "dependencies": {
-    "@kriya/gridsome": "^0.8.1-1"
+    "@kriya/gridsome": "^0.9.1"
   }
 }

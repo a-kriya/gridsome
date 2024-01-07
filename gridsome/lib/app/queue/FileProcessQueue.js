@@ -1,20 +1,18 @@
-const path = require('path')
-const fs = require('fs-extra')
-const md5File = require('md5-file')
-const { forwardSlash } = require('../../utils')
+import path from 'path'
+import fs from 'fs-extra'
+import md5File from 'md5-file'
+import { forwardSlash } from '../../utils/index.js'
 
 class FileProcessQueue {
-  constructor ({ context, config }) {
+  constructor({ context, config }) {
     this.context = context
     this.config = config
     this._queue = new Map()
   }
-
-  get queue () {
+  get queue() {
     return Array.from(this._queue.values())
   }
-
-  async add (filePath, options = {}) {
+  async add(filePath, options = {}) {
     const asset = await this.preProcess(filePath, options)
 
     if (process.env.GRIDSOME_MODE === 'serve') {
@@ -30,8 +28,7 @@ class FileProcessQueue {
 
     return asset
   }
-
-  async preProcess (filePath) {
+  async preProcess(filePath) {
     if (!await fs.exists(filePath)) {
       throw new Error(`${filePath} was not found. `)
     }
@@ -39,16 +36,15 @@ class FileProcessQueue {
     const { outputDir, pathPrefix } = this.config
     const filesDir = path.relative(outputDir, this.config.filesDir)
     const relPath = path.relative(this.context, filePath)
-
     let filename = ''
 
     if (process.env.GRIDSOME_MODE === 'serve') {
       filename = forwardSlash(relPath)
-    } else {
+    }
+    else {
       const { name, ext } = path.parse(relPath)
       const hash = await md5File(filePath)
       const urlHash = `.${!process.env.GRIDSOME_TEST ? hash : 'test'}`
-
       filename = `${name}${urlHash}${ext}`
     }
 
@@ -56,7 +52,6 @@ class FileProcessQueue {
     const destPath = process.env.GRIDSOME_MODE !== 'serve'
       ? path.join(this.config.filesDir, filename)
       : undefined
-
     return {
       src: encodeURI(src),
       destPath
@@ -64,4 +59,4 @@ class FileProcessQueue {
   }
 }
 
-module.exports = FileProcessQueue
+export default FileProcessQueue

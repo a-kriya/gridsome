@@ -1,16 +1,15 @@
-const { Collection } = require('lokijs')
-const { SyncWaterfallHook } = require('tapable')
+import lokijs from 'lokijs'
+import { SyncWaterfallHook } from 'tapable'
+import processNodeReferences from './processNodeReferences.js'
+const { Collection } = lokijs
 
 class NodeIndex {
-  constructor (app) {
+  constructor(app) {
     this.app = app
-
     this.hooks = {
       addEntry: new SyncWaterfallHook(['entry', 'node', 'collection'])
     }
-
-    this.hooks.addEntry.tap('BelongsToProcessor', require('./processNodeReferences'))
-
+    this.hooks.addEntry.tap('BelongsToProcessor', processNodeReferences)
     this.index = new Collection('NodeIndex', {
       indices: ['typeName', 'id'],
       unique: ['uid'],
@@ -18,53 +17,35 @@ class NodeIndex {
       adaptiveBinaryIndices: false
     })
   }
-
-  addEntry (node, collection) {
+  addEntry(node, collection) {
     const options = {
       typeName: node.internal.typeName,
       uid: node.$uid,
       id: node.id
     }
-
-    const entry = this.hooks.addEntry.call(
-      options,
-      node,
-      collection
-    )
-
+    const entry = this.hooks.addEntry.call(options, node, collection)
     this.index.insert(entry)
   }
-
-  updateEntry (node, collection) {
+  updateEntry(node, collection) {
     const oldEntry = this.index.by('uid', node.$uid)
-
     const options = {
       $loki: oldEntry.$loki,
       typeName: node.internal.typeName,
       uid: node.$uid,
       id: node.id
     }
-
-    const entry = this.hooks.addEntry.call(
-      options,
-      node,
-      collection
-    )
-
+    const entry = this.hooks.addEntry.call(options, node, collection)
     this.index.update(entry)
   }
-
-  removeEntry (node) {
+  removeEntry(node) {
     this.index.findAndRemove({ uid: node.$uid })
   }
-
-  getEntry (uid) {
+  getEntry(uid) {
     return this.index.by('uid', uid) || null
   }
-
-  getChain () {
+  getChain() {
     return this.index.chain()
   }
 }
 
-module.exports = NodeIndex
+export default NodeIndex

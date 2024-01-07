@@ -1,19 +1,28 @@
-const { ObjectTypeComposer } = require('graphql-compose')
-const { PER_PAGE, SORT_ORDER } = require('../../utils/constants')
-const { createFilterInput } = require('../filters/input')
-const { toFilterArgs } = require('../filters/query')
-const { safeKey } = require('../../utils')
+import * as graphqlCompose from 'graphql-compose'
+import { PER_PAGE, SORT_ORDER } from '../../utils/constants.js'
+import { createFilterInput } from '../filters/input.js'
+import { toFilterArgs } from '../filters/query.js'
+import { safeKey } from '../../utils/index.js'
+import { createSortOptions, createPagedNodeEdges } from './utils.js'
+const { ObjectTypeComposer } = graphqlCompose
 
-const {
-  createSortOptions,
-  createPagedNodeEdges
-} = require('./utils')
+function createFilterComposer(schemaComposer) {
+  const typeComposer = ObjectTypeComposer.createTemp({
+    name: 'BelongsTo',
+    fields: {
+      id: 'ID',
+      path: 'String',
+      typeName: 'TypeName'
+    }
+  }, schemaComposer)
+  return createFilterInput(schemaComposer, typeComposer)
+}
 
-exports.createBelongsToKey = function (node) {
+export const createBelongsToKey = function (node) {
   return `belongsTo.${node.internal.typeName}.${safeKey(node.id)}`
 }
 
-exports.createBelongsTo = function (schemaComposer, store) {
+export const createBelongsTo = function (schemaComposer, store) {
   schemaComposer.createObjectTC({
     name: 'NodeBelongsToEdge',
     interfaces: ['NodeConnectionEdge'],
@@ -23,7 +32,6 @@ exports.createBelongsTo = function (schemaComposer, store) {
       previous: 'Node'
     }
   })
-
   schemaComposer.createObjectTC({
     name: 'NodeBelongsTo',
     interfaces: ['NodeConnection'],
@@ -37,7 +45,6 @@ exports.createBelongsTo = function (schemaComposer, store) {
   for (const typeName in store.collections) {
     const typeComposer = schemaComposer.get(typeName)
     const filterTypeComposer = createFilterComposer(schemaComposer)
-
     const belongsToArgs = {
       sortBy: { type: 'String', defaultValue: 'date' },
       order: { type: 'SortOrder', defaultValue: SORT_ORDER },
@@ -48,38 +55,22 @@ exports.createBelongsTo = function (schemaComposer, store) {
       sort: '[SortArgument!]',
       filter: filterTypeComposer
     }
-
     const belongsTo = {
       type: 'NodeBelongsTo',
       args: belongsToArgs,
-      resolve (node, { filter, ...args }, { store }) {
+      resolve(node, { filter, ...args }, { store }) {
         const key = exports.createBelongsToKey(node)
         const sort = createSortOptions(args)
-        const query = { [key]: { $eq: true }}
+        const query = { [key]: { $eq: true } }
 
         if (filter) {
           Object.assign(query, toFilterArgs(filter, filterTypeComposer))
         }
 
         const chain = store.chainIndex(query)
-
         return createPagedNodeEdges(chain, args, sort)
       }
     }
-
     typeComposer.addFields({ belongsTo })
   }
-}
-
-function createFilterComposer (schemaComposer) {
-  const typeComposer = ObjectTypeComposer.createTemp({
-    name: 'BelongsTo',
-    fields: {
-      id: 'ID',
-      path: 'String',
-      typeName: 'TypeName'
-    }
-  }, schemaComposer)
-
-  return createFilterInput(schemaComposer, typeComposer)
 }

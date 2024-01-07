@@ -1,14 +1,10 @@
-const path = require('path')
-const { pathToFilePath } = require('../../pages/utils')
-const { trimEnd } = require('lodash')
+import path from 'path'
+import { pathToFilePath } from '../../pages/utils.js'
+import lodash from 'lodash'
+import { toFilterArgs, createBelongsToKey, createPagedNodeEdges } from '../../graphql/index.js'
+const { trimEnd } = lodash
 
-const {
-  toFilterArgs,
-  createBelongsToKey,
-  createPagedNodeEdges
-} = require('../../graphql')
-
-function createRenderQueue ({ hooks, pages, store, schema, config }) {
+function createRenderQueue({ hooks, pages, store, schema, config }) {
   const queue = []
 
   for (const route of pages.routes()) {
@@ -21,7 +17,8 @@ function createRenderQueue ({ hooks, pages, store, schema, config }) {
         for (let i = 1; i <= totalPages; i++) {
           queue.push(createRenderEntry(page, route, config, i))
         }
-      } else {
+      }
+      else {
         queue.push(createRenderEntry(page, route, config))
       }
     }
@@ -30,17 +27,14 @@ function createRenderQueue ({ hooks, pages, store, schema, config }) {
   return hooks.renderQueue.call(queue)
 }
 
-function calcTotalPages (paginate, store, schema) {
+function calcTotalPages(paginate, store, schema) {
   const { belongsToArgs, fieldName, typeName, args } = paginate
   const gqlField = schema.getComposer().Query.getField(fieldName)
   const typeComposer = schema.getComposer().get(typeName)
   const { collection } = store.getCollection(typeName)
-
   const filterQuery = toFilterArgs(args.filter, belongsToArgs
     ? gqlField.type.getFields().belongsTo.args.filter.type
-    : gqlField.args.filter.type
-  )
-
+    : gqlField.args.filter.type)
   let chain
 
   if (belongsToArgs) {
@@ -49,20 +43,19 @@ function calcTotalPages (paginate, store, schema) {
     const node = resolver.resolve({ args: belongsToArgs, context })
     filterQuery[createBelongsToKey(node)] = { $eq: true }
     chain = store.chainIndex(filterQuery)
-  } else {
+  }
+  else {
     chain = collection.chain().find(filterQuery)
   }
 
   const page = args.page || 1
   const res = createPagedNodeEdges(chain, { ...args, page })
-
   return res.pageInfo.totalPages
 }
 
-function createRenderEntry (page, route, config, currentPage = 1) {
+function createRenderEntry(page, route, config, currentPage = 1) {
   const { outputDir, dataDir, pathPrefix } = config
   const hasTrailingSlash = /\/$/.test(page.publicPath)
-
   let publicPath = page.publicPath
 
   if (currentPage > 1) {
@@ -74,11 +67,9 @@ function createRenderEntry (page, route, config, currentPage = 1) {
   const htmlOutput = pathToFilePath(publicPath)
   const dataOutput = pathToFilePath(publicPath, 'json')
   const prettyPath = trimEnd(publicPath, '/') || '/'
-
   const location = route.type === 'dynamic'
     ? { name: route.name }
     : { path: publicPath }
-
   return {
     location,
     path: prettyPath,
@@ -93,4 +84,4 @@ function createRenderEntry (page, route, config, currentPage = 1) {
   }
 }
 
-module.exports = createRenderQueue
+export default createRenderQueue

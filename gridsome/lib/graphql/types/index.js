@@ -1,15 +1,14 @@
-const { createDateScalar } = require('./date')
-const { createFileScalar } = require('./file')
-const { createImageScalar, createImageFitEnum, createImagePositionEnum } = require('./image')
+import { createDateScalar } from './date.js'
+import { createFileScalar } from './file.js'
+import { createImageScalar, createImageFitEnum, createImagePositionEnum } from './image.js'
 
-module.exports = schemaComposer => {
+export default schemaComposer => {
   const nodeInterface = schemaComposer.createInterfaceTC({
     name: 'Node',
     fields: {
       id: 'ID!'
     }
   })
-
   const nodeConnectionEdgeInterface = schemaComposer.createInterfaceTC({
     name: 'NodeConnectionEdge',
     fields: {
@@ -18,7 +17,6 @@ module.exports = schemaComposer => {
       previous: 'Node'
     }
   })
-
   const nodeConnectionInterface = schemaComposer.createInterfaceTC({
     name: 'NodeConnection',
     fields: () => ({
@@ -27,13 +25,11 @@ module.exports = schemaComposer => {
       edges: ['NodeConnectionEdge']
     })
   })
-
   const dateScalarType = createDateScalar(schemaComposer)
   const fileScalarType = createFileScalar(schemaComposer)
   const imageScalarType = createImageScalar(schemaComposer)
   const imageFitEnum = createImageFitEnum(schemaComposer)
   const imagePositionEnum = createImagePositionEnum(schemaComposer)
-
   const pageInfoType = schemaComposer.createObjectTC({
     name: 'PageInfo',
     fields: {
@@ -47,7 +43,6 @@ module.exports = schemaComposer => {
       isLast: 'Boolean!'
     }
   })
-
   const sortOrderType = schemaComposer.createEnumTC({
     name: 'SortOrder',
     values: {
@@ -63,7 +58,6 @@ module.exports = schemaComposer => {
       }
     }
   })
-
   const sortType = schemaComposer.createInputTC({
     name: 'SortArgument',
     fields: {
@@ -77,7 +71,6 @@ module.exports = schemaComposer => {
       }
     }
   })
-
   return [
     nodeInterface,
     nodeConnectionEdgeInterface,

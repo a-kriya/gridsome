@@ -124,6 +124,7 @@ module.exports = async (name, starter = '') => {
   if (answers.packageManager) {
     console.log('')
     packageManager = answers.packageManager
+
     if (answers.preservePackageManager) {
       config.set('packageManager', answers.packageManager)
       console.log('')
@@ -178,12 +179,15 @@ module.exports = async (name, starter = '') => {
   console.log('A new Gridsome project was created successfully!')
   console.log('Follow these steps to get started:')
   console.log()
+
   if (process.cwd() !== dir) {
     console.log(`  - Enter the directory by running ${chalk.green.bold(`cd ${name}`)}`)
   }
+
   if (!context.didInstall) {
     console.log(`  - Install dependencies with your preferred package manager`)
   }
+
   console.log(`  - Run ${chalk.green.bold(commandName.develop)} to start local development`)
   console.log(`  - Run ${chalk.green.bold(commandName.build)} to build for production`)
   console.log()

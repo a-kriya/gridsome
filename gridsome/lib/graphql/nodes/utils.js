@@ -1,14 +1,24 @@
-const { PER_PAGE } = require('../../utils/constants')
+import { PER_PAGE } from '../../utils/constants.js'
 
-exports.applyChainArgs = function (chain, args = {}, sort = []) {
-  if (sort.length) chain = applySort(chain, sort)
-  if (args.skip) chain = chain.offset(args.skip)
-  if (args.limit) chain = chain.limit(args.limit)
-
+function applySort(chain, sort = []) {
+  if (sort.length > 1)
+    return chain.compoundsort(sort)
+  else if (sort.length)
+    return chain.simplesort(...sort[0])
   return chain
 }
 
-exports.createPagedNodeEdges = function (chain, args = {}, sort = []) {
+export const applyChainArgs = function (chain, args = {}, sort = []) {
+  if (sort.length)
+    chain = applySort(chain, sort)
+  if (args.skip)
+    chain = chain.offset(args.skip)
+  if (args.limit)
+    chain = chain.limit(args.limit)
+  return chain
+}
+
+export const createPagedNodeEdges = function (chain, args = {}, sort = []) {
   let { limit: limitArg, perPage: perPageArg } = args
   const isPaged = typeof args.page !== 'undefined'
 
@@ -24,19 +34,18 @@ exports.createPagedNodeEdges = function (chain, args = {}, sort = []) {
   const totalCount = chain.data().length
   const maxResults = Math.max(totalCount - skip)
   const totalItemsCount = Math.min(limit, maxResults)
-
   const perPage = isPaged
     ? Math.max(perPageArg || PER_PAGE, 1)
     : args.limit
       ? args.limit
       : totalItemsCount
-
   chain = applySort(chain, sort)
 
   if (isPaged) {
     chain = chain.offset(((page - 1) * perPage) + skip)
     chain = chain.limit(perPage)
-  } else {
+  }
+  else {
     chain = chain.offset(skip)
     chain = chain.limit(limit)
   }
@@ -46,7 +55,6 @@ exports.createPagedNodeEdges = function (chain, args = {}, sort = []) {
   const totalPages = Math.max(Math.ceil(totalItemsCount / perPage) || 1, 1)
   const hasPreviousPage = page > 1
   const hasNextPage = page < totalPages
-
   return {
     totalCount,
     edges: nodes.map((node, index) => ({
@@ -67,20 +75,13 @@ exports.createPagedNodeEdges = function (chain, args = {}, sort = []) {
   }
 }
 
-exports.createSortOptions = function ({ sort, sortBy, order }) {
+export const createSortOptions = function ({ sort, sortBy, order }) {
   if (sort && sort.length) {
     return sort.map(({ by, order }) => [by, order === 'DESC'])
-  } else if (sortBy) {
+  }
+  else if (sortBy) {
     return [[sortBy, order === 'DESC']]
   }
 
   return []
 }
-
-function applySort (chain, sort = []) {
-  if (sort.length > 1) return chain.compoundsort(sort)
-  else if (sort.length) return chain.simplesort(...sort[0])
-
-  return chain
-}
-

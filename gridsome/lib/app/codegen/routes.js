@@ -1,10 +1,10 @@
-const slash = require('slash')
-const { relative } = require('path')
-const { slugify } = require('../../utils')
-const { pathToFilePath } = require('../../pages/utils')
-const { NOT_FOUND_NAME } = require('../../utils/constants')
-const { uniqBy } = require('lodash')
-
+import slash from 'slash'
+import { relative } from 'path'
+import { slugify } from '../../utils/index.js'
+import { pathToFilePath } from '../../pages/utils.js'
+import { NOT_FOUND_NAME } from '../../utils/constants.js'
+import lodash from 'lodash'
+const { uniqBy } = lodash
 const isUnitTest = process.env.GRIDSOME_TEST === 'unit'
 
 function genRoutes(app) {
@@ -12,7 +12,6 @@ function genRoutes(app) {
   const fallback = app.pages._routes.findOne({ name: NOT_FOUND_NAME })
   const components = []
   const items = []
-
   const createRouteItem = (route, name = route.name, path = route.path) => ({
     name,
     path,
@@ -35,6 +34,7 @@ function genRoutes(app) {
     if (route.name === NOT_FOUND_NAME) {
       continue // Don't generate the /404 route.
     }
+
     items.push(createRouteItem(route))
   }
 
@@ -47,14 +47,10 @@ function genRoutes(app) {
     if (item.from && item.to) {
       return genRedirect(item)
     }
+
     return genRoute(item)
   })
-
-  const componentItems = uniqBy(
-    items.filter(item => item.component),
-    'component'
-  )
-
+  const componentItems = uniqBy(items.filter(item => item.component), 'component')
   return [
     `${componentItems.map(genComponent).join('\n')}\n\n`,
     `export default [${routes.join(',')}\n]\n`
@@ -64,26 +60,22 @@ function genRoutes(app) {
 function genComponent(item) {
   const component = JSON.stringify(item.component)
   const chunkName = JSON.stringify(item.chunkName)
-
   return [
     `const ${item.variableName} = `,
     `() => import(/* webpackChunkName: ${chunkName} */ ${component})`
   ].join('')
 }
 
-function genRedirect (rule) {
+function genRedirect(rule) {
   const props = []
-
   props.push(`    path: ${JSON.stringify(rule.from)}`)
   props.push(`    redirect: ${JSON.stringify(rule.to)}`)
-
   return `\n  {\n${props.join(',\n')}\n  }`
 }
 
-function genRoute (item) {
+function genRoute(item) {
   const props = []
   const metas = []
-
   props.push(`    path: ${JSON.stringify(item.path)}`)
   props.push(`    component: ${item.variableName}`)
 
@@ -91,7 +83,8 @@ function genRoute (item) {
     const dataPath = pathToFilePath(item.path, 'json')
     metas.push(`dataPath: ${JSON.stringify(slash(dataPath))}`)
     metas.push(`dynamic: true`)
-  } else if (item.name === NOT_FOUND_NAME) {
+  }
+  else if (item.name === NOT_FOUND_NAME) {
     metas.push(`dataPath: ${JSON.stringify('/404.json')}`)
   }
 
@@ -101,7 +94,8 @@ function genRoute (item) {
 
       if (key[0] === '$') {
         metas.push(`${key}: ${value}`)
-      } else {
+      }
+      else {
         metas.push(`${key}: ${JSON.stringify(value)}`)
       }
     }
@@ -118,14 +112,13 @@ function genRoute (item) {
   return `\n  {\n${props.join(',\n')}\n  }`
 }
 
-function genChunkName (context, route) {
+function genChunkName(context, route) {
   const chunkName = relative(context, route.component)
     .split('/')
     .filter(s => s !== '..')
     .map(s => slugify(s))
     .join('--')
-
   return `page--${chunkName}`
 }
 
-module.exports = genRoutes
+export default genRoutes
