@@ -1,6 +1,7 @@
+import { createRequire } from 'node:module'
 import path from 'path'
 import * as compiler from 'vue-loader/lib/compiler'
-import glob from 'globby'
+import {globbySync} from 'globby'
 import fs from 'fs-extra'
 import hash from 'hash-sum'
 import lodash from 'lodash'
@@ -20,24 +21,31 @@ import htmlWebpackPlugin from 'html-webpack-plugin'
 import definePlugin from 'webpack/lib/DefinePlugin'
 import package$0 from '../../package.json'
 import package$1 from 'vue-loader/package.json'
+import { getDirname } from 'cross-dirname'
+
+const require = createRequire(import.meta.url)
 const orgResolveCompiler = compiler.resolveCompiler
 
-// eslint-disable-next-line no-import-assign
-compiler.resolveCompiler = (ctx, loaderContext) => {
-  return orgResolveCompiler(path.resolve(__dirname, '../..'), loaderContext)
-}
+try {
+  // eslint-disable-next-line no-import-assign
+  compiler.resolveCompiler = (ctx, loaderContext) => {
+    return orgResolveCompiler(path.resolve(getDirname(), '../..'), loaderContext)
+  }
+// eslint-disable-next-line no-empty
+} catch(e) {}
 
 const { pick } = lodash
-const resolve = (p, c) => path.resolve(c || __dirname, p)
+const resolve = (p, c) => path.resolve(c || getDirname(), p)
 const resolveExists = (path) => fs.existsSync(path) ? path : false
 
 const gridsomeEnv = () => {
   return pick(process.env, Object.keys(process.env).filter(key => key.startsWith('GRIDSOME_')))
 }
 
-async function hasCoreJS(root) {
+function hasCoreJS(root) {
   const pkgPath = path.join(root, 'package.json')
-  const { dependencies, devDependencies } = await import(pkgPath)
+  const pkg = fs.existsSync(pkgPath) ? require(pkgPath) : {}
+  const { dependencies, devDependencies } = pkg
   return Object.keys({ ...dependencies, ...devDependencies }).includes('core-js')
 }
 
@@ -72,7 +80,7 @@ export default (app, { isProd, isServer }) => {
     .use(corejsresolver, [{
       includePaths: [
         projectConfig.appCacheDir,
-        !hasCoreJS(projectConfig.context) ? projectConfig.context : ''
+        hasCoreJS(projectConfig.context) ? '' : projectConfig.context
       ].filter(Boolean)
     }])
   config.resolve.merge({
@@ -166,7 +174,7 @@ export default (app, { isProd, isServer }) => {
     }
   })
   // css
-  const postcssConfigFiles = glob.sync(['.postcssrc?({.js,.yaml,.json})', 'postcss.config.js'], {
+  const postcssConfigFiles = globbySync(['.postcssrc?({.js,.yaml,.json})', 'postcss.config.js'], {
     cwd: fs.existsSync(projectConfig.context)
       ? projectConfig.context
       : process.cwd()

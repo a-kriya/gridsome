@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`disable lazy loading 1`] = `"<img class=\\"g-image\\" src=\\"/assets/static/1000x600.97c148e.test.png\\" width=\\"1000\\" height=\\"600\\">"`;
+exports[`disable lazy loading 1`] = `"<img class="g-image" src="/assets/static/1000x600.97c148e.test.png" width="1000" height="600">"`;
 
-exports[`generate srcset for image 1`] = `"<img class=\\"g-image g-image--lazy g-image--loading\\" src=\\"...\\" width=\\"1000\\" height=\\"600\\" data-srcset=\\"/assets/static/1000x600.82a2fbd.test.png 480w, /assets/static/1000x600.97c148e.test.png 1000w\\" data-sizes=\\"(max-width: 1000px) 100vw, 1000px\\" data-src=\\"/assets/static/1000x600.97c148e.test.png\\">"`;
+exports[`generate srcset for image 1`] = `"<img class="g-image g-image--lazy g-image--loading" src="..." width="1000" height="600" data-srcset="/assets/static/1000x600.82a2fbd.test.png 480w, /assets/static/1000x600.97c148e.test.png 1000w" data-sizes="(max-width: 1000px) 100vw, 1000px" data-src="/assets/static/1000x600.97c148e.test.png">"`;
 
-exports[`generate srcset for image 2`] = `"<noscript><img class=\\"g-image g-image--lazy g-image--loaded\\" src=\\"/assets/static/1000x600.97c148e.test.png\\" width=\\"1000\\" height=\\"600\\"></noscript>"`;
+exports[`generate srcset for image 2`] = `"<noscript><img class="g-image g-image--lazy g-image--loaded" src="/assets/static/1000x600.97c148e.test.png" width="1000" height="600"></noscript>"`;
 
-exports[`skip srcset and dataUri 1`] = `"<img class=\\"g-image\\" src=\\"/assets/static/1000x600.97c148e.test.png\\" width=\\"1000\\" height=\\"600\\">"`;
+exports[`skip srcset and dataUri 1`] = `"<img class="g-image" src="/assets/static/1000x600.97c148e.test.png" width="1000" height="600">"`;

@@ -1,9 +1,10 @@
-const App = require('../../App')
-const genRoutes = require('../routes')
-const { NOT_FOUND_NAME } = require('../../../utils/constants')
+import App from '../../App.js'
+import genRoutes from '../routes.js'
+import { NOT_FOUND_NAME } from '../../../utils/constants.js'
+import { getDirname } from 'cross-dirname'
 
 test('generate a simple route', async () => {
-  const app = await new App(__dirname).init()
+  const app = await new App(getDirname()).init()
 
   app.pages.createPage({
     path: '/page',
@@ -14,7 +15,7 @@ test('generate a simple route', async () => {
 })
 
 test('generate a route with meta', async () => {
-  const app = await new App(__dirname).init()
+  const app = await new App(getDirname()).init()
 
   app.pages.createPage({
     path: '/page',
@@ -32,7 +33,7 @@ test('generate a route with meta', async () => {
 })
 
 test('generate a route with raw code as meta', async () => {
-  const app = await new App(__dirname).init()
+  const app = await new App(getDirname()).init()
 
   app.pages.createPage({
     path: '/page',
@@ -48,7 +49,7 @@ test('generate a route with raw code as meta', async () => {
 })
 
 test('generate component imports as variables', async () => {
-  const app = await new App(__dirname).init()
+  const app = await new App(getDirname()).init()
 
   app.pages.createPage({
     path: '/404',
@@ -76,9 +77,8 @@ test('generate component imports as variables', async () => {
   expect(genRoutes(app)).toMatchSnapshot()
 })
 
-
 test('generate redirect routes', async () => {
-  const app = await new App(__dirname, {
+  const app = await new App(getDirname(), {
     config: {
       redirects: [
         { from: '/old', to: '/page' }

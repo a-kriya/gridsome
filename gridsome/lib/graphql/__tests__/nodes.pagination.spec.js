@@ -1,9 +1,8 @@
-const App = require('../../app/App')
-const { BOOTSTRAP_PAGES } = require('../../utils/constants')
-
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
+import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
 test('should return all nodes', async () => {
   const results = await graphql(100)
-
   expect(results.errors).toBeUndefined()
   expect(results.data.allPost.totalCount).toEqual(100)
   expect(results.data.allPost.edges).toHaveLength(100)
@@ -195,14 +194,13 @@ test('return specific page within limit with custom perPage', async () => {
   })
 })
 
-async function graphql (count, ...args) {
+async function graphql(count, ...args) {
   const defaultSort = 'sort: [{ by: "order", order: ASC }]'
   const argsArr = [...args, defaultSort]
-
-  const app = await new App(__dirname, {
+  const app = await new App(getDirname(), {
     localConfig: {
       plugins: [
-        function plugin (api) {
+        function plugin(api) {
           api.loadSource(store => {
             const posts = store.addCollection('Post')
 

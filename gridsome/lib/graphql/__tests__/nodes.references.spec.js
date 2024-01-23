@@ -1,6 +1,5 @@
-const App = require('../../app/App')
-const PluginAPI = require('../../app/PluginAPI')
-
+import App from '../../app/App.js'
+import PluginAPI from '../../app/PluginAPI.js'
 let app, api
 
 beforeEach(async () => {
@@ -238,8 +237,7 @@ test('union reference with collection.addReference()', async () => {
   books.addNode({ id: '2', author: '1' })
   books.addNode({ id: '3' })
   posts.addNode({ id: '4', author: '1' })
-  posts.addNode({ id: '5'})
-
+  posts.addNode({ id: '5' })
   const { errors, data } = await createSchemaAndExecute(`{
     author (id: "1") {
       works { __typename }

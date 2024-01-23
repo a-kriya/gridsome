@@ -59,7 +59,7 @@ export const createBelongsTo = function (schemaComposer, store) {
       type: 'NodeBelongsTo',
       args: belongsToArgs,
       resolve(node, { filter, ...args }, { store }) {
-        const key = exports.createBelongsToKey(node)
+        const key = createBelongsToKey(node)
         const sort = createSortOptions(args)
         const query = { [key]: { $eq: true } }
 

@@ -1,11 +1,11 @@
-const path = require('path')
-const App = require('../App')
-const createApp = require('../index')
-const { BOOTSTRAP_PAGES } = require('../../utils/constants')
-const createRenderQueue = require('../build/createRenderQueue')
-
+import path from 'path'
+import App from '../App.js'
+import createApp from '../index.js'
+import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
+import createRenderQueue from '../build/createRenderQueue.js'
+import { getDirname } from 'cross-dirname'
 test('create render queue for basic project', async () => {
-  const context = path.resolve(__dirname, '../../__tests__/__fixtures__/project-basic')
+  const context = path.resolve(getDirname(), '../../__tests__/__fixtures__/project-basic')
   const app = await createApp(context, undefined, BOOTSTRAP_PAGES)
 
   const renderQueue = createRenderQueue(app)
@@ -35,7 +35,7 @@ test('create render queue for basic project', async () => {
 })
 
 test('create render queue for blog project', async () => {
-  const context = path.resolve(__dirname, '../../__tests__/__fixtures__/project-blog')
+  const context = path.resolve(getDirname(), '../../__tests__/__fixtures__/project-blog')
   const app = await createApp(context, undefined, BOOTSTRAP_PAGES)
   const queue = createRenderQueue(app)
 
@@ -84,13 +84,13 @@ test('create render queue for blog project', async () => {
 })
 
 test('create render queue for createPages hook', async () => {
-  const app = await _createApp(function plugin (api) {
-    api.loadSource(async store => {
+  const app = await _createApp(function plugin(api) {
+    api.loadSource(async (store) => {
       const posts = api.store.addCollection({ typeName: 'Post', route: '/post/:id/' })
       const movies = api.store.addCollection({ typeName: 'Movie' })
 
       for (let i = 1; i <= 3; i++) {
-        posts.addNode({ id: String(i), fields: { author: '2' }})
+        posts.addNode({ id: String(i), fields: { author: '2' } })
       }
 
       movies.addNode({
@@ -242,11 +242,7 @@ describe('dynamic pages', () => {
 
   test('html output paths for dynamic pages', async () => {
     const { app, renderQueue } = await _createRenderQueue()
-
-    const outputs = renderQueue.map(entry =>
-      path.relative(app.config.outputDir, entry.htmlOutput)
-    )
-
+    const outputs = renderQueue.map(entry => path.relative(app.config.outputDir, entry.htmlOutput))
     expect(outputs).toEqual([
       'a/b/index.html',
       'a/_b_d_plus.html',
@@ -280,10 +276,9 @@ describe('dynamic pages', () => {
   })
 })
 
-async function _createApp (plugin) {
-  const app = await new App(__dirname, {
+async function _createApp(plugin) {
+  const app = await new App(getDirname(), {
     localConfig: { plugins: plugin ? [plugin] : [] }
   })
-
   return app.bootstrap(BOOTSTRAP_PAGES)
 }

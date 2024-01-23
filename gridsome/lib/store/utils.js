@@ -15,7 +15,7 @@ function parsePath(string) {
   let basePath = string
 
   if (isUrl(string)) {
-    const info = exports.parseUrl(string)
+    const info = parseUrl(string)
     rootPath = info.baseUrl
     basePath = info.basePath
   }
@@ -76,7 +76,7 @@ export const resolvePath = function (origin, toPath, options = {}) {
     return toPath
   if (mimeType === 'application/x-msdownload')
     return toPath
-  const url = isUrl(origin) ? exports.parseUrl(origin) : null
+  const url = isUrl(origin) ? parseUrl(origin) : null
   const contextPath = url && resolveAbsolute === true ? url.baseUrl : context
   const fromPath = url ? url.fullUrl : origin
   const resolver = url ? path.posix : path

@@ -1,13 +1,11 @@
-const App = require('../../app/App')
-const PluginAPI = require('../../app/PluginAPI')
-const parseQuery = require('../parseQuery')
-
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
+import PluginAPI from '../../app/PluginAPI.js'
+import parseQuery from '../parseQuery.js'
 let app
-
 beforeEach(async () => {
-  app = await new App(__dirname).init()
+  app = await new App(getDirname()).init()
   const api = new PluginAPI(app)
-
   api.createSchema(({ addSchema, GraphQLSchema, GraphQLObjectType, GraphQLList, GraphQLInt }) => {
     addSchema(new GraphQLSchema({
       query: new GraphQLObjectType({
@@ -117,10 +115,7 @@ describe('give useful error messages', () => {
         }
       }
     `
-
-    expect(() => parseQuery(app.schema.getSchema(), query)).toThrow(
-      `Cannot use @paginate on the 'missingType' field.`
-    )
+    expect(() => parseQuery(app.schema.getSchema(), query)).toThrow(`Cannot use @paginate on the 'missingType' field.`)
   })
 
   test('for field not a node collection', async () => {

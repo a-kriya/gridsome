@@ -1,11 +1,11 @@
 class JSONTransformer {
-  static mimeTypes () {
+  static mimeTypes() {
     return ['application/json']
   }
 
-  parse (content) {
+  parse(content) {
     return JSON.parse(content)
   }
 }
 
-module.exports = JSONTransformer
+export default JSONTransformer

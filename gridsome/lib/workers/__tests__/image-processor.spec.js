@@ -1,10 +1,11 @@
-const path = require('path')
-const fs = require('fs-extra')
-const imageSize = require('probe-image-size')
-const AssetsQueue = require('../../app/queue/AssetsQueue')
-const ImageProcessQueue = require('../../app/queue/ImageProcessQueue')
-const { process: processImages } = require('../image-processor')
-const context = path.resolve(__dirname, '../../__tests__')
+import path from 'path'
+import fs from 'fs-extra'
+import imageSize from 'probe-image-size'
+import AssetsQueue from '../../app/queue/AssetsQueue.js'
+import ImageProcessQueue from '../../app/queue/ImageProcessQueue.js'
+import { process as processImages } from '../image-processor.js'
+import { getDirname } from 'cross-dirname'
+const context = path.resolve(getDirname(), '../../__tests__')
 const imagesDir = path.join(context, 'assets', 'static')
 const imageCacheDir = path.join(context, 'assets', 'cache')
 const pathPrefix = '/'
@@ -174,13 +175,7 @@ test('ignore extension casing', async () => {
   expect(stats.size).toBeLessThan(10000)
 })
 
-async function process (
-  filenames,
-  options = {},
-  {
-    images = {}
-  } = {}
-) {
+async function process(filenames, options = {}, { images = {} } = {}) {
   const config = {
     pathPrefix,
     imagesDir,
@@ -200,7 +195,7 @@ async function process (
 
   const processQueue = new AssetsQueue({ context, config })
 
-  const assets = await Promise.all(filenames.map(async filename => {
+  const assets = await Promise.all(filenames.map(async (filename) => {
     const filePath = path.join(context, 'assets', filename)
     return processQueue.add(filePath, options)
   }))

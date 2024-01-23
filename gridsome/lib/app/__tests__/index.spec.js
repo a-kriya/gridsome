@@ -1,11 +1,11 @@
-const path = require('path')
-const App = require('../App')
-const createApp = require('../index')
-const PluginAPI = require('../PluginAPI')
-const loadConfig = require('../loadConfig')
-const { BOOTSTRAP_CONFIG } = require('../../utils/constants')
-
-const context = path.join(__dirname, '../../__tests__/__fixtures__/project-basic')
+import path from 'path'
+import App from '../App.js'
+import createApp from '../index.js'
+import PluginAPI from '../PluginAPI.js'
+import loadConfig from '../loadConfig.js'
+import { BOOTSTRAP_CONFIG } from '../../utils/constants.js'
+import { getDirname } from 'cross-dirname'
+const context = path.join(getDirname(), '../../__tests__/__fixtures__/project-basic')
 const originalEnv = { ...process.env }
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ test('setup basic config', async () => {
 })
 
 test('setup basic config for path prefix', async () => {
-  const context = path.join(__dirname, '../../__tests__/__fixtures__/project-path-prefix')
+  const context = path.join(getDirname(), '../../__tests__/__fixtures__/project-path-prefix')
   const config = await loadConfig(context)
 
   expect(config.pathPrefix).toEqual('/sub/-/dir')
@@ -268,7 +268,7 @@ test('setup webpack client config', async () => {
   expect(config.entry.app[0]).toMatch(/entry\.client\.js$/)
   expect(config.resolve.alias['~']).toEqual(path.join(context, 'src'))
   expect(config.resolve.alias['@']).toEqual(path.join(context, 'src'))
-  expect(config.resolve.alias['gridsome$']).toEqual(path.resolve(__dirname, '../../../app/index.js'))
+  expect(config.resolve.alias['gridsome$']).toEqual(path.resolve(getDirname(), '../../../app/index.js'))
 
   const chain = await app.compiler.resolveChainableWebpackConfig()
   const postcss = chain.module.rule('postcss').oneOf('normal').use('postcss-loader').toConfig()
@@ -288,7 +288,7 @@ test('setup webpack server config', async () => {
   expect(config.entry.app[0]).toMatch(/entry\.server\.js$/)
   expect(config.resolve.alias['~']).toEqual(path.join(context, 'src'))
   expect(config.resolve.alias['@']).toEqual(path.join(context, 'src'))
-  expect(config.resolve.alias['gridsome$']).toEqual(path.resolve(__dirname, '../../../app/index.js'))
+  expect(config.resolve.alias['gridsome$']).toEqual(path.resolve(getDirname(), '../../../app/index.js'))
 })
 
 test('setup style loader options', async () => {
@@ -339,7 +339,7 @@ test('setup style loader options', async () => {
 test('config.chainWebpack', async () => {
   const app = await createApp(context, {
     localConfig: {
-      chainWebpack (config) {
+      chainWebpack(config) {
         config.mode('none')
       }
     }
@@ -469,7 +469,7 @@ test('do not allow a custom publicPath', async () => {
   await expect(app).rejects.toThrow('pathPrefix')
 })
 
-async function createPlugin (context = '/') {
+async function createPlugin(context = '/') {
   const app = await new App(context).init()
   const api = new PluginAPI(app, {
     entry: {

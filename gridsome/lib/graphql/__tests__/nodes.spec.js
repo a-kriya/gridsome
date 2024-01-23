@@ -1,9 +1,9 @@
-const path = require('path')
-const App = require('../../app/App')
-const PluginAPI = require('../../app/PluginAPI')
-const JSONTransformer = require('./__fixtures__/JSONTransformer')
-
-const context = path.resolve(__dirname, '../../__tests__')
+import path from 'path'
+import App from '../../app/App.js'
+import PluginAPI from '../../app/PluginAPI.js'
+import JSONTransformer from './__fixtures__/JSONTransformer.js'
+import { getDirname } from 'cross-dirname'
+const context = path.resolve(getDirname(), '../../__tests__')
 const imagesDir = path.join(context, 'assets', 'static')
 const filesDir = path.join(context, 'assets', 'files')
 const pathPrefix = '/'
@@ -491,9 +491,7 @@ test('transformer should resolve absolute paths', async () => {
   }`)
 
   expect(errors).toBeUndefined()
-  expect(data.testPost.fileField).toEqual(
-    path.resolve(context, 'assets/image.png')
-  )
+  expect(data.testPost.fileField).toEqual(path.resolve(context, 'assets/image.png'))
 })
 
 test('process image types in schema', async () => {
@@ -646,6 +644,6 @@ test('process file types in schema', async () => {
   expect(data.testPost.text).toEqual('pdf')
 })
 
-async function createSchemaAndExecute (query, _app = app) {
+async function createSchemaAndExecute(query, _app = app) {
   return _app.schema.buildSchema().runQuery(query)
 }

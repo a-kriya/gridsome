@@ -1,6 +1,5 @@
-const slugify = require('@sindresorhus/slugify')
-const { createPagePath: file } = require('../lib/utils')
-
+import slugify from '@sindresorhus/slugify'
+import { createPagePath as file } from '../lib/utils.js'
 test('transform static index file paths', () => {
   expect(file('/Index.vue', slugify)).toEqual('/')
   expect(file('/index.vue', slugify)).toEqual('/')

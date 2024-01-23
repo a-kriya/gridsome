@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import glob from 'globby'
+import {globby} from 'globby'
 import slash from 'slash'
 import * as chokidar from 'chokidar'
 import lodash from 'lodash'
@@ -20,7 +20,7 @@ class VuePages {
     }
   }
   async createPages({ slugify, createPage, removePagesByComponent }) {
-    const files = await glob('**/*.vue', {
+    const files = await globby('**/*.vue', {
       cwd: this.pagesDir,
       absolute: true
     })

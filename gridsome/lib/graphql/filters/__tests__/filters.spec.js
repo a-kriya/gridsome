@@ -1,12 +1,11 @@
-const { forEach } = require('lodash')
-const initMustHaveTypes = require('../../types')
-const { createFilterInput } = require('../input')
-const { SchemaComposer } = require('graphql-compose')
-const { scalarOperators, listOperators } = require('../operators')
-
-test.each(
-  ['ID', 'Boolean', 'JSON', 'String', 'Int', 'Float', 'Date']
-)('create filter operators for %s scalar type', (typeName) => {
+import lodash from 'lodash'
+import initMustHaveTypes from '../../types/index.js'
+import { createFilterInput } from '../input.js'
+import * as graphqlCompose from 'graphql-compose'
+import { scalarOperators, listOperators } from '../operators.js'
+const { forEach } = lodash
+const { SchemaComposer } = graphqlCompose
+test.each(['ID', 'Boolean', 'JSON', 'String', 'Int', 'Float', 'Date'])('create filter operators for %s scalar type', (typeName) => {
   const typeComposer = createTypeComposer({
     name: 'Post',
     fields: {
@@ -14,28 +13,20 @@ test.each(
       b: `${typeName}!`
     }
   })
-
   forEach(typeComposer.getInputTypeComposer().getFields(), field => {
-    expect(Object.keys(field.type.getFields())).toEqual(
-      expect.arrayContaining(scalarOperators[typeName])
-    )
+    expect(Object.keys(field.type.getFields())).toEqual(expect.arrayContaining(scalarOperators[typeName]))
   })
 })
 
-test.each(
-  ['ID', 'Boolean', 'JSON', 'String', 'Int', 'Float', 'Date']
-)('create filter list operators for %s scalar type', (typeName) => {
+test.each(['ID', 'Boolean', 'JSON', 'String', 'Int', 'Float', 'Date'])('create filter list operators for %s scalar type', (typeName) => {
   const typeComposer = createTypeComposer({
     name: 'Post',
     fields: {
       a: [typeName]
     }
   })
-
   forEach(typeComposer.getInputTypeComposer().getFields(), field => {
-    expect(Object.keys(field.type.getFields())).toEqual(
-      expect.arrayContaining(listOperators)
-    )
+    expect(Object.keys(field.type.getFields())).toEqual(expect.arrayContaining(listOperators))
   })
 })
 
@@ -81,7 +72,7 @@ test('create filter operators for node references', () => {
   })
 })
 
-function createTypeComposer (config) {
+function createTypeComposer(config) {
   const schemaComposer = new SchemaComposer()
   const typeComposer = schemaComposer.createObjectTC(config)
 

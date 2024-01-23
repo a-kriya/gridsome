@@ -1,10 +1,12 @@
-const path = require('path')
-const App = require('../../app/App')
-const PluginAPI = require('../../app/PluginAPI')
-const JSONTransformer = require('./__fixtures__/JSONTransformer')
-const { BOOTSTRAP_PAGES } = require('../../utils/constants')
+import path from 'path'
+import {jest} from '@jest/globals'
+import App from '../../app/App.js'
+import PluginAPI from '../../app/PluginAPI.js'
+import JSONTransformer from './__fixtures__/JSONTransformer.js'
+import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
+import { getDirname } from 'cross-dirname'
 
-async function createPlugin (cwd = '/', localConfig) {
+async function createPlugin(cwd = '/', localConfig) {
   const context = path.resolve(cwd)
   const app = await new App(context, { localConfig }).init()
   const api = new PluginAPI(app, {
@@ -22,32 +24,25 @@ async function createPlugin (cwd = '/', localConfig) {
       }
     }
   })
-
   return api
 }
 
-async function createApp (plugin) {
-  const app = await new App(__dirname, {
-    localConfig: { plugins: plugin ? [plugin] : [] }
-  })
-
+async function createApp(plugin) {
+  const app = new App(getDirname(), { localConfig: { plugins: plugin ? [plugin] : [] } })
   return app.bootstrap(BOOTSTRAP_PAGES)
 }
 
 test('add collection', async () => {
   const api = await createPlugin()
-
   const collection = api.store.addCollection({
     typeName: 'TestPost',
     route: '/path/:id/:bar/:foo_raw/(.*)?'
   })
-
   expect(collection.typeName).toEqual('TestPost')
   expect(collection.route).toBeUndefined()
   expect(collection._refs).toMatchObject({})
   expect(collection._fields).toMatchObject({})
   expect(collection._resolveAbsolutePaths).toEqual(false)
-
   expect(collection.addNode).toBeInstanceOf(Function)
   expect(collection.updateNode).toBeInstanceOf(Function)
   expect(collection.removeNode).toBeInstanceOf(Function)
@@ -60,7 +55,6 @@ test('add collection', async () => {
 test('add node', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-
   const emit = jest.spyOn(collection._events, 'emit')
   const node = collection.addNode({
     id: 'test',
@@ -68,9 +62,7 @@ test('add node', async () => {
     date: '2018-09-04T23:20:33.918Z',
     customField: true
   })
-
   const entry = api.store.store.nodeIndex.getEntry(node.$uid)
-
   expect(node).toHaveProperty('$loki')
   expect(node.id).toEqual('test')
   expect(typeof node.$uid).toEqual('string')
@@ -82,20 +74,16 @@ test('add node', async () => {
   expect(entry.id).toEqual('test')
   expect(entry.uid).toEqual(node.$uid)
   expect(entry.typeName).toEqual('TestPost')
-
   emit.mockRestore()
 })
 
 test('update node', async () => {
   const api = await createPlugin()
-
   const collection = api.store.addCollection({
     typeName: 'TestPost',
     route: '/test/:foo/:slug'
   })
-
   const emit = jest.spyOn(collection._events, 'emit')
-
   const oldNode = collection.addNode({
     id: 'test',
     slug: 'test',
@@ -104,9 +92,7 @@ test('update node', async () => {
     excerpt: 'Lorem ipsum...',
     foo: 'bar'
   })
-
   const uid = oldNode.$uid
-
   const node = collection.updateNode({
     id: 'test',
     title: 'New title',
@@ -115,9 +101,7 @@ test('update node', async () => {
     excerpt: 'Praesent commodo...',
     foo: 'foo'
   })
-
   const entry = api.store.store.nodeIndex.getEntry(node.$uid)
-
   expect(node.id).toEqual('test')
   expect(node.title).toEqual('New title')
   expect(node.slug).toEqual('new-title')
@@ -130,23 +114,17 @@ test('update node', async () => {
   expect(entry.id).toEqual('test')
   expect(entry.uid).toEqual(uid)
   expect(node.date).toBeUndefined()
-
   emit.mockRestore()
 })
 
 test('change node id', async () => {
   const { store } = await createPlugin()
-
   const uid = 'test'
   const collection = store.addCollection({ typeName: 'TestPost' })
-
   const node1 = collection.addNode({ $uid: uid, id: 'test' })
-
   expect(node1.id).toEqual('test')
-
   const node2 = collection.updateNode({ $uid: uid, id: 'test-2' })
   const entry = store.store.nodeIndex.getEntry(uid)
-
   expect(node2.id).toEqual('test-2')
   expect(node2.$uid).toEqual('test')
   expect(entry.uid).toEqual('test')
@@ -155,45 +133,36 @@ test('change node id', async () => {
 test('get node by id', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-
   collection.addNode({ id: 'test' })
-
   expect(collection.getNode('test').id).toEqual('test')
 })
 
 test('get node by uid', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-
   collection.addNode({ $uid: 'foo', id: '1' })
-
   expect(api.store.getNodeByUid('foo').id).toEqual('1')
 })
 
 test('find node', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-
   collection.addNode({ id: 'test' })
-
   expect(collection.findNode({ id: 'test' }).id).toEqual('test')
 })
 
 test('find many nodes', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-
   collection.addNode({ id: '1', value: 1 })
   collection.addNode({ id: '2', value: 2 })
   collection.addNode({ id: '3', value: 3 })
-
-  expect(collection.findNodes({ value: { $gt: 1 }})).toHaveLength(2)
+  expect(collection.findNodes({ value: { $gt: 1 } })).toHaveLength(2)
 })
 
 test('get all nodes', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-
   collection.addNode({ id: '1' })
   collection.addNode({ id: '2' })
   collection.addNode({ id: '3' })
@@ -656,9 +625,7 @@ test('resolve absolute file paths with no origin', async () => {
   })
 
   expect(node.file).toEqual('image.png')
-  expect(node.file2).toEqual(
-    path.resolve('/absolute/dir/to/project/image.png')
-  )
+  expect(node.file2).toEqual(path.resolve('/absolute/dir/to/project/image.png'))
 })
 
 test('resolve absolute file paths with a custom path', async () => {
@@ -715,10 +682,7 @@ test('always resolve relative paths from filesystem sources', async () => {
       origin: path.resolve('/absolute/dir/to/a/file.md')
     }
   })
-
-  expect(node.file).toEqual(
-    path.resolve('/absolute/dir/to/image.png')
-  )
+  expect(node.file).toEqual(path.resolve('/absolute/dir/to/image.png'))
 })
 
 test('dont resolve relative paths when no origin', async () => {
@@ -893,11 +857,9 @@ test('exclude node with api.onCreateNode()', async () => {
       store.addCollection('Test').addNode({ id: '1' })
     })
     api.onCreateNode(node => {
-      if (
-        node.internal.typeName === 'Test' &&
-        node.id === '1'
-      ) return null
-
+      if (node.internal.typeName === 'Test' &&
+                node.id === '1')
+        return null
       return node
     })
   })
@@ -911,13 +873,11 @@ test('exclude node with api.onCreateNode()', async () => {
 test('experimental: add transformer', async () => {
   const api = await createPlugin()
   const posts = api.store.addCollection('TestPost')
-
   api.store._addTransformer(class {
-    static mimeTypes () {
+    static mimeTypes() {
       return ['application/test']
     }
-
-    parse (content) {
+    parse(content) {
       return JSON.parse(content)
     }
   })

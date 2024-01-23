@@ -1,14 +1,14 @@
-const App = require('../../app/App')
-const { Kind } = require('graphql')
-const PluginAPI = require('../../app/PluginAPI')
-const createPageQuery = require('../createPageQuery')
-const { PER_PAGE } = require('../../utils/constants')
-const parseQuery = require('../../graphql/parseQuery')
-
+import App from '../../app/App.js'
+import { Kind } from 'graphql'
+import PluginAPI from '../../app/PluginAPI.js'
+import createPageQuery from '../createPageQuery.js'
+import { PER_PAGE } from '../../utils/constants.js'
+import parseQuery from '../../graphql/parseQuery.js'
+import { getDirname } from 'cross-dirname'
 let app
 
 beforeEach(async () => {
-  app = await new App(__dirname).init()
+  app = await new App(getDirname()).init()
   const api = new PluginAPI(app)
 
   api.store.addCollection('TestPost')

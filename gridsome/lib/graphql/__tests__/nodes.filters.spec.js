@@ -1,5 +1,5 @@
-const App = require('../../app/App')
-
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
 test('filter by multiple ids', async () => {
   const { errors, data } = await createSchemaAndExecute(`{
     allProduct (filter: { id: { in: ["2", "3"] } }) {
@@ -856,7 +856,7 @@ test('setup custom filter input types for custom object types', async () => {
   expect(deepType.fields.related.type).toEqual(schema.getType('ProductQueryOperatorInput'))
 })
 
-function createCollections (api) {
+function createCollections(api) {
   api.loadSource(({ addCollection }) => {
     const products = addCollection('Product')
     const items = addCollection('Item')
@@ -949,18 +949,16 @@ function createCollections (api) {
   })
 }
 
-async function createSchemaAndExecute (query) {
-  const app = await new App(__dirname, {
+async function createSchemaAndExecute(query) {
+  const app = await new App(getDirname(), {
     plugins: [createCollections]
   }).init()
-
   await app.plugins.loadSources()
-
   return app.schema.buildSchema().runQuery(query)
 }
 
-async function buildSchema (fn = () => null, query) {
-  const app = await new App(__dirname, {
+async function buildSchema(fn = () => null, query) {
+  const app = await new App(getDirname(), {
     plugins: [
       createCollections,
       fn

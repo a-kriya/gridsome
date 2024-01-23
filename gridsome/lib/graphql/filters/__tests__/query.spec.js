@@ -1,8 +1,8 @@
-const { toFilterArgs } = require('../query')
-const initMustHaveTypes = require('../../types')
-const { createFilterInput } = require('../input')
-const { SchemaComposer } = require('graphql-compose')
-
+import { toFilterArgs } from '../query.js'
+import initMustHaveTypes from '../../types/index.js'
+import { createFilterInput } from '../input.js'
+import * as graphqlCompose from 'graphql-compose'
+const { SchemaComposer } = graphqlCompose
 test('convert filters to Loki query', () => {
   const inputTypeComposer = createInputTypeComposer(`
     type Post implements Node {
@@ -10,31 +10,25 @@ test('convert filters to Loki query', () => {
       author: String
     }
   `)
-
   const query = toFilterArgs({
     title: { eq: 'Test' },
     author: { in: ['1', '2'] }
   }, inputTypeComposer)
-
   expect(query.title).toMatchObject({ $eq: 'Test' })
   expect(query.author).toMatchObject({ $in: ['1', '2'] })
 })
-
 test('convert deep objects to dot notation (single)', () => {
-  const [,,,post] = createTypes([
+  const [, , , post] = createTypes([
     `type Three { four: String! }`,
     `type Two { three: Three }`,
     `type One { two: Two }`,
     `type Post implements Node { one: One }`
   ])
-
   const query = toFilterArgs({
     one: { two: { three: { four: { in: ['1', '2'] } } } }
   }, post.getInputTypeComposer())
-
   expect(query['one.two.three.four']).toMatchObject({ '$in': ['1', '2'] })
 })
-
 test('convert deep objects to dot notation (list)', () => {
   const [, , , post] = createTypes([
     `type Three { four: [String] }`,
@@ -42,29 +36,23 @@ test('convert deep objects to dot notation (list)', () => {
     `type One { two: Two }`,
     `type Post implements Node { one: One }`
   ])
-
   const query = toFilterArgs({
     one: { two: { three: { four: { contains: '1' } } } }
   }, post.getInputTypeComposer())
-
   expect(query['one.two.three.four']).toMatchObject({ '$contains': '1' })
 })
-
 test('convert proxied filters to Loki query', () => {
   const inputTypeComposer = createInputTypeComposer(`
     type Post implements Node {
       proxyValue: String @proxy(from:"field-name")
     }
   `)
-
   const query = toFilterArgs({
     proxyValue: { eq: 'Test' }
   }, inputTypeComposer)
-
   expect(query['field-name']).toMatchObject({ $eq: 'Test' })
   expect(query.proxyValue).toBeUndefined()
 })
-
 test('use custom loki operators for node references (single)', () => {
   const [, post] = createTypes([
     `type Author implements Node {
@@ -116,21 +104,17 @@ test('use custom loki operators for node references (list)', () => {
   expect(query5).toMatchObject({ authors: { '$refListExists': false } })
 })
 
-function createInputTypeComposer (config) {
+function createInputTypeComposer(config) {
   const schemaComposer = new SchemaComposer()
   const typeComposer = schemaComposer.createObjectTC(config)
-
   initMustHaveTypes(schemaComposer)
   createFilterInput(schemaComposer, typeComposer)
-
   return typeComposer.getInputTypeComposer()
 }
 
-function createTypes (types) {
+function createTypes(types) {
   const schemaComposer = new SchemaComposer()
-
   initMustHaveTypes(schemaComposer)
-
   return types.map(type => {
     const typeComposer = schemaComposer.createObjectTC(type)
     createFilterInput(schemaComposer, typeComposer)

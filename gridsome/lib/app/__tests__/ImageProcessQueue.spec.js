@@ -1,8 +1,9 @@
-const path = require('path')
-const fs = require('fs-extra')
-const AssetsQueue = require('../queue/AssetsQueue')
-const ImageProcessQueue = require('../queue/ImageProcessQueue')
-const context = path.resolve(__dirname, '../../__tests__')
+import path from 'path'
+import fs from 'fs-extra'
+import AssetsQueue from '../queue/AssetsQueue.js'
+import ImageProcessQueue from '../queue/ImageProcessQueue.js'
+import { getDirname } from 'cross-dirname'
+const context = path.resolve(getDirname(), '../../__tests__')
 const imagesDir = path.join(context, 'assets', 'static')
 const pathPrefix = '/'
 

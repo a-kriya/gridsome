@@ -1,5 +1,8 @@
-const App = require('../../app/App')
-const { BOOTSTRAP_CONFIG, BOOTSTRAP_PAGES } = require('../../utils/constants')
+import {jest} from '@jest/globals'
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
+import { BOOTSTRAP_CONFIG, BOOTSTRAP_PAGES } from '../../utils/constants.js'
+import { createObjectType } from '../utils.js'
 
 test('add custom GraphQL object types', async () => {
   const app = await createApp(api => {
@@ -87,7 +90,7 @@ test('add custom GraphQL union type with Node interface', async () => {
             appearsOn: {
               type: ['AppearsOnUnion'],
               resolve: (_, args, ctx) => {
-                const query = { typeName: { $in: ['Album', 'Single'] }}
+                const query = { typeName: { $in: ['Album', 'Single'] } }
                 return ctx.store.chainIndex(query).data()
               }
             }
@@ -207,7 +210,7 @@ test('add custom GraphQL union type', async () => {
 test('add custom GraphQL types from SDL', async () => {
   const app = await createApp(api => {
     api.loadSource(({ addCollection, store }) => {
-      addCollection('Tag').addNode({ id: '1', foo: { slug: 'tag-one' }})
+      addCollection('Tag').addNode({ id: '1', foo: { slug: 'tag-one' } })
       addCollection('Post').addNode({
         id: '1',
         title: 'My Post',
@@ -380,10 +383,10 @@ describe('add reference resolvers', () => {
       `)
       addSchemaResolvers({
         Track: {
-          overiddenAlbum (source, args, context) {
+          overiddenAlbum(source, args, context) {
             return context.store.getCollection('Album').getNode('2')
           },
-          customAlbum (source, { id }, context) {
+          customAlbum(source, { id }, context) {
             return context.store.getCollection('Album').getNode(id)
           }
         }
@@ -593,7 +596,7 @@ test('add custom resolvers for content type', async () => {
         Post: {
           customField: {
             type: 'String',
-            resolve () {
+            resolve() {
               return 'value'
             }
           }
@@ -924,7 +927,6 @@ test('add custom Metadata schema', async () => {
 })
 
 test('merge object types', async () => {
-  const { createObjectType } = require('../utils')
   const app = await createApp(null, BOOTSTRAP_CONFIG)
 
   app.schema.buildSchema({
@@ -1032,7 +1034,7 @@ test('add a experimental field extension', async () => {
       addSchemaFieldExtension({
         name: 'myExtension',
         args: { value: 'String' },
-        apply (ext) {
+        apply(ext) {
           return {
             resolve: (source, args, context, info) => {
               return source[info.fieldName] + ext.value
@@ -1199,9 +1201,7 @@ test('output field value as JSON', async () => {
   }`)
 
   expect(errors).toBeUndefined()
-  expect(data.track.albumsBySlug).toEqual(
-    expect.arrayContaining(['second-album', 'third-album'])
-  )
+  expect(data.track.albumsBySlug).toEqual(expect.arrayContaining(['second-album', 'third-album']))
 })
 
 test('add custom scalar types with createScalarType()', async () => {
@@ -1232,15 +1232,14 @@ test('add custom scalar types with createScalarType()', async () => {
   expect(data.album.myField).toMatchObject({ test: true, foo: 'bar' })
 })
 
-function createApp (plugin, phase = BOOTSTRAP_PAGES) {
-  const app = new App(__dirname, {
+function createApp(plugin, phase = BOOTSTRAP_PAGES) {
+  const app = new App(getDirname(), {
     localConfig: { plugins: plugin ? [plugin] : [] }
   })
-
   return app.bootstrap(phase)
 }
 
-function initApp (fn) {
+function initApp(fn) {
   return createApp(api => {
     api.loadSource(actions => {
       const tracks = actions.addCollection('Track')

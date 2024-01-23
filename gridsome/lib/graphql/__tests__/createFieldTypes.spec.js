@@ -1,14 +1,10 @@
-const App = require('../../app/App')
-const { createFieldTypes } = require('../createFieldTypes')
-const createFieldDefinitions = require('../createFieldDefinitions')
-
-const {
-  ListComposer,
-  SchemaComposer,
-  UnionTypeComposer,
-  ObjectTypeComposer
-} = require('graphql-compose')
-
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
+import { createFieldTypes } from '../createFieldTypes.js'
+import createFieldDefinitions from '../createFieldDefinitions.js'
+import * as graphqlCompose from 'graphql-compose'
+import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
+const { ListComposer, SchemaComposer, UnionTypeComposer, ObjectTypeComposer } = graphqlCompose
 const nodes = [
   {
     '123': 1,
@@ -302,12 +298,9 @@ test('infer file fields', () => {
   expect(types.file4.type).toEqual('String')
 })
 
-const { BOOTSTRAP_PAGES } = require('../../utils/constants')
-
-function createApp (plugin, phase = BOOTSTRAP_PAGES) {
-  const app = new App(__dirname, {
+function createApp(plugin, phase = BOOTSTRAP_PAGES) {
+  const app = new App(getDirname(), {
     localConfig: { plugins: plugin ? [plugin] : [] }
   })
-
   return app.bootstrap(phase)
 }

@@ -1,10 +1,10 @@
-const App = require('../../app/App')
-const PluginAPI = require('../../app/PluginAPI')
-
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
+import PluginAPI from '../../app/PluginAPI.js'
 let app, api
 
 beforeEach(async () => {
-  app = await new App(__dirname, {
+  app = await new App(getDirname(), {
     config: {
       plugins: []
     }
@@ -169,11 +169,11 @@ test('handle pagination for filtered belongsTo', async () => {
   authors.addNode({ id: '1', title: 'Author 1' })
 
   for (let i = 1; i <= 10; i++) {
-    books.addNode({ id: String(i), author: { typeName: 'Author', id: '1' }})
+    books.addNode({ id: String(i), author: { typeName: 'Author', id: '1' } })
   }
 
   for (let i = 1; i <= 10; i++) {
-    stores.addNode({ id: String(i), author: { typeName: 'Author', id: '1' }})
+    stores.addNode({ id: String(i), author: { typeName: 'Author', id: '1' } })
   }
 
   const query = `query {
@@ -201,6 +201,6 @@ test('handle pagination for filtered belongsTo', async () => {
   expect(data.author.belongsTo.edges[0].node.__typename).toEqual('Book')
 })
 
-function createSchemaAndExecute (query, options) {
+function createSchemaAndExecute(query, options) {
   return app.schema.buildSchema(options).runQuery(query)
 }

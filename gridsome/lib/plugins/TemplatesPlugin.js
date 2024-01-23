@@ -1,5 +1,5 @@
 import path from 'path'
-import glob from 'globby'
+import {globby} from 'globby'
 import fs from 'fs-extra'
 import { distance } from 'fastest-levenshtein'
 import crypto from 'crypto'
@@ -307,7 +307,7 @@ class TemplatesPlugin {
              * in development to act on new or deleted files.
              */
       const paths = Array.from(byComponent.keys())
-      const files = await glob(paths, { globstar: false, extglob: false })
+      const files = await globby(paths, { globstar: false, extglob: false })
 
       for (const filePath of files) {
         createTemplate(path.normalize(filePath))

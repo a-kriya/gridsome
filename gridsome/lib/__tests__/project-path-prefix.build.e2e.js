@@ -1,11 +1,11 @@
-const path = require('path')
-const fs = require('fs-extra')
-const build = require('../build')
-const cheerio = require('cheerio')
-const express = require('express')
-const puppeteer = require('puppeteer')
-
-const context = path.join(__dirname, '__fixtures__', 'project-path-prefix')
+import path from 'path'
+import fs from 'fs-extra'
+import build from '../build.js'
+import cheerio from 'cheerio'
+import * as express from 'express'
+import puppeteer from 'puppeteer'
+import { getDirname } from 'cross-dirname'
+const context = path.join(getDirname(), '__fixtures__', 'project-path-prefix')
 const content = file => fs.readFileSync(path.join(context, file), 'utf8')
 const exists = file => fs.existsSync(path.join(context, file))
 const load = file => cheerio.load(content(file))
@@ -90,4 +90,3 @@ test('open /about/ directly', async () => {
   await page.goto(`http://localhost:8080${publicPath}about/`, { waitUntil: 'networkidle2' })
   await page.waitForSelector('#app.is-mounted')
 })
-

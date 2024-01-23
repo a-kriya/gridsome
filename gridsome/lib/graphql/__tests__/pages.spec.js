@@ -1,4 +1,5 @@
-const App = require('../../app/App')
+import { getDirname } from 'cross-dirname'
+import App from '../../app/App.js'
 
 test('get page by path', async () => {
   const { errors, data } = await runQuery(`
@@ -27,9 +28,8 @@ test('filter pages by path', async () => {
   expect(data.allPage[0].path).toEqual('/page-two/')
 })
 
-async function runQuery (query) {
-  const app = await new App(__dirname).init()
-
+async function runQuery(query) {
+  const app = await new App(getDirname()).init()
   app.pages.createPage({
     path: '/page-one',
     component: './__fixtures__/Page.vue',

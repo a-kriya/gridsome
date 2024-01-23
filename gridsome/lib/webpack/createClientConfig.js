@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module'
 import path from 'path'
 import createBaseConfig from './createBaseConfig.js'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
@@ -8,6 +9,8 @@ import esbuild from 'esbuild'
 import noEmitOnErrorsPlugin from 'webpack/lib/NoEmitOnErrorsPlugin'
 import friendlyErrorsWebpackPlugin from '@soda/friendly-errors-webpack-plugin'
 import { getDirname } from 'cross-dirname'
+
+const require = createRequire(import.meta.url)
 const resolve = p => path.resolve(getDirname(), p)
 
 export default async (app) => {

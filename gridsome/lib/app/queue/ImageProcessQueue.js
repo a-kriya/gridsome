@@ -113,7 +113,7 @@ class ImageProcessQueue {
       options.background = this.config.imageBackgroundColor
     }
 
-    const cacheKey = genHash(filePath + hash + JSON.stringify(options)).substr(0, 7)
+    const cacheKey = genHash(filePath + hash + JSON.stringify(options)).slice(0, 7)
 
     const createDestPath = (filename, imageOptions) => {
       if (process.env.GRIDSOME_MODE === 'serve') {
@@ -221,7 +221,7 @@ class ImageProcessQueue {
   createFileName(relPath, arr, hash) {
     const { name, ext } = path.parse(relPath)
     const string = arr.length ? createOptionsQuery(arr) : ''
-    const optionsHash = genHash(string).substr(0, 7)
+    const optionsHash = genHash(string).slice(0, 7)
     const contentHash = !process.env.GRIDSOME_TEST ? hash : 'test'
     return `${name}.${optionsHash}.${contentHash}${ext}`
   }

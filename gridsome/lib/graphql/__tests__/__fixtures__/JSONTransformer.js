@@ -1,19 +1,20 @@
-const { GraphQLString } = require('../../graphql')
+import graphql from '../../graphql.js'
+const { GraphQLString } = graphql
 
 class JSONTransformer {
-  static mimeTypes () {
+  static mimeTypes() {
     return ['application/json']
   }
 
-  constructor (options, { resolveNodeFilePath }) {
+  constructor(options, { resolveNodeFilePath }) {
     this.resolveNodeFilePath = resolveNodeFilePath
   }
 
-  parse (content) {
+  parse(content) {
     return JSON.parse(content)
   }
 
-  extendNodeType () {
+  extendNodeType() {
     return {
       myField: {
         type: GraphQLString,
@@ -29,4 +30,4 @@ class JSONTransformer {
   }
 }
 
-module.exports = JSONTransformer
+export default JSONTransformer

@@ -1,16 +1,4 @@
-const {
-  $refListIn,
-  $refListNin,
-  $refListEq,
-  $refListNe,
-  $refListExists,
-  $refIn,
-  $refNin,
-  $refEq,
-  $refNe,
-  $refExists
-} = require('../lokiOps')
-
+import { $refListIn, $refListNin, $refListEq, $refListNe, $refListExists, $refIn, $refNin, $refEq, $refNe, $refExists } from '../lokiOps.js'
 test('$refListIn', () => {
   expect($refListIn(['1', '2', '3'], ['2'])).toEqual(true)
   expect($refListIn([{ id: '1' }, { id: '2' }], ['2'])).toEqual(true)
