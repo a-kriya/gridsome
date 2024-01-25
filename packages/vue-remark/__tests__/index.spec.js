@@ -1,4 +1,5 @@
 import { resolve } from 'path'
+import { getDirname } from 'cross-dirname'
 import VueRemark from '..'
 import App from '@kriya/gridsome/lib/app/App'
 
@@ -400,7 +401,7 @@ describe('process import statements', () => {
 })
 
 async function createPlugin (options = {}) {
-  const app = new App(resolve(__dirname, './__fixtures__'), {
+  const app = new App(resolve(getDirname(), './__fixtures__'), {
     plugins: [{
       use: require.resolve('..'),
       options: { typeName: 'Test', baseDir: '.', ...options }

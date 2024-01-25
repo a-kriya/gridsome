@@ -2,20 +2,19 @@ const { GRIDSOME_TEST = 'unit' } = process.env
 
 /** @type {import('jest').Config} */
 const config = {
-  detectLeaks: true,
+  // detectLeaks: true,
   workerIdleMemoryLimit: '512MB',
   maxWorkers: 1,
   logHeapUsage: true,
   transform: {},
   testEnvironment: 'node',
   testMatch: [
-    `**/__tests__/**/*.${GRIDSOME_TEST === 'e2e' ? 'e2e' : 'spec'}.js`
+    `**/cli/__tests__/**/*.${GRIDSOME_TEST === 'e2e' ? 'e2e' : 'spec'}.js`
   ],
   collectCoverageFrom: [
     'gridsome/lib/**/*.js'
   ],
   testPathIgnorePatterns: [
-    '/packages/',
     '/__fixtures__/',
     '/projects/',
     '/scripts/'

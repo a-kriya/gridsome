@@ -8,7 +8,7 @@
   ],
   "type": "module",
   "scripts": {
-    "test:unit": "GRIDSOME_TEST=unit node --expose-gc --experimental-vm-modules ./node_modules/.bin/jest --runInBand createSchema.spec.js",
+    "test:unit": "GRIDSOME_TEST=unit node --expose-gc --experimental-vm-modules ./node_modules/.bin/jest --runInBand",
     "test:e2e": "GRIDSOME_TEST=e2e jest --runInBand",
     "test:pnp": "node scripts/pnp-test.js",
     "changelog": "node scripts/changelog.js",

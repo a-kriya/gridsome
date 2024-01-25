@@ -4,7 +4,7 @@
   "description": "Syntax highlighter for markdown code blocks",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/remark-prismjs#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/remark-prismjs",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

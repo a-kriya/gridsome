@@ -4,7 +4,7 @@
   "description": "Generate sitemap for Gridsome sites",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-sitemap#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-sitemap",
-  "main": "index.js",
+  "exports": "./index.js",
   "license": "MIT",
   "type": "module",
   "keywords": [

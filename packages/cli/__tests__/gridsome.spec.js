@@ -1,4 +1,5 @@
 import path from 'path'
+import { getDirname } from 'cross-dirname'
 import runCLI from './utils/helpers.js'
 
 test('show @kriya/gridsome-cli version', async () => {
@@ -8,7 +9,7 @@ test('show @kriya/gridsome-cli version', async () => {
 })
 
 test('show local gridsome version', async () => {
-  const testPath = path.join(__dirname, '__fixtures__', 'project')
+  const testPath = path.join(getDirname(), '__fixtures__', 'project')
   const { stdout } = await runCLI(['-v'], { cwd: testPath })
 
   expect(stdout).toMatch(/@kriya\/gridsome v(\d+\.?){3}/)

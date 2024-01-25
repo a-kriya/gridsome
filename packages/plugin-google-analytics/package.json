@@ -4,7 +4,7 @@
   "description": "Google Analytics plugin for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-google-analytics#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-google-analytics",
-  "main": "gridsome.client.js",
+  "exports": "./gridsome.client.js",
   "license": "MIT",
   "type": "module",
   "files": [

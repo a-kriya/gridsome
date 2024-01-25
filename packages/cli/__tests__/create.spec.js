@@ -1,7 +1,9 @@
 import fs from 'fs-extra'
 import { join } from 'path'
+import { getDirname } from 'cross-dirname'
 import runCLI from './utils/helpers.js'
-const genPath = join(__dirname, 'my-project')
+
+const genPath = join(getDirname(), 'my-project')
 
 beforeEach(() => {
   fs.ensureDirSync(genPath)
@@ -13,7 +15,7 @@ afterEach(() => {
 })
 
 test('warns if a directory with the same name exists in path', async () => {
-  const { stderr } = await runCLI(['create', 'my-project'], { cwd: __dirname, reject: false })
+  const { stderr } = await runCLI(['create', 'my-project'], { cwd: getDirname(), reject: false })
 
   expect(stderr).toMatch('because the directory is not empty')
 })

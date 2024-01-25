@@ -8,12 +8,12 @@ import resolveCwd from 'resolve-cwd'
 import updateNotifier from 'update-notifier'
 import resolveVersions from '../lib/utils/version.js'
 import findUp from 'find-up'
-import pkg from '../package.json'
 import create from '../lib/commands/create.js'
 import config from '../lib/commands/config.js'
 import info from '../lib/commands/info.js'
 import utils from '../lib/utils/index.js'
 
+const pkg = importSync('../package.json')
 const pkgPath = findUp.sync('package.json')
 const notifier = updateNotifier({ pkg })
 

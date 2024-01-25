@@ -4,7 +4,7 @@
   "description": "Strapi source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-strapi#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-strapi",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

@@ -4,12 +4,14 @@ import chalk from 'chalk'
 import { execa } from 'execa'
 import axios from 'axios'
 import jsYaml from 'js-yaml'
-import * as inquirer from 'inquirer'
-import * as Tasks from '@hjvedvik/tasks'
+import inquirer from 'inquirer'
+import Tasks from '@hjvedvik/tasks'
 import sortPackageJson from 'sort-package-json'
 import autocompletePrompt from 'inquirer-autocomplete-prompt'
 import utils from '../utils/index.js'
+
 const { config, hasYarn, hasPnpm, installDependencies } = utils
+
 inquirer.registerPrompt('autocomplete', autocompletePrompt)
 
 async function fetchStarters() {

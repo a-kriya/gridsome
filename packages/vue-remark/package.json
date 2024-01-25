@@ -4,7 +4,7 @@
   "description": "Use Vue Components in Markdown",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/vue-remark#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/vue-remark",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

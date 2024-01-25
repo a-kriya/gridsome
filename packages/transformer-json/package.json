@@ -5,7 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-json#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-json",
   "license": "MIT",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

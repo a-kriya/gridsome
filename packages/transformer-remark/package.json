@@ -4,7 +4,7 @@
   "description": "Markdown transformer for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-remark#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-remark",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

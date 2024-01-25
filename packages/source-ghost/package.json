@@ -4,7 +4,7 @@
   "description": "ghost source for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-ghost#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-ghost",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

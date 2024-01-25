@@ -4,7 +4,7 @@
   "description": "Yaml transformer for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-yaml",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-yaml",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

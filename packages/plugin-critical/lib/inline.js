@@ -1,5 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
+import { getDirname } from 'cross-dirname'
 import * as htmlParser from 'parse5'
 import getStream from 'get-stream'
 import replaceStream from 'replacestream'
@@ -23,7 +24,7 @@ function createNoScriptNode(node) {
 }
 
 export const createPolyfillScript = function () {
-  const filePath = path.resolve(__dirname, 'polyfill.txt')
+  const filePath = path.resolve(getDirname(), 'polyfill.txt')
   const fileContent = fs.readFileSync(filePath, 'utf-8')
   const code = fileContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '').trim()
 

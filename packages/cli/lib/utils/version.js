@@ -1,7 +1,8 @@
 import chalk from 'chalk'
 import resolveCwd from 'resolve-cwd'
 import importSync from 'import-sync'
-import packageJson from '../../package.json'
+
+const packageJson = importSync('../../package.json')
 
 export default function resolveVersions(pkgPath) {
   const cliVersion = packageJson.version

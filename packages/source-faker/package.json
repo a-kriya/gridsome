@@ -4,7 +4,7 @@
   "description": "Source with fake data for Gridsome",
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-faker#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-faker",
-  "main": "index.js",
+  "exports": "./index.js",
   "type": "module",
   "keywords": [
     "gridsome",

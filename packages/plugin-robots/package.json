@@ -4,7 +4,7 @@
   "description": "Gridsome plugin that automatically creates robots.txt for your site",
   "homepage": "https://github.com/rkalkani/gridsome-plugin-robots",
   "repository": "https://github.com/rkalkani/gridsome-plugin-robots.git",
-  "main": "index.js",
+  "exports": "./index.js",
   "license": "MIT",
   "type": "module",
   "keywords": [

@@ -1,5 +1,6 @@
 import path from 'path'
 import pathToRegexp$0 from 'path-to-regexp'
+import { getDirname } from 'cross-dirname'
 import Filesystem from '@kriya/gridsome-source-filesystem'
 import RemarkTransformer from '@kriya/gridsome-transformer-remark'
 import lodash from 'lodash'
@@ -11,6 +12,7 @@ import remarkFilePlugin from './lib/plugins/file.js'
 import remarkImagePlugin from './lib/plugins/image.js'
 import { HeadingType, HeadingLevels } from './lib/types/HeadingType.js'
 import { createFile, makePathParams, normalizeLayout, createCacheIdentifier } from './lib/utils.js'
+
 const { pathToRegexp, compile } = pathToRegexp$0
 const { omit, trimEnd, kebabCase } = lodash
 const { GraphQLList, GraphQLBoolean } = graphql
@@ -144,7 +146,7 @@ class VueRemark {
         ]
       }
     })
-    api.transpileDependencies([path.resolve(__dirname, 'src')])
+    api.transpileDependencies([path.resolve(getDirname(), 'src')])
     api.chainWebpack(config => this.chainWebpack(config))
     api.createPages(actions => this.createPages(actions))
 
