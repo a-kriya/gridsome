@@ -1,10 +1,5 @@
-const path = require('path')
-
-const {
-  createPolyfillScript,
-  inlineCriticalCSS
-} = require('../lib/inline')
-
+import path from 'path'
+import { createPolyfillScript, inlineCriticalCSS } from '../lib/inline.js'
 test('inline critical css', async () => {
   const filePath = path.join(__dirname, '__fixtures__/index.html')
   const html = await inlineCriticalCSS(filePath, {

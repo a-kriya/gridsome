@@ -1,9 +1,9 @@
-const camelCase = require('camelcase')
-const contentful = require('contentful')
-const createRichTextType = require('./lib/types/rich-text')
+import camelCase from 'camelcase'
+import * as contentful from 'contentful'
+import createRichTextType from './lib/types/rich-text.js'
 
 class ContentfulSource {
-  static defaultOptions () {
+  static defaultOptions() {
     return {
       space: undefined,
       accessToken: undefined,
@@ -16,7 +16,7 @@ class ContentfulSource {
     }
   }
 
-  constructor (api, options) {
+  constructor(api, options) {
     this.options = options
     this.typesIndex = {}
 
@@ -27,19 +27,19 @@ class ContentfulSource {
       host: options.host
     })
 
-    api.loadSource(async store => {
+    api.loadSource(async (store) => {
       await this.getContentTypes(store)
       await this.getAssets(store)
       await this.getEntries(store)
     })
   }
 
-  async getContentTypes (actions) {
+  async getContentTypes(actions) {
     const contentTypes = await this.fetch('getContentTypes')
     const richTextType = createRichTextType(this.options)
 
     for (const contentType of contentTypes) {
-      const { name, sys: { id }} = contentType
+      const { name, sys: { id } } = contentType
       const typeName = this.createTypeName(name)
       const route = this.options.routes[name]
       const resolvers = {}
@@ -59,7 +59,7 @@ class ContentfulSource {
     }
   }
 
-  async getAssets (actions) {
+  async getAssets(actions) {
     const assets = await this.fetch('getAssets')
     const typeName = this.createTypeName('asset')
     const route = this.options.routes.asset
@@ -70,7 +70,7 @@ class ContentfulSource {
     }
   }
 
-  async getEntries (actions) {
+  async getEntries(actions) {
     const parameters = this.options.parameters
     const entries = await this.fetch('getEntries', 1000, 'sys.createdAt', parameters)
 
@@ -93,8 +93,7 @@ class ContentfulSource {
         if (Array.isArray(value)) {
           node[key] = value.map(item => this.isReference(item)
             ? this.createReference(item, actions)
-            : item
-          )
+            : item)
         } else if (this.isReference(value)) {
           node[key] = this.createReference(value, actions)
         } else if (this.isRichText(value)) {
@@ -111,7 +110,7 @@ class ContentfulSource {
     }
   }
 
-  async fetch (method, limit = 1000, order = 'sys.createdAt', parameters = {}) {
+  async fetch(method, limit = 1000, order = 'sys.createdAt', parameters = {}) {
     const fetch = skip => this.client[method]({ ...parameters, skip, limit, order })
     const { total, items } = await fetch(0)
     const pages = Math.ceil(total / limit)
@@ -124,33 +123,30 @@ class ContentfulSource {
     return items
   }
 
-  createReference (item, store) {
+  createReference(item, store) {
     switch (item.sys.type) {
-      case 'Asset' :
-        return store.createReference(
-          this.createTypeName('asset'),
-          item.sys.id
-        )
+      case 'Asset':
+        return store.createReference(this.createTypeName('asset'), item.sys.id)
 
-      case 'Entry' :
+      case 'Entry': {
         const contentType = this.typesIndex[item.sys.contentType.sys.id]
         const typeName = this.createTypeName(contentType.name)
-
         return store.createReference(typeName, item.sys.id)
+      }
     }
   }
 
-  createTypeName (name = '') {
+  createTypeName(name = '') {
     return camelCase(`${this.options.typeName} ${name}`, { pascalCase: true })
   }
 
-  isReference (value) {
+  isReference(value) {
     return typeof value === 'object' && typeof value.sys !== 'undefined'
   }
 
-  isRichText (value) {
+  isRichText(value) {
     return typeof value === 'object' && value.nodeType === 'document'
   }
 }
 
-module.exports = ContentfulSource
+export default ContentfulSource

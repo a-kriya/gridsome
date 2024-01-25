@@ -5,6 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-critical#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-critical",
   "main": "index.js",
+  "type": "module",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
@@ -14,11 +15,11 @@
   ],
   "dependencies": {
     "critical": "^4.0.1",
-    "fs-extra": "^11.1.1",
-    "get-stream": "^6.0.0",
+    "fs-extra": "^11.2.0",
+    "get-stream": "^6.0.1",
     "jest-worker": "^29.7.0",
-    "micromatch": "^4.0.2",
-    "oust": "^1.0.2",
+    "micromatch": "^4.0.5",
+    "oust": "^1.2.0",
     "parse5": "^6.0.1",
     "replacestream": "^4.0.3"
   },

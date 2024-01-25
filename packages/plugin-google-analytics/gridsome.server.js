@@ -1,3 +1,3 @@
-module.exports = (api, options) => {
+export default (api, options) => {
   api.setClientOptions(options)
 }

@@ -1,14 +1,13 @@
-const GhostContentAPI = require('@tryghost/content-api')
-const camelCase = require('camelcase')
-const schemaTypes = require('./ghost-schema')
-
+import * as GhostContentAPI from '@tryghost/content-api'
+import camelCase from 'camelcase'
+import schemaTypes from './ghost-schema.js'
 const TYPE_AUTHOR = 'author'
 const TYPE_POST = 'post'
 const TYPE_PAGE = 'page'
 const TYPE_TAG = 'tag'
 
 class GhostSource {
-  static defaultOptions () {
+  static defaultOptions() {
     return {
       baseUrl: '',
       contentKey: '',
@@ -18,18 +17,16 @@ class GhostSource {
       settingsName: null
     }
   }
-
-  constructor (api, options) {
+  constructor(api, options) {
     this.api = api
     this.options = options
-    this.restBases = { posts: {}, taxonomies: {}}
+    this.restBases = { posts: {}, taxonomies: {} }
     this.typeNames = {
       author: this.createTypeName(TYPE_AUTHOR),
       post: this.createTypeName(TYPE_POST),
       page: this.createTypeName(TYPE_PAGE),
       tag: this.createTypeName(TYPE_TAG)
     }
-
     this.contentAPI = new GhostContentAPI({
       url: options.baseUrl,
       key: options.contentKey,
@@ -40,7 +37,7 @@ class GhostSource {
       throw new Error(`${options.typeName}: perPage cannot be more than 100 or less than 1`)
     }
 
-    api.loadSource(async actions => {
+    api.loadSource(async (actions) => {
       console.log(`Loading data from ${options.baseUrl}`)
       await this.loadAuthors(actions)
       await this.loadPosts(actions)
@@ -48,7 +45,6 @@ class GhostSource {
       await this.loadPages(actions)
       await this.loadSettings(actions)
     })
-
     api.createSchema(async ({ addSchemaTypes }) => {
       addSchemaTypes(schemaTypes.GhostAuthor(this.typeNames))
       addSchemaTypes(schemaTypes.GhostTag(this.typeNames))
@@ -56,17 +52,14 @@ class GhostSource {
       addSchemaTypes(schemaTypes.GhostPage(this.typeNames))
     })
   }
-
-  async loadTags ({ addCollection }) {
+  async loadTags({ addCollection }) {
     console.log(`Loading ${TYPE_TAG}`)
     const tags = addCollection({
       typeName: this.typeNames.tag
     })
-
     await this.loadBasicEntity(tags, this.contentAPI.tags)
   }
-
-  async loadPages ({ addCollection, createReference }) {
+  async loadPages({ addCollection, createReference }) {
     console.log(`Loading ${TYPE_PAGE}`)
     const pages = addCollection({
       typeName: this.typeNames.page,
@@ -74,7 +67,6 @@ class GhostSource {
     })
     const tagTypeName = this.typeNames.tag
     const authorTypeName = this.typeNames.author
-
     let keepGoing = true
     let currentPage = 1
 
@@ -84,18 +76,15 @@ class GhostSource {
         include: 'tags,authors',
         page: currentPage
       })
-
       entities.forEach(entity => {
         const { tags = [], authors = [], ...options } = entity
-        const { primary_tag, primary_author } = options // eslint-disable-line
-
-        options.primary_tag = primary_tag // eslint-disable-line
+                const { primary_tag, primary_author } = options; // eslint-disable-line
+                options.primary_tag = primary_tag // eslint-disable-line
           ? createReference(tagTypeName, primary_tag.id)
           : null
         options.primary_author = createReference(authorTypeName, primary_author.id)
         options.tags = tags.map(tag => createReference(tagTypeName, tag.id))
         options.authors = authors.map(author => createReference(authorTypeName, author.id))
-
         pages.addNode(options)
       })
 
@@ -106,26 +95,21 @@ class GhostSource {
       currentPage++
     }
   }
-
-  async loadAuthors ({ addCollection }) {
+  async loadAuthors({ addCollection }) {
     console.log(`Loading ${TYPE_AUTHOR}`)
     const authors = addCollection({
       typeName: this.typeNames.author
     })
-
     await this.loadBasicEntity(authors, this.contentAPI.authors)
   }
-
-  async loadPosts ({ createReference, addCollection }) {
+  async loadPosts({ createReference, addCollection }) {
     console.log(`Loading ${TYPE_POST}`)
     const posts = addCollection({
       typeName: this.typeNames.post,
       dateField: 'published_at'
     })
-
     const tagTypeName = this.typeNames.tag
     const authorTypeName = this.typeNames.author
-
     let keepGoing = true
     let currentPage = 1
 
@@ -135,18 +119,15 @@ class GhostSource {
         include: 'tags,authors',
         page: currentPage
       })
-
       entities.forEach(entity => {
         const { tags = [], authors = [], ...options } = entity
-        const { primary_tag, primary_author } = options // eslint-disable-line
-
-        options.primary_tag = primary_tag // eslint-disable-line
+                const { primary_tag, primary_author } = options; // eslint-disable-line
+                options.primary_tag = primary_tag // eslint-disable-line
           ? createReference(tagTypeName, primary_tag.id)
           : null
         options.primary_author = createReference(authorTypeName, primary_author.id)
         options.tags = tags.map(tag => createReference(tagTypeName, tag.id))
         options.authors = authors.map(author => createReference(authorTypeName, author.id))
-
         posts.addNode(options)
       })
 
@@ -157,16 +138,13 @@ class GhostSource {
       currentPage++
     }
   }
-
-  async loadSettings (store) {
+  async loadSettings(store) {
     const { settingsName, typeName } = this.options
     const settings = await this.contentAPI.settings.browse()
     const fieldName = settingsName || camelCase(typeName)
-
     store.addMetadata(fieldName, settings)
   }
-
-  async loadBasicEntity (collection, contentEntity) {
+  async loadBasicEntity(collection, contentEntity) {
     let keepGoing = true
     let currentPage = 1
 
@@ -175,7 +153,6 @@ class GhostSource {
         limit: this.options.perPage,
         page: currentPage
       })
-
       entities.forEach(entity => {
         collection.addNode(entity)
       })
@@ -187,10 +164,9 @@ class GhostSource {
       currentPage++
     }
   }
-
-  createTypeName (typeName = '') {
+  createTypeName(typeName = '') {
     return camelCase(`${this.options.typeName} ${typeName}`, { pascalCase: true })
   }
 }
 
-module.exports = GhostSource
+export default GhostSource

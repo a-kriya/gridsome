@@ -1,9 +1,9 @@
-const fs = require('fs-extra')
-const oust = require('oust')
-const critical = require('critical')
-const { createPolyfillScript, inlineCriticalCSS } = require('./inline')
+import fs from 'fs-extra'
+import oust from 'oust'
+import critical from 'critical'
+import { createPolyfillScript, inlineCriticalCSS } from './inline.js'
 
-exports.processHtmlFile = async function (filename, options = {}) {
+export const processHtmlFile = async function (filename, options = {}) {
   const { publicPath, baseDir, polyfill, ...criticalOptions } = options
   const sourceHTML = await fs.readFile(filename, 'utf-8')
 

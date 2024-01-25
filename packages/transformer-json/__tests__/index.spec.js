@@ -1,4 +1,4 @@
-const JSONTransformer = require('../index')
+import JSONTransformer from '../index'
 
 test('parse string', async () => {
   const transformer = new JSONTransformer()

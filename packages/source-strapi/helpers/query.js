@@ -1,18 +1,18 @@
-const axios = require('axios')
-const pluralize = require('pluralize')
+import axios from 'axios'
+import pluralize from 'pluralize'
 
-module.exports = async ({ apiURL, resourceName, jwtToken, queryLimit, isSingleType }) => {
+export default async ({ apiURL, resourceName, jwtToken, queryLimit, isSingleType }) => {
   let resource
 
   if (isSingleType) {
     resource = resourceName
-  } else {
+  }
+  else {
     resource = pluralize(resourceName)
   }
 
   // Define API endpoint.
   const apiEndpoint = `${apiURL}/${resource}?_limit=${queryLimit}`
-
   // Set authorization token
   const fetchRequestConfig = {}
 

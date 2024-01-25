@@ -1,6 +1,6 @@
-const envinfo = require('envinfo')
+import envinfo from 'envinfo'
 
-module.exports = async () => {
+export default async () => {
   const data = await envinfo
     .run({
       System: ['OS', 'CPU'],

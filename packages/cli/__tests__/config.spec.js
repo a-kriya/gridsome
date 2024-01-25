@@ -1,4 +1,4 @@
-const runCLI = require('./utils/helpers')
+import runCLI from './utils/helpers.js'
 
 test('warns if unkown option name', async () => {
   const { stdout } = await runCLI(['config', '--set', 'asdf'], { cwd: __dirname })

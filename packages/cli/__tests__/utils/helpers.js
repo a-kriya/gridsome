@@ -1,9 +1,8 @@
-const execa = require('execa')
-
+import { execa } from 'execa'
 const CLI_PATH = require.resolve('../../bin/gridsome')
 
 const runCLI = (args, options = {}) => {
   return execa(CLI_PATH, args, options)
 }
 
-module.exports = runCLI
+export default runCLI

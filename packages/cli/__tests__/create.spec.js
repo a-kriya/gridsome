@@ -1,8 +1,6 @@
-const fs = require('fs-extra')
-const { join } = require('path')
-
-const runCLI = require('./utils/helpers')
-
+import fs from 'fs-extra'
+import { join } from 'path'
+import runCLI from './utils/helpers.js'
 const genPath = join(__dirname, 'my-project')
 
 beforeEach(() => {

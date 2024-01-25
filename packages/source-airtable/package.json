@@ -5,6 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-airtable",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-airtable#readme",
   "main": "index.js",
+  "type": "module",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
@@ -12,10 +13,10 @@
     "airtable"
   ],
   "dependencies": {
-    "airtable": "^0.7.2"
+    "airtable": "^0.12.2"
   },
   "peerDependencies": {
-    "@kriya/gridsome": "^0.8.1-1"
+    "@kriya/gridsome": "^0.9.1"
   },
   "publishConfig": {
     "access": "public"

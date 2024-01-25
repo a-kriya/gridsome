@@ -1,17 +1,15 @@
-const parseJson = require('json-parse-better-errors')
+import parseJson from 'json-parse-better-errors'
 
 class JSONTransformer {
-  static mimeTypes () {
+  static mimeTypes() {
     return ['application/json']
   }
-
-  parse (source) {
+  parse(source) {
     const data = parseJson(source)
-
     return typeof data !== 'object' || Array.isArray(data)
       ? { data }
       : data
   }
 }
 
-module.exports = JSONTransformer
+export default JSONTransformer

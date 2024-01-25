@@ -1,17 +1,18 @@
-const { documentToHtmlString } = require('@contentful/rich-text-html-renderer')
-const { GraphQLScalarType } = require('@kriya/gridsome/graphql')
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
+import graphql from '@kriya/gridsome/graphql'
 
+const { GraphQLScalarType } = graphql
 const ContentfulRichTextField = new GraphQLScalarType({
   name: 'ContentfulRichTextField',
   serialize: value => value
 })
 
-module.exports = options => ({
+export default options => ({
   type: ContentfulRichTextField,
   args: {
     html: { type: 'Boolean', defaultValue: false }
   },
-  resolve (obj, args, context, info) {
+  resolve(obj, args, context, info) {
     const value = obj[info.fieldName]
 
     const json = typeof value === 'string'

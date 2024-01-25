@@ -1,4 +1,4 @@
-const YamlTransformer = require('../index')
+import YamlTransformer from '../index'
 
 test('parse string', async () => {
   const transformer = new YamlTransformer()

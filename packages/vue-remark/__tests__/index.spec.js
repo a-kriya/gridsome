@@ -1,6 +1,6 @@
-const path = require('path')
-const VueRemark = require('..')
-const App = require('@kriya/gridsome/lib/app/App')
+import { resolve } from 'path'
+import VueRemark from '..'
+import App from '@kriya/gridsome/lib/app/App'
 
 test('parse simple title', async () => {
   const plugin = await createPlugin()
@@ -400,7 +400,7 @@ describe('process import statements', () => {
 })
 
 async function createPlugin (options = {}) {
-  const app = new App(path.resolve(__dirname, './__fixtures__'), {
+  const app = new App(resolve(__dirname, './__fixtures__'), {
     plugins: [{
       use: require.resolve('..'),
       options: { typeName: 'Test', baseDir: '.', ...options }

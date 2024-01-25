@@ -1,15 +1,20 @@
 #!/usr/bin/env node
+import path from 'path'
+import chalk from 'chalk'
+import program from 'commander'
+import { distance } from 'fastest-levenshtein'
+import importSync from 'import-sync'
+import resolveCwd from 'resolve-cwd'
+import updateNotifier from 'update-notifier'
+import resolveVersions from '../lib/utils/version.js'
+import findUp from 'find-up'
+import pkg from '../package.json'
+import create from '../lib/commands/create.js'
+import config from '../lib/commands/config.js'
+import info from '../lib/commands/info.js'
+import utils from '../lib/utils/index.js'
 
-const path = require('path')
-const chalk = require('chalk')
-const program = require('commander')
-const { distance } = require('fastest-levenshtein')
-const resolveCwd = require('resolve-cwd')
-const updateNotifier = require('update-notifier')
-const resolveVersions = require('../lib/utils/version')
-const pkgPath = require('find-up').sync('package.json')
-
-const pkg = require('../package.json')
+const pkgPath = findUp.sync('package.json')
 const notifier = updateNotifier({ pkg })
 
 const context = pkgPath ? path.resolve(path.dirname(pkgPath)) : process.cwd()
@@ -23,7 +28,6 @@ program
   .command('create <name> [starter]')
   .description('create a new website')
   .action((...args) => {
-    const create = require('../lib/commands/create')
     return wrapCommand(create)(...args)
   })
 
@@ -32,11 +36,12 @@ try {
   const gridsomePath = resolveCwd.silent('@kriya/gridsome')
 
   if (commandsPath) {
-    require(commandsPath)({ context, program })
+    importSync(commandsPath)({ context, program })
   } else if (gridsomePath) {
-    require(gridsomePath)({ context, program })
+    importSync(gridsomePath)({ context, program })
   }
-} catch (err) {
+}
+catch (err) {
   console.log(err)
 }
 
@@ -48,7 +53,6 @@ program
   .option('--json', 'output all options as JSON')
   .description('inspect or set config')
   .action((...args) => {
-    const config = require('../lib/commands/config')
     return wrapCommand(config)(...args)
   })
 
@@ -56,13 +60,10 @@ program
   .command('info')
   .description('output information about the local environment')
   .action(() => {
-    const info = require('../lib/commands/info')
     return wrapCommand(info)()
   })
-
 // show a warning if the command does not exist
-program.arguments('<command>').action(async command => {
-  const { isGridsomeProject } = require('../lib/utils')
+program.arguments('<command>').action(async (command) => {
   const availableCommands = program.commands.map(cmd => cmd._name)
   const suggestion = availableCommands.find(cmd => {
     const steps = distance(cmd, command)
@@ -71,11 +72,12 @@ program.arguments('<command>').action(async command => {
 
   console.log(chalk.red(`Unknown command ${chalk.bold(command)}`))
 
-  if (isGridsomeProject(pkgPath) && !suggestion) {
+  if (utils.isGridsomeProject(pkgPath) && !suggestion) {
     console.log()
     console.log()
     program.outputHelp()
-  } else if (suggestion) {
+  }
+  else if (suggestion) {
     console.log()
     console.log(`Did you mean ${suggestion}?`)
   }
@@ -101,7 +103,7 @@ if (notifier.update) {
   })()
 }
 
-function wrapCommand (fn) {
+function wrapCommand(fn) {
   return (...args) => {
     return fn(...args).catch(err => {
       console.error(chalk.red(err.stack))

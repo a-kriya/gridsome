@@ -1,11 +1,11 @@
-const { LRUCache } = require('lru-cache')
-const hash = require('hash-sum')
-const loaderUtils = require('loader-utils')
+import { LRUCache } from 'lru-cache'
+import hash from 'hash-sum'
+import { getOptions } from 'loader-utils'
 
 const cache = new LRUCache({ max: 1000 })
 
-module.exports = async function vueRemarkLoader (source, map) {
-  const plugin = loaderUtils.getOptions(this)
+export default async function vueRemarkLoader (source, map) {
+  const plugin = getOptions(this)
   const cacheKey = hash(source + this.resourcePath)
   const cached = cache.get(cacheKey)
   const callback = this.async()

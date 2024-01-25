@@ -5,6 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-wordpress#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-wordpress",
   "main": "index.js",
+  "type": "module",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
@@ -12,7 +13,7 @@
     "wordpress"
   ],
   "dependencies": {
-    "axios": "^1.6.2",
+    "axios": "^1.6.7",
     "camelcase": "~6.3.0",
     "lodash": "^4.17.21",
     "p-map": "~4.0.0"

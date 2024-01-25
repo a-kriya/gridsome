@@ -1,14 +1,13 @@
-const visit = require('unist-util-visit')
-
-module.exports = function attacher () {
+import visit from 'unist-util-visit'
+export default (function attacher() {
   const transformer = this.data('transformer')
 
-  return async function transform (tree, file, callback) {
-    if (!transformer) return callback()
-    if (!file.path) return callback()
-
+  return async function transform(tree, file, callback) {
+    if (!transformer)
+      return callback()
+    if (!file.path)
+      return callback()
     const links = []
-
     visit(tree, 'link', node => { links.push(node) })
 
     for (const node of links) {
@@ -19,7 +18,8 @@ module.exports = function attacher () {
       try {
         const asset = await transformer.assets.add(path)
         node.url = asset.src
-      } catch (err) {
+      }
+      catch (err) {
         callback(err)
         return
       }
@@ -27,4 +27,4 @@ module.exports = function attacher () {
 
     callback()
   }
-}
+})

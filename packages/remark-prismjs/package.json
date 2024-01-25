@@ -5,6 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/remark-prismjs#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/remark-prismjs",
   "main": "index.js",
+  "type": "module",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
@@ -13,11 +14,11 @@
   ],
   "dependencies": {
     "escape-html": "^1.0.3",
-    "hast-util-to-html": "^6.0.2",
-    "hastscript": "^5.1.0",
-    "prismjs": "^1.15.0",
+    "hast-util-to-html": "^6.1.0",
+    "hastscript": "^5.1.2",
+    "prismjs": "^1.29.0",
     "unist-builder": "^1.0.4",
-    "unist-util-visit": "^1.4.0"
+    "unist-util-visit": "^1.4.1"
   },
   "publishConfig": {
     "access": "public"

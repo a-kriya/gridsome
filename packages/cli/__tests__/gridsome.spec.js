@@ -1,6 +1,5 @@
-const path = require('path')
-
-const runCLI = require('./utils/helpers')
+import path from 'path'
+import runCLI from './utils/helpers.js'
 
 test('show @kriya/gridsome-cli version', async () => {
   const { stdout } = await runCLI(['-v'])

@@ -1,8 +1,25 @@
-const vfile = require('vfile')
-const hash = require('hash-sum')
-const visit = require('unist-util-visit')
+import * as vfile from 'vfile'
+import hash from 'hash-sum'
+import importSync from 'import-sync'
+import visit from 'unist-util-visit'
+import file from './plugins/file.js'
+import image from './plugins/image.js'
 
-exports.cacheKey = function (node, key) {
+function normalizePlugins(arr = []) {
+  const normalize = entry => {
+    return typeof entry === 'string'
+      ? importSync(entry)
+      : entry
+  }
+
+  return arr.map(entry => {
+    return Array.isArray(entry)
+      ? [normalize(entry[0]), entry[1] || {}]
+      : [normalize(entry), {}]
+  })
+}
+
+export const cacheKey = function (node, key) {
   return hash({
     content: node.content,
     path: node.internal.origin,
@@ -11,7 +28,7 @@ exports.cacheKey = function (node, key) {
   })
 }
 
-exports.createFile = function (node) {
+export const createFile = function (node) {
   return vfile({
     contents: node.content,
     path: node.internal.origin,
@@ -19,7 +36,7 @@ exports.createFile = function (node) {
   })
 }
 
-exports.createPlugins = function (options, localOptions) {
+export const createPlugins = function (options, localOptions) {
   const userPlugins = (options.plugins || []).concat(localOptions.plugins || [])
   const plugins = []
 
@@ -28,11 +45,11 @@ exports.createPlugins = function (options, localOptions) {
   }
 
   if (options.processFiles !== false) {
-    plugins.push(require('./plugins/file'))
+    plugins.push(file)
   }
 
   if (options.processImages !== false) {
-    plugins.push([require('./plugins/image'), {
+    plugins.push([image, {
       blur: options.imageBlurRatio,
       quality: options.imageQuality,
       background: options.imageBackground,
@@ -76,13 +93,11 @@ exports.createPlugins = function (options, localOptions) {
   }
 
   plugins.push(...userPlugins)
-
   return normalizePlugins(plugins)
 }
 
-exports.findHeadings = function (ast) {
+export const findHeadings = function (ast) {
   const headings = []
-
   visit(ast, 'heading', node => {
     const heading = { depth: node.depth, value: '', anchor: '' }
     const children = node.children || []
@@ -92,27 +107,13 @@ exports.findHeadings = function (ast) {
 
       if (el.type === 'link') {
         heading.anchor = el.url
-      } else if (el.value) {
+      }
+      else if (el.value) {
         heading.value += el.value
       }
     }
 
     headings.push(heading)
   })
-
   return headings
-}
-
-function normalizePlugins (arr = []) {
-  const normalize = entry => {
-    return typeof entry === 'string'
-      ? require(entry)
-      : entry
-  }
-
-  return arr.map(entry => {
-    return Array.isArray(entry)
-      ? [normalize(entry[0]), entry[1] || {}]
-      : [normalize(entry), {}]
-  })
 }

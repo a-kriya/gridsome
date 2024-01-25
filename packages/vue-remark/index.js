@@ -1,39 +1,26 @@
-const path = require('path')
-const { pathToRegexp, compile } = require('path-to-regexp')
-const Filesystem = require('@kriya/gridsome-source-filesystem')
-const RemarkTransformer = require('@kriya/gridsome-transformer-remark')
-const { omit, trimEnd, kebabCase } = require('lodash')
-const { GraphQLList, GraphQLBoolean } = require('@kriya/gridsome/graphql')
-
-const toSFC = require('./lib/toSfc')
-const sfcSyntax = require('./lib/sfcSyntax')
-const toVueRemarkAst = require('./lib/toVueRemarkAst')
-const remarkFilePlugin = require('./lib/plugins/file')
-const remarkImagePlugin = require('./lib/plugins/image')
-
-const {
-  HeadingType,
-  HeadingLevels
-} = require('./lib/types/HeadingType')
-
-const {
-  createFile,
-  makePathParams,
-  normalizeLayout,
-  createCacheIdentifier
-} = require('./lib/utils')
-
+import path from 'path'
+import pathToRegexp$0 from 'path-to-regexp'
+import Filesystem from '@kriya/gridsome-source-filesystem'
+import RemarkTransformer from '@kriya/gridsome-transformer-remark'
+import lodash from 'lodash'
+import graphql from '@kriya/gridsome/graphql'
+import toSFC from './lib/toSfc.js'
+import sfcSyntax from './lib/sfcSyntax.js'
+import toVueRemarkAst from './lib/toVueRemarkAst.js'
+import remarkFilePlugin from './lib/plugins/file.js'
+import remarkImagePlugin from './lib/plugins/image.js'
+import { HeadingType, HeadingLevels } from './lib/types/HeadingType.js'
+import { createFile, makePathParams, normalizeLayout, createCacheIdentifier } from './lib/utils.js'
+const { pathToRegexp, compile } = pathToRegexp$0
+const { omit, trimEnd, kebabCase } = lodash
+const { GraphQLList, GraphQLBoolean } = graphql
 const normalizeRouteKeys = keys => keys
   .filter(key => typeof key.name === 'string')
   .map(key => {
     // separate field name from suffix
-    const [, fieldName, suffix] = (
-      key.name.match(/^(.*[^_])_([a-z]+)$/) ||
-      [null, key.name, null]
-    )
-
+    const [, fieldName, suffix] = (key.name.match(/^(.*[^_])_([a-z]+)$/) ||
+        [null, key.name, null])
     const path = fieldName.split('__')
-
     return {
       name: key.name,
       path,
@@ -45,7 +32,6 @@ const normalizeRouteKeys = keys => keys
 
 const createCustomBlockRule = (config, type) => {
   const re = new RegExp(`blockType=(${type})`)
-
   config.module.rule(type)
     .resourceQuery(re)
     .use('babel-loader')
@@ -63,14 +49,12 @@ const genChunkName = (context, component) => {
     .filter(s => s !== '..')
     .map(s => kebabCase(s))
     .join('--')
-
   return `vue-remark--${chunkName}`
 }
 
 // TODO: refactor and clean up
-
 class VueRemark {
-  static defaultOptions () {
+  static defaultOptions() {
     return {
       typeName: undefined,
       baseDir: undefined,
@@ -84,8 +68,7 @@ class VueRemark {
       ignore: []
     }
   }
-
-  constructor (api, options) {
+  constructor(api, options) {
     if (!options.baseDir) {
       throw new Error(`@kriya/gridsome-vue-remark requires the 'baseDir' option.`)
     }
@@ -95,17 +78,14 @@ class VueRemark {
     }
 
     if (api.config.templates[options.typeName]) {
-      throw new Error(
-        `@kriya/gridsome-vue-remark does not work with a template. ` +
-        `Remove "${options.typeName}" from the global templates config ` +
-        `and use the "template" option for the plugin instead.`
-      )
+      throw new Error(`@kriya/gridsome-vue-remark does not work with a template. ` +
+                `Remove "${options.typeName}" from the global templates config ` +
+                `and use the "template" option for the plugin instead.`)
     }
 
     this.api = api
     this.options = options
     this.context = options.baseDir ? api.resolve(options.baseDir) : api.context
-
     api.setClientOptions({})
 
     if (typeof options.template === 'string') {
@@ -123,7 +103,6 @@ class VueRemark {
 
       const routeKeys = []
       pathToRegexp(this.route.path, routeKeys)
-
       this.route.createPath = compile(this.route.path, { encode: encodeURIComponent })
       this.route.routeKeys = normalizeRouteKeys(routeKeys)
     }
@@ -132,7 +111,6 @@ class VueRemark {
       '**/*.md',
       ...options.ignore.map((path) => `!${path}`)
     ]
-
     this.filesystem = new Filesystem(api, {
       path: paths,
       typeName: options.typeName,
@@ -141,9 +119,7 @@ class VueRemark {
       index: options.index,
       refs: options.refs
     })
-
     const remarkOptions = options.remark || {}
-
     this.remark = new RemarkTransformer({}, {
       assets: api._app.assets,
       localOptions: {
@@ -168,25 +144,19 @@ class VueRemark {
         ]
       }
     })
-
     api.transpileDependencies([path.resolve(__dirname, 'src')])
     api.chainWebpack(config => this.chainWebpack(config))
     api.createPages(actions => this.createPages(actions))
 
     if (api._app.compiler.hooks.cacheIdentifier) {
       api._app.compiler.hooks.cacheIdentifier.tap('VueRemark', id => {
-        id[`vue-remark-${api._entry.uid}`] = createCacheIdentifier(
-          api.context,
-          this.options.remark,
-          this.remark.processor.attachers
-        )
+        id[`vue-remark-${api._entry.uid}`] = createCacheIdentifier(api.context, this.options.remark, this.remark.processor.attachers)
       })
     }
 
     api._app.pages.hooks.parseComponent.for('md').tap('VueRemark', source => {
       const pageQueryRE = /<page-query>([^</]+)<\/page-query>/
       const ast = this.remark.processor.parse(source)
-
       return {
         pageQuery: ast.children
           .filter(node => node.type === 'html' && /^<page-query/.test(node.value))
@@ -194,7 +164,6 @@ class VueRemark {
           .pop()
       }
     })
-
     api._app.store.hooks.addCollection.tap({
       name: 'VueRemark',
       before: 'TemplatesPlugin'
@@ -203,7 +172,6 @@ class VueRemark {
         options.component = false
       }
     })
-
     api._app.store.hooks.addNode.tap({
       name: 'VueRemark',
       before: 'TransformNodeContent'
@@ -213,13 +181,13 @@ class VueRemark {
 
         if (!parsed.title) {
           const title = parsed.content.split('\n').find(line => /^#\s/.test(line))
-          if (title) parsed.title = title.match(/^#\s+(.*)/)[1]
+          if (title)
+            parsed.title = title.match(/^#\s+(.*)/)[1]
         }
 
-        if (!parsed.excerpt) parsed.excerpt = null
-
+        if (!parsed.excerpt)
+          parsed.excerpt = null
         Object.assign(options, omit(parsed, ['layout']))
-
         options.internal.mimeType = null
         options.internal.content = null
 
@@ -230,14 +198,12 @@ class VueRemark {
         }
       }
     })
-
     api.createSchema(({ addSchemaResolvers }) => {
       if (options.remark.autolinkHeadings === false) {
         return
       }
 
       const { headings } = this.remark.extendNodeType()
-
       addSchemaResolvers({
         [this.options.typeName]: {
           headings: {
@@ -257,14 +223,11 @@ class VueRemark {
       })
     })
   }
-
-  chainWebpack (config) {
+  chainWebpack(config) {
     const vueLoader = config.module.rule('vue').use('vue-loader')
     const includePaths = this.options.includePaths.map(p => this.api.resolve(p))
-
     createCustomBlockRule(config, 'vue-remark-import')
     createCustomBlockRule(config, 'vue-remark-frontmatter')
-
     config.module.rule('vue-remark')
       .test(/\.md$/)
       .include
@@ -284,8 +247,7 @@ class VueRemark {
       .loader(require.resolve('./lib/loader.js'))
       .options(this)
   }
-
-  async createPages ({ getCollection, createPage }) {
+  async createPages({ getCollection, createPage }) {
     const collection = getCollection(this.options.typeName)
     const nodes = collection.data()
     const length = nodes.length
@@ -294,11 +256,7 @@ class VueRemark {
       const node = nodes[i]
 
       if (this.template) {
-        const chunkName = genChunkName(
-          this.api.context,
-          node.internal.origin
-        )
-
+        const chunkName = genChunkName(this.api.context, node.internal.origin)
         createPage({
           path: node.path,
           component: this.template,
@@ -309,7 +267,8 @@ class VueRemark {
             }
           }
         })
-      } else {
+      }
+      else {
         createPage({
           path: node.path,
           component: node.internal.origin,
@@ -318,8 +277,7 @@ class VueRemark {
       }
     }
   }
-
-  async parse (source, options = {}) {
+  async parse(source, options = {}) {
     const { content, ...data } = this.remark.parse(source.trim())
     const defaultLayout = require.resolve('./src/VueRemarkRoot.js')
     const layout = normalizeLayout(data.layout || defaultLayout)
@@ -328,8 +286,8 @@ class VueRemark {
       layout.component = path.resolve(this.api.context, layout.component)
     }
 
-    if (!data.excerpt) data.excerpt = null
-
+    if (!data.excerpt)
+      data.excerpt = null
     const file = createFile({
       contents: content,
       data: {
@@ -344,9 +302,8 @@ class VueRemark {
     }
 
     const sfc = await this.remark.processor.process(file)
-
     return sfc.contents
   }
 }
 
-module.exports = VueRemark
+export default VueRemark

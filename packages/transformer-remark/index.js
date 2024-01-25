@@ -1,62 +1,43 @@
-const { LRUCache } = require('lru-cache')
-const unified = require('unified')
-const parse = require('gray-matter')
-const remarkHtml = require('remark-html')
-const remarkParse = require('remark-parse')
-const sanitizeHTML = require('sanitize-html')
-const { defaultsDeep } = require('lodash')
-
+import { LRUCache } from 'lru-cache'
+import unified from 'unified'
+import parse from 'gray-matter'
+import remarkHtml from 'remark-html'
+import remarkParse from 'remark-parse'
+import sanitizeHTML from 'sanitize-html'
+import lodash from 'lodash'
+import { cacheKey, createFile, findHeadings, createPlugins } from './lib/utils.js'
+import { estimateTimeToRead } from './lib/timeToRead.js'
+import { HeadingType, HeadingLevels } from './lib/types/HeadingType.js'
+import graphql from '@kriya/gridsome/graphql'
+const { defaultsDeep } = lodash
 const cache = new LRUCache({ max: 1000 })
-
-const {
-  cacheKey,
-  createFile,
-  findHeadings,
-  createPlugins
-} = require('./lib/utils')
-
-const { estimateTimeToRead } = require('./lib/timeToRead')
-
-const {
-  HeadingType,
-  HeadingLevels
-} = require('./lib/types/HeadingType')
-
-const {
-  GraphQLInt,
-  GraphQLList,
-  GraphQLString,
-  GraphQLBoolean
-} = require('@kriya/gridsome/graphql')
+const { GraphQLInt, GraphQLList, GraphQLString, GraphQLBoolean } = graphql
 
 class RemarkTransformer {
-  static mimeTypes () {
+  static mimeTypes() {
     return ['text/markdown', 'text/x-markdown']
   }
-
-  constructor (options, context) {
+  constructor(options, context) {
     const { localOptions, resolveNodeFilePath } = context
-
     this.options = defaultsDeep(localOptions, options)
     this.processor = this.createProcessor(localOptions)
     this.resolveNodeFilePath = resolveNodeFilePath
     this.assets = context.assets || context.queue
   }
-
-  parse (source) {
+  parse(source) {
     const { data, content, excerpt } = parse(source, this.options.grayMatter || {})
 
     // if no title was found by gray-matter,
     // try to find the first one in the content
     if (!data.title) {
       const title = content.trim().match(/^#+\s+(.*)/)
-      if (title) data.title = title[1]
+      if (title)
+        data.title = title[1]
     }
 
     return { content, excerpt, ...data }
   }
-
-  extendNodeType () {
+  extendNodeType() {
     return {
       content: {
         type: GraphQLString,
@@ -79,9 +60,7 @@ class RemarkTransformer {
           }
 
           return headings
-            .filter(heading =>
-              typeof depth === 'number' ? heading.depth === depth : true
-            )
+            .filter(heading => typeof depth === 'number' ? heading.depth === depth : true)
             .map(heading => ({
               depth: heading.depth,
               anchor: heading.anchor,
@@ -110,7 +89,6 @@ class RemarkTransformer {
               allowedAttributes: {},
               allowedTags: []
             })
-
             cached = estimateTimeToRead(text, speed)
             cache.set(key, cached)
           }
@@ -151,34 +129,29 @@ class RemarkTransformer {
       }
     }
   }
-
-  createProcessor (options = {}) {
+  createProcessor(options = {}) {
     const processor = unified().data('transformer', this)
     const plugins = createPlugins(this.options, options)
     const config = this.options.config || {}
-
     return processor
       .use(remarkParse, config)
       .use(plugins)
       .use(options.stringifier || remarkHtml)
   }
-
-  _nodeToAST (node) {
+  _nodeToAST(node) {
     const key = cacheKey(node, 'ast')
     let cached = cache.get(key)
 
     if (!cached) {
       const file = createFile(node)
       const ast = this.processor.parse(file)
-
       cached = this.processor.run(ast, file)
       cache.set(key, cached)
     }
 
     return Promise.resolve(cached)
   }
-
-  _nodeToHTML (node) {
+  _nodeToHTML(node) {
     const key = cacheKey(node, 'html')
     let cached = cache.get(key)
 
@@ -186,10 +159,8 @@ class RemarkTransformer {
       cached = (async () => {
         const file = createFile(node)
         const ast = await this._nodeToAST(node)
-
         return this.processor.stringify(ast, file)
       })()
-
       cache.set(key, cached)
     }
 
@@ -197,4 +168,4 @@ class RemarkTransformer {
   }
 }
 
-module.exports = RemarkTransformer
+export default RemarkTransformer

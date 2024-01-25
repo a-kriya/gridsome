@@ -1,5 +1,4 @@
-const htmlTags = require('html-tags')
-
+import * as htmlTags from 'html-tags'
 const isImport = value => /^import\s+/.test(value)
 const isStyle = value => /^<style/.test(value)
 const isScript = value => /^<script/.test(value)
@@ -12,19 +11,18 @@ const getValue = value => {
   return index !== -1 ? value.slice(0, index) : value
 }
 
-function tokenizeImportSyntax (eat, value) {
+function tokenizeImportSyntax(eat, value) {
   value = getValue(value)
 
   if (isImport(value)) {
     const lines = getValue(value).split('\n')
     const statements = lines.filter(line => line.startsWith('import'))
     const portion = statements.join('\n')
-
     return eat(portion)({ type: 'vue-remark:import', value: portion })
   }
 }
 
-function tokenizeSFCBlocks (eat, value) {
+function tokenizeSFCBlocks(eat, value) {
   value = getValue(value)
 
   if (isQuery(value) || isScript(value) || isStyle(value)) {
@@ -32,12 +30,11 @@ function tokenizeSFCBlocks (eat, value) {
     const re = new RegExp(`^<${name}[^>]*>(.|\\n|\\t)*?<\\/${name}>`)
     const matches = value.match(re)
     const portion = matches ? matches[0] : ''
-
     return eat(portion)({ type: 'vue-remark:block', value: portion })
   }
 }
 
-function tokenizeVueComponents (eat, value) {
+function tokenizeVueComponents(eat, value) {
   value = getValue(value)
 
   if (isStartTag(value)) {
@@ -46,7 +43,8 @@ function tokenizeVueComponents (eat, value) {
     if (name && !htmlTags.includes(name)) {
       return eat(value)({ type: 'html', value })
     }
-  } else if (isEndTag(value)) {
+  }
+  else if (isEndTag(value)) {
     const [, name] = value.match(/<\/?([\w-]+)[>\s]$/) || []
 
     if (name && !htmlTags.includes(name)) {
@@ -56,13 +54,11 @@ function tokenizeVueComponents (eat, value) {
   }
 }
 
-module.exports = function sfcSyntax () {
+export default (function sfcSyntax() {
   const { blockTokenizers, blockMethods } = this.Parser.prototype
-
   blockTokenizers.sfcBlocks = tokenizeSFCBlocks
   blockTokenizers.vueComponents = tokenizeVueComponents
   blockTokenizers.importSyntax = tokenizeImportSyntax
-
   blockMethods.splice(blockMethods.indexOf('html'), 0, 'importSyntax', 'sfcBlocks')
   blockMethods.splice(blockMethods.indexOf('paragraph'), 0, 'vueComponents')
-}
+})

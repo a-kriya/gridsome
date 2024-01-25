@@ -1,25 +1,22 @@
-const visit = require('unist-util-visit')
-
-module.exports = function attacher (options = {}) {
+import visit from 'unist-util-visit'
+export default (function attacher(options = {}) {
   const transformer = this.data('transformer')
 
-  return async function transform (tree, file, callback) {
-    if (!transformer) return callback()
-    if (!file.path) return callback()
-
+  return async function transform(tree, file, callback) {
+    if (!transformer)
+      return callback()
+    if (!file.path)
+      return callback()
     const images = []
-
     visit(tree, 'image', node => { images.push(node) })
 
     for (const node of images) {
       const data = node.data || {}
       const props = data.hProperties || {}
       const classNames = props.class || []
-
       const path = file.data.node
         ? transformer.resolveNodeFilePath(file.data.node, node.url)
         : node.url
-
       let imageHTML = null
       let noscriptHTML = null
 
@@ -31,10 +28,10 @@ module.exports = function attacher (options = {}) {
           classNames,
           ...options
         })
-
         imageHTML = asset.imageHTML
         noscriptHTML = asset.noscriptHTML
-      } catch (err) {
+      }
+      catch (err) {
         callback(err)
         return
       }
@@ -47,4 +44,4 @@ module.exports = function attacher (options = {}) {
 
     callback()
   }
-}
+})

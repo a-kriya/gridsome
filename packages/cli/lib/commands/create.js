@@ -1,18 +1,41 @@
-const path = require('path')
-const fs = require('fs-extra')
-const chalk = require('chalk')
-const execa = require('execa')
-const axios = require('axios')
-const jsYaml = require('js-yaml')
-const inquirer = require('inquirer')
-const Tasks = require('@hjvedvik/tasks')
-const sortPackageJson = require('sort-package-json')
-const autocompletePrompt = require('inquirer-autocomplete-prompt')
-const { config, hasYarn, hasPnpm, installDependencies } = require('../utils')
-
+import path from 'path'
+import fs from 'fs-extra'
+import chalk from 'chalk'
+import { execa } from 'execa'
+import axios from 'axios'
+import jsYaml from 'js-yaml'
+import * as inquirer from 'inquirer'
+import * as Tasks from '@hjvedvik/tasks'
+import sortPackageJson from 'sort-package-json'
+import autocompletePrompt from 'inquirer-autocomplete-prompt'
+import utils from '../utils/index.js'
+const { config, hasYarn, hasPnpm, installDependencies } = utils
 inquirer.registerPrompt('autocomplete', autocompletePrompt)
 
-module.exports = async (name, starter = '') => {
+async function fetchStarters() {
+  try {
+    const res = await axios('https://raw.githubusercontent.com/gridsome/gridsome.org/master/starters/starters.yaml')
+    return jsYaml.load(res.data)
+  }
+  catch (err) {
+    return []
+  }
+}
+
+async function updatePkg(pkgPath, obj) {
+  const content = await fs.readFile(pkgPath, 'utf-8')
+  const pkg = JSON.parse(content)
+  const newPkg = sortPackageJson(Object.assign(pkg, obj))
+  await fs.outputFile(pkgPath, JSON.stringify(newPkg, null, 2))
+}
+
+function absolutePath(string) {
+  if (path.isAbsolute(string))
+    return string
+  return path.join(process.cwd(), string)
+}
+
+export default async (name, starter = '') => {
   const dir = absolutePath(name)
   const projectName = path.basename(dir)
   const commandName = {
@@ -22,11 +45,7 @@ module.exports = async (name, starter = '') => {
 
   if (fs.existsSync(dir) && fs.readdirSync(dir).length) {
     process.exitCode = 1
-    return console.error(
-      chalk.red(
-        `Could not create project in ${chalk.bold(projectName)} because the directory is not empty.`
-      )
-    )
+    return console.error(chalk.red(`Could not create project in ${chalk.bold(projectName)} because the directory is not empty.`))
   }
 
   let packageManager = config.get('packageManager')
@@ -43,7 +62,7 @@ module.exports = async (name, starter = '') => {
       pageSize: 12,
       prefix: ' ',
       when: () => !starter && starters.length,
-      async source (answers, input) {
+      async source(answers, input) {
         const choices = starters.map((starter) => {
           const preview = starter.preview ? chalk.dim(`\n  - ${starter.preview}`) : ''
           const platforms = starter.platforms ? ` (${starter.platforms})` : ''
@@ -107,17 +126,19 @@ module.exports = async (name, starter = '') => {
 
   if (starter) {
     const officialTemplates = starters
-      // Official starter kit entries
+    // Official starter kit entries
       .filter(({ author }) => author === 'gridsome')
-      // Extract the starter kit name
+    // Extract the starter kit name
       .map(({ repo }) => repo.split('-').pop())
 
     if (/^([a-z0-9_-]+)\//i.test(starter)) {
       starter = `https://github.com/${starter}.git`
-    } else if (officialTemplates.includes(starter)) {
+    }
+    else if (officialTemplates.includes(starter)) {
       starter = `https://github.com/gridsome/gridsome-starter-${starter}.git`
     }
-  } else {
+  }
+  else {
     starter = 'https://github.com/gridsome/gridsome-starter-default'
   }
 
@@ -128,12 +149,10 @@ module.exports = async (name, starter = '') => {
     if (answers.preservePackageManager) {
       config.set('packageManager', answers.packageManager)
       console.log('')
-      console.log(
-        `  - Run ${chalk.green(chalk.bold('gridsome config --set packageManager yarn'))} to install\n` +
-        `    with Yarn or other supported package managers by default.\n` +
-        `  - Run ${chalk.green(chalk.bold('gridsome config --delete packageManager'))} to clear\n` +
-        `    the preferred package manager.\n`
-      )
+      console.log(`  - Run ${chalk.green(chalk.bold('gridsome config --set packageManager yarn'))} to install\n` +
+                `    with Yarn or other supported package managers by default.\n` +
+                `  - Run ${chalk.green(chalk.bold('gridsome config --delete packageManager'))} to clear\n` +
+                `    the preferred package manager.\n`)
     }
   }
 
@@ -154,7 +173,8 @@ module.exports = async (name, starter = '') => {
             version: '1.0.0',
             private: true
           })
-        } catch (err) {
+        }
+        catch (err) {
           task.skip('Failed to update package.json')
         }
       }
@@ -166,7 +186,8 @@ module.exports = async (name, starter = '') => {
           task.setStatus('Installing dependencies...')
           await installDependencies(packageManager || 'npm', dir, task)
           context.didInstall = true
-        } catch (err) {
+        }
+        catch (err) {
           throw new Error(`\n\n${err.message}`)
         }
       }
@@ -191,26 +212,4 @@ module.exports = async (name, starter = '') => {
   console.log(`  - Run ${chalk.green.bold(commandName.develop)} to start local development`)
   console.log(`  - Run ${chalk.green.bold(commandName.build)} to build for production`)
   console.log()
-}
-
-async function fetchStarters () {
-  try {
-    const res = await axios('https://raw.githubusercontent.com/gridsome/gridsome.org/master/starters/starters.yaml')
-    return jsYaml.load(res.data)
-  } catch (err) {
-    return []
-  }
-}
-
-async function updatePkg (pkgPath, obj) {
-  const content = await fs.readFile(pkgPath, 'utf-8')
-  const pkg = JSON.parse(content)
-  const newPkg = sortPackageJson(Object.assign(pkg, obj))
-
-  await fs.outputFile(pkgPath, JSON.stringify(newPkg, null, 2))
-}
-
-function absolutePath (string) {
-  if (path.isAbsolute(string)) return string
-  return path.join(process.cwd(), string)
 }

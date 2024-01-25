@@ -1,10 +1,20 @@
-const path = require('path')
-const fs = require('fs-extra')
-const micromatch = require('micromatch')
+import path from 'path'
+import fs from 'fs-extra'
+import micromatch from 'micromatch'
+import {createSitemap} from 'sitemap'
 
 const normalize = p => p.replace(/\/+$/, '') || '/'
 
-module.exports = function (api, options) {
+export const defaultOptions = () => ({
+  output: '/sitemap.xml',
+  cacheTime: 600000,
+  staticUrls: [],
+  include: [],
+  exclude: [],
+  config: {}
+})
+
+export default function (api, options) {
   const include = options.include.map(normalize)
   const exclude = options.exclude.map(normalize)
   const staticUrls = []
@@ -69,7 +79,7 @@ module.exports = function (api, options) {
       }
     })
 
-    const sitemap = require('sitemap').createSitemap({
+    const sitemap = createSitemap({
       hostname: normalize(config.siteUrl) + pathPrefix,
       cacheTime: options.cacheTime,
       urls: [...generatedUrls, ...staticUrls]
@@ -78,12 +88,3 @@ module.exports = function (api, options) {
     await fs.outputFile(filename, sitemap.toString())
   })
 }
-
-module.exports.defaultOptions = () => ({
-  output: '/sitemap.xml',
-  cacheTime: 600000,
-  staticUrls: [],
-  include: [],
-  exclude: [],
-  config: {}
-})

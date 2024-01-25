@@ -1,10 +1,5 @@
-const {
-  GraphQLInt,
-  GraphQLString,
-  GraphQLEnumType,
-  GraphQLObjectType
-} = require('@kriya/gridsome/graphql')
-
+import graphql from '@kriya/gridsome/graphql'
+const { GraphQLInt, GraphQLString, GraphQLEnumType, GraphQLObjectType } = graphql
 const HeadingType = new GraphQLObjectType({
   name: 'VueRemarkHeading',
   fields: {
@@ -13,7 +8,6 @@ const HeadingType = new GraphQLObjectType({
     anchor: { type: GraphQLString }
   }
 })
-
 const HeadingLevels = new GraphQLEnumType({
   name: 'VueRemarkHeadingLevels',
   values: {
@@ -25,8 +19,9 @@ const HeadingLevels = new GraphQLEnumType({
     h6: { value: 6 }
   }
 })
-
-module.exports = {
+export { HeadingType }
+export { HeadingLevels }
+export default {
   HeadingType,
   HeadingLevels
 }

@@ -1,5 +1,7 @@
-const { DEFAULT_EXCLUDES } = require('./lib/constants')
+import { DEFAULT_EXCLUDES } from './lib/constants.js'
 
-module.exports = {
-  defaultExcludes: DEFAULT_EXCLUDES.slice()
+export const defaultExcludes = DEFAULT_EXCLUDES.slice()
+
+export default {
+  defaultExcludes
 }

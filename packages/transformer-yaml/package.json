@@ -5,6 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-yaml",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/transformer-yaml",
   "main": "index.js",
+  "type": "module",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
@@ -12,7 +13,7 @@
     "yaml"
   ],
   "dependencies": {
-    "js-yaml": "^3.12.1"
+    "js-yaml": "^3.14.1"
   },
   "publishConfig": {
     "access": "public"

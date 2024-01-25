@@ -1,10 +1,19 @@
-const fs = require('fs-extra')
-const micromatch = require('micromatch')
-const Worker = require('jest-worker').default
+import fs from 'fs-extra'
+import micromatch from 'micromatch'
+import * as jestWorker from 'jest-worker'
 
+const Worker = { default: jestWorker }.default
 const normalize = p => p.replace(/\/+$/, '') || '/'
 
-module.exports = function (api, options = {}) {
+export const defaultOptions = () => ({
+  paths: ['/'],
+  ignore: undefined,
+  polyfill: true,
+  width: 1300,
+  height: 900
+})
+
+export default (function (api, options = {}) {
   const { paths, ...workerOptions } = options
   const patterns = (paths || []).map(p => normalize(p))
 
@@ -26,7 +35,8 @@ module.exports = function (api, options = {}) {
         })
 
         await fs.outputFile(htmlOutput, resultHTML)
-      } catch (err) {
+      }
+      catch (err) {
         worker.end()
         throw err
       }
@@ -34,12 +44,4 @@ module.exports = function (api, options = {}) {
 
     worker.end()
   })
-}
-
-module.exports.defaultOptions = () => ({
-  paths: ['/'],
-  ignore: undefined,
-  polyfill: true,
-  width: 1300,
-  height: 900
 })

@@ -2,7 +2,7 @@ const { GRIDSOME_TEST = 'unit' } = process.env
 
 /** @type {import('jest').Config} */
 const config = {
-  // detectLeaks: true,
+  detectLeaks: true,
   workerIdleMemoryLimit: '512MB',
   maxWorkers: 1,
   logHeapUsage: true,

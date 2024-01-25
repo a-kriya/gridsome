@@ -1,6 +1,10 @@
-const path = require('path')
-const moment = require('moment')
-const { isPlainObject, get } = require('lodash')
+import path from 'path'
+import moment from 'moment'
+import lodash from 'lodash'
+import importSync from 'import-sync'
+import packageJson from '../package.json'
+
+const { isPlainObject, get } = lodash
 
 const SUPPORTED_DATE_FORMATS = [
   'YYYY',
@@ -40,7 +44,7 @@ const SUPPORTED_DATE_FORMATS = [
   'YYYY-MM-DD HH:mm:ss.SSSS'
 ]
 
-exports.createFile = function (options) {
+export const createFile = function (options) {
   const file = {
     contents: options.contents
   }
@@ -51,16 +55,16 @@ exports.createFile = function (options) {
   return file
 }
 
-exports.createCacheIdentifier = function (context, options, attachers = []) {
-  const version = require('../package.json').version
-  const pkg = require(path.resolve(context, 'package.json'))
+export const createCacheIdentifier = function (context, options, attachers = []) {
+  const version = packageJson.version
+  const pkg = importSync(path.resolve(context, 'package.json'))
   const { dependencies: deps1 = {}, devDependencies: deps2 = {}} = pkg
 
   const remarkPlugins = Object.keys({ ...deps1, ...deps2 })
     .filter(name => /remark-(?!cli$)/.test(name))
     .map(name => ({
-      fn: require(name),
-      pkg: require(`${name}/package.json`)
+      fn: importSync(name),
+      pkg: importSync(`${name}/package.json`)
     }))
 
   const plugins = attachers
@@ -78,11 +82,11 @@ exports.createCacheIdentifier = function (context, options, attachers = []) {
   return JSON.stringify({ version, options, plugins })
 }
 
-exports.normalizeLayout = function (layout) {
+export const normalizeLayout = function (layout) {
   const defaultLayout = require.resolve('../src/VueRemarkRoot.js')
 
   if (typeof layout === 'string') {
-    return { component: layout, props: {}}
+    return { component: layout, props: {} }
   } else if (typeof layout === 'object') {
     return {
       component: layout.component || defaultLayout,
@@ -90,10 +94,10 @@ exports.normalizeLayout = function (layout) {
     }
   }
 
-  return { component: defaultLayout, props: {}}
+  return { component: defaultLayout, props: {} }
 }
 
-exports.makePathParams = (object, { routeKeys, dateField = 'date' }, slugify) => {
+export const makePathParams = (object, { routeKeys, dateField = 'date' }, slugify) => {
   const date = moment.utc(object[dateField], SUPPORTED_DATE_FORMATS, true)
   const length = routeKeys.length
   const params = {}
@@ -119,8 +123,8 @@ exports.makePathParams = (object, { routeKeys, dateField = 'date' }, slugify) =>
       const segments = values.map(value => {
         if (
           isPlainObject(value) &&
-          value.hasOwnProperty('typeName') &&
-          value.hasOwnProperty('id') &&
+          Object.hasOwn(value, 'typeName') &&
+          Object.hasOwn(value, 'id') &&
           !Array.isArray(value.id)
         ) {
           return String(value.id)

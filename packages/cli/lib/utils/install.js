@@ -1,5 +1,4 @@
-const execa = require('execa')
-
+import { execa } from 'execa'
 const stdio = ['ignore', 'pipe', 'pipe']
 const defaultArgs = {
   npm: ['install', '--loglevel', 'error'],
@@ -8,30 +7,13 @@ const defaultArgs = {
 }
 
 /**
- * @param {string} command
- * @param {string} cwd
- * @param {any} task
- * @returns {Promise<void>}
- */
-exports.installDependencies = async (command, cwd, task) => {
-  const args = defaultArgs[command] || []
-
-  switch (command) {
-    case 'yarn': return installWithYarn(cwd, task)
-  }
-
-  await execa(command, args, { stdio, cwd })
-}
-
-/**
  * @param {string} cwd
  * @param {any} task
  */
-async function installWithYarn (cwd, task) {
+async function installWithYarn(cwd, task) {
   const subprocess = execa('yarn', defaultArgs.yarn, { stdio, cwd })
-
-  if (!task) return subprocess
-
+  if (!task)
+    return subprocess
   return new Promise((resolve, reject) => {
     const onRecievedData = (buffer) => {
       let str = buffer.toString().trim()
@@ -48,20 +30,31 @@ async function installWithYarn (cwd, task) {
 
           if (type === 'step') {
             const { message, current, total } = data
-
             task.setStatus(`${message} (${current} of ${total})`)
 
             if (current === total) {
               resolve()
             }
-          } else if (type === 'error') {
+          }
+          else if (type === 'error') {
             reject(new Error(data))
           }
-        } catch (e) {}
+        }
+        catch (e) { /* empty */ }
       }
     }
 
     subprocess.stderr.on('data', onRecievedData)
     subprocess.stdout.on('data', onRecievedData)
   })
+}
+
+export const installDependencies = async (command, cwd, task) => {
+  const args = defaultArgs[command] || []
+
+  switch (command) {
+    case 'yarn': return installWithYarn(cwd, task)
+  }
+
+  await execa(command, args, { stdio, cwd })
 }

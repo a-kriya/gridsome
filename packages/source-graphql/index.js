@@ -1,15 +1,45 @@
-const fetch = require('node-fetch')
-const { print, GraphQLNonNull, GraphQLObjectType } = require('@kriya/gridsome/graphql')
-const { introspectSchema, wrapSchema, RenameTypes } = require('@graphql-tools/wrap')
+import graphql from '@kriya/gridsome/graphql'
+import * as wrap from '@graphql-tools/wrap'
+import utils from '@graphql-tools/utils'
 
-const {
-  addTypes,
-  mapSchema,
-  MapperKind,
-  modifyObjectFields
-} = require('@graphql-tools/utils')
+const { print, GraphQLNonNull, GraphQLObjectType } = graphql
+const { introspectSchema, wrapSchema, RenameTypes } = wrap
+const { addTypes, mapSchema, MapperKind, modifyObjectFields } = utils
 
-module.exports = (api, options) => {
+class WarpQueryType {
+  constructor(typeName, fieldName) {
+    this.typeName = typeName
+    this.fieldName = fieldName
+  }
+
+  transformSchema(schema) {
+    const config = schema.getQueryType().toConfig()
+    const queryType = new GraphQLObjectType({ ...config, name: this.typeName })
+    const newSchema = addTypes(schema, [queryType])
+    const rootFields = {
+      [this.fieldName]: {
+        type: new GraphQLNonNull(queryType),
+        resolve: () => ({})
+      }
+    }
+    return modifyObjectFields(newSchema, config.name, () => true, rootFields)[0]
+  }
+}
+
+class StripNonQuery {
+  transformSchema(schema) {
+    return mapSchema(schema, {
+      [MapperKind.MUTATION]() {
+        return null
+      },
+      [MapperKind.SUBSCRIPTION]() {
+        return null
+      }
+    })
+  }
+}
+
+export default (api, options) => {
   const { url, fieldName, headers, typeName = fieldName } = options
 
   if (!url) {
@@ -20,7 +50,7 @@ module.exports = (api, options) => {
     throw new Error('Missing fieldName option.')
   }
 
-  async function remoteExecutor ({ document, variables }) {
+  async function remoteExecutor({ document, variables }) {
     const query = print(document)
     const res = await fetch(url, {
       method: 'POST',
@@ -31,51 +61,14 @@ module.exports = (api, options) => {
   }
 
   api.createSchema(async ({ addSchema }) => {
-    addSchema(
-      wrapSchema({
-        schema: await introspectSchema(remoteExecutor),
-        executor: remoteExecutor,
-        transforms: [
-          new StripNonQuery(),
-          new WarpQueryType(typeName, fieldName),
-          new RenameTypes(name => `${typeName}_${name}`)
-        ]
-      })
-    )
+    addSchema(wrapSchema({
+      schema: await introspectSchema(remoteExecutor),
+      executor: remoteExecutor,
+      transforms: [
+        new StripNonQuery(),
+        new WarpQueryType(typeName, fieldName),
+        new RenameTypes(name => `${typeName}_${name}`)
+      ]
+    }))
   })
-}
-
-class WarpQueryType {
-  constructor (typeName, fieldName) {
-    this.typeName = typeName
-    this.fieldName = fieldName
-  }
-
-  transformSchema (schema) {
-    const config = schema.getQueryType().toConfig()
-    const queryType = new GraphQLObjectType({ ...config, name: this.typeName })
-    const newSchema = addTypes(schema, [queryType])
-
-    const rootFields = {
-      [this.fieldName]: {
-        type: new GraphQLNonNull(queryType),
-        resolve: () => ({})
-      }
-    }
-
-    return modifyObjectFields(newSchema, config.name, () => true, rootFields)[0]
-  }
-}
-
-class StripNonQuery {
-  transformSchema (schema) {
-    return mapSchema(schema, {
-      [MapperKind.MUTATION] () {
-        return null
-      },
-      [MapperKind.SUBSCRIPTION] () {
-        return null
-      }
-    })
-  }
 }

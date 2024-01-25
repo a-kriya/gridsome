@@ -1,5 +1,7 @@
-const { SiteClient, Loader, ItemsRepo, i18n } = require('datocms-client')
-const { camelize } = require('humps')
+import datocmsClient from 'datocms-client'
+import humps from 'humps'
+const { SiteClient, Loader, ItemsRepo, i18n } = datocmsClient
+const { camelize } = humps
 
 const withNoEmptyValues = (object) => {
   if (Object.prototype.toString.call(object) === '[object Object]') {
@@ -25,7 +27,7 @@ const withNoEmptyValues = (object) => {
 }
 
 class DatoCmsSource {
-  static defaultOptions () {
+  static defaultOptions() {
     return {
       typeName: 'DatoCms',
       apiToken: undefined,
@@ -34,21 +36,18 @@ class DatoCmsSource {
     }
   }
 
-  constructor (api, options) {
+  constructor(api, options) {
     this.options = options
     api.loadSource(args => this.fetchContent(args))
   }
 
-  createTypeName (name) {
+  createTypeName(name) {
     const cleanName = name.replace(/[^a-zA-Z0-9 ]/g, '')
-
-    return (
-      this.options.typeName.charAt(0).toUpperCase() +
-      camelize(`${this.options.typeName} ${cleanName}`).slice(1)
-    )
+    return (this.options.typeName.charAt(0).toUpperCase() +
+            camelize(`${this.options.typeName} ${cleanName}`).slice(1))
   }
 
-  async fetchContent (store) {
+  async fetchContent(store) {
     const { addCollection, getCollection } = store
     const { apiToken, apiUrl, previewMode } = this.options
 
@@ -79,27 +78,16 @@ class DatoCmsSource {
 
       cache[itemType.id] = { titleField, slugField }
 
-      const collection = addCollection(
-        this.createTypeName(itemType.name)
-      )
-
+      const collection = addCollection(this.createTypeName(itemType.name))
       fields
         .filter(({ fieldType }) => ['link', 'links', 'rich_text'].includes(fieldType))
         .forEach((field) => {
-          const typeNames = (
-            field.validators.itemItemType ||
-            field.validators.itemsItemType ||
-            field.validators.richTextBlocks
-          ).itemTypes.map((id) => (
-            this.createTypeName(entitiesRepo.findEntity('item_type', id).name)
-          ))
-
-          collection.addReference(
-            camelize(field.apiKey),
-            {
-              typeName: typeNames.length > 1 ? typeNames : typeNames[0]
-            }
-          )
+          const typeNames = (field.validators.itemItemType ||
+                    field.validators.itemsItemType ||
+                    field.validators.richTextBlocks).itemTypes.map((id) => (this.createTypeName(entitiesRepo.findEntity('item_type', id).name)))
+          collection.addReference(camelize(field.apiKey), {
+            typeName: typeNames.length > 1 ? typeNames : typeNames[0]
+          })
         })
     }
 
@@ -118,22 +106,22 @@ class DatoCmsSource {
         ...item.itemType.fields.reduce((fields, field) => {
           const val = item.readAttribute(field)
 
-          if (item.itemType.hasOwnProperty('apiKey')) {
+          if (Object.hasOwn(item.itemType, 'apiKey')) {
             fields.model = { apiKey: item.itemType.apiKey }
           }
 
-          if (!val) return fields
+          if (!val)
+            return fields
 
           if (['link', 'links', 'rich_text'].includes(field.fieldType)) {
             const val = item.entity[camelize(field.apiKey)]
             const sanitizedVal = Array.isArray(val) ? withNoEmptyValues(val) : val
-
-            if (!sanitizedVal) return fields
-
+            if (!sanitizedVal)
+              return fields
             fields[camelize(field.apiKey)] = sanitizedVal
-
             return fields
-          } else {
+          }
+          else {
             fields[camelize(field.apiKey)] = val.toMap
               ? withNoEmptyValues(val.toMap())
               : withNoEmptyValues(val)
@@ -148,4 +136,4 @@ class DatoCmsSource {
   }
 }
 
-module.exports = DatoCmsSource
+export default DatoCmsSource

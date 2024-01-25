@@ -6,6 +6,7 @@
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/plugin-google-analytics",
   "main": "gridsome.client.js",
   "license": "MIT",
+  "type": "module",
   "files": [
     "gridsome.client.js"
   ],

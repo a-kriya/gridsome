@@ -1,38 +1,17 @@
-const h = require('hastscript')
-const Prism = require('prismjs')
-const u = require('unist-builder')
-const escapeHtml = require('escape-html')
-const visit = require('unist-util-visit')
-const toHTML = require('hast-util-to-html')
+import * as h from 'hastscript'
+import Prism from 'prismjs'
+import u from 'unist-builder'
+import escapeHtml from 'escape-html'
+import visit from 'unist-util-visit'
+import * as toHTML from 'hast-util-to-html'
+import parseOptions from './parse-options.js'
+import 'prismjs/plugins/custom-class/prism-custom-class'
+import index from 'prismjs/components/index'
+index()
 
-const parseOptions = require('./parse-options')
-
-require('prismjs/plugins/custom-class/prism-custom-class')
-require('prismjs/components/index')()
-
-module.exports = (
-  {
-    customClassPrefix = '',
-    transformInlineCode = false,
-    showLineNumbers: showLineNumbersGlobal = false
-  } = {}
-) => tree => {
-  Prism.plugins.customClass.prefix(customClassPrefix)
-
-  visit(tree, 'code', (node, index, parent) => {
-    parent.children.splice(index, 1, createCode(node, showLineNumbersGlobal))
-  })
-
-  if (transformInlineCode) {
-    visit(tree, 'inlineCode', (node, index, parent) => {
-      parent.children.splice(index, 1, createInlineCode(node))
-    })
-  }
-}
-
-function highlight (node) {
+function highlight(node) {
   let lang = node.lang
-  let code = Prism.languages.hasOwnProperty(lang)
+  let code = Object.hasOwn(Prism.languages, lang)
     ? Prism.highlight(node.value, Prism.languages[lang], lang)
     : node.value
 
@@ -44,7 +23,7 @@ function highlight (node) {
   return { lang, code }
 }
 
-function createLineNumberWrapper (code) {
+function createLineNumberWrapper(code) {
   const numberOfLines = code.length !== 0
     ? code.split('\n').length
     : 0
@@ -59,56 +38,36 @@ function createLineNumberWrapper (code) {
     return row
   }
 
-  const wrapper = h(
-    'span',
-    {
-      className: 'line-numbers-rows',
-      'aria-hidden': 'true'
-    },
-    generateRows(numberOfLines)
-  )
-
+  const wrapper = h('span', {
+    className: 'line-numbers-rows',
+    'aria-hidden': 'true'
+  }, generateRows(numberOfLines))
   return wrapper
 }
 
-function createCode (node, showLineNumbersGlobal) {
+function createCode(node, showLineNumbersGlobal) {
   const { lang, code } = highlight(node)
-
-  const {
-    showLineNumbersLocal,
-    lineNumbersStartAt
-  } = parseOptions(node.meta || '')
-
+  const { showLineNumbersLocal, lineNumbersStartAt } = parseOptions(node.meta || '')
   const data = node.data || {}
   const props = data.hProperties || {}
   const className = `language-${lang}`
   const showLineNumbers = showLineNumbersLocal || showLineNumbersGlobal
-
   const codeNode = showLineNumbers
-    ? h(
-      'code',
-      { className },
-      [
-        u('raw', code),
-        createLineNumberWrapper(code)
-      ]
-    )
+    ? h('code', { className }, [
+      u('raw', code),
+      createLineNumberWrapper(code)
+    ])
     : h('code', { className }, [u('raw', code)])
-
   const preNode = showLineNumbers
-    ? h(
-      'pre',
-      {
-        className: [className, 'line-numbers'],
-        style: lineNumbersStartAt - 1
-          ? {
-            'counter-reset': `linenumber ${lineNumbersStartAt - 1}`
-          }
-          : null,
-        ...props
-      },
-      [codeNode]
-    )
+    ? h('pre', {
+      className: [className, 'line-numbers'],
+      style: lineNumbersStartAt - 1
+        ? {
+          'counter-reset': `linenumber ${lineNumbersStartAt - 1}`
+        }
+        : null,
+      ...props
+    }, [codeNode])
     : h('pre', { className, ...props }, [codeNode])
 
   return u('html', toHTML(preNode, {
@@ -116,7 +75,7 @@ function createCode (node, showLineNumbersGlobal) {
   }))
 }
 
-function createInlineCode (node) {
+function createInlineCode(node) {
   const { lang, code } = highlight(node)
 
   const data = node.data || {}
@@ -127,4 +86,17 @@ function createInlineCode (node) {
   return u('html', toHTML(codeNode, {
     allowDangerousHTML: true
   }))
+}
+
+export default ({ customClassPrefix = '', transformInlineCode = false, showLineNumbers: showLineNumbersGlobal = false } = {}) => tree => {
+  Prism.plugins.customClass.prefix(customClassPrefix)
+  visit(tree, 'code', (node, index, parent) => {
+    parent.children.splice(index, 1, createCode(node, showLineNumbersGlobal))
+  })
+
+  if (transformInlineCode) {
+    visit(tree, 'inlineCode', (node, index, parent) => {
+      parent.children.splice(index, 1, createInlineCode(node))
+    })
+  }
 }

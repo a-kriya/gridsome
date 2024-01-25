@@ -1,6 +1,10 @@
-const faker = require('faker')
-
-module.exports = function (api, options) {
+import faker from 'faker'
+export const defaultOptions = () => ({
+  numNodes: 500,
+  typeName: 'Faker',
+  route: '/:year/:month/:day/:slug'
+})
+export default (function (api, options) {
   api.loadSource(({ addContentType, slugify }) => {
     const contentType = addContentType({
       typeName: options.typeName,
@@ -10,7 +14,6 @@ module.exports = function (api, options) {
     for (let i = 0; i < options.numNodes; i++) {
       const random = faker.random.number({ min: 3, max: 6 })
       const title = faker.lorem.sentence(random).slice(0, -1)
-
       contentType.addNode({
         title,
         id: faker.random.uuid(),
@@ -25,10 +28,4 @@ module.exports = function (api, options) {
       })
     }
   })
-}
-
-module.exports.defaultOptions = () => ({
-  numNodes: 500,
-  typeName: 'Faker',
-  route: '/:year/:month/:day/:slug'
 })

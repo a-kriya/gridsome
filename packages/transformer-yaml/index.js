@@ -1,11 +1,11 @@
-const jsYaml = require('js-yaml')
+import jsYaml from 'js-yaml'
 
 class YamlTransformer {
-  static mimeTypes () {
+  static mimeTypes() {
     return ['text/yaml']
   }
 
-  parse (content) {
+  parse(content) {
     const data = jsYaml.load(content)
 
     return typeof data !== 'object' || Array.isArray(data)
@@ -14,4 +14,4 @@ class YamlTransformer {
   }
 }
 
-module.exports = YamlTransformer
+export default YamlTransformer

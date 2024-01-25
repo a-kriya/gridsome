@@ -1,10 +1,28 @@
-const path = require('path')
-const fs = require('fs-extra')
-const htmlParser = require('parse5')
-const getStream = require('get-stream')
-const replaceStream = require('replacestream')
+import path from 'path'
+import fs from 'fs-extra'
+import * as htmlParser from 'parse5'
+import getStream from 'get-stream'
+import replaceStream from 'replacestream'
 
-exports.createPolyfillScript = function () {
+function createNoScriptNode(node) {
+  return {
+    tagName: 'noscript',
+    attrs: [],
+    childNodes: [
+      {
+        tagName: 'link',
+        attrs: [
+          { name: 'rel', value: 'stylesheet' },
+          ...node.attrs.filter(({ name }) => {
+            return name === 'href'
+          })
+        ]
+      }
+    ]
+  }
+}
+
+export const createPolyfillScript = function () {
   const filePath = path.resolve(__dirname, 'polyfill.txt')
   const fileContent = fs.readFileSync(filePath, 'utf-8')
   const code = fileContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '').trim()
@@ -12,7 +30,7 @@ exports.createPolyfillScript = function () {
   return `<script>${code}</script>`
 }
 
-exports.inlineCriticalCSS = function (filePath, { css, polyfill }) {
+export const inlineCriticalCSS = function (filePath, { css, polyfill }) {
   const inlineString = `<style id="___critical-css">${css}</style>`
 
   let isInlined = false
@@ -29,7 +47,8 @@ exports.inlineCriticalCSS = function (filePath, { css, polyfill }) {
       const onload = `this.onload=null;this.rel='stylesheet'`
 
       node.attrs.forEach(attr => {
-        if (attr.name === 'rel') attr.value = 'preload'
+        if (attr.name === 'rel')
+          attr.value = 'preload'
       })
 
       node.attrs.push({ name: 'as', value: 'style' })
@@ -54,22 +73,4 @@ exports.inlineCriticalCSS = function (filePath, { css, polyfill }) {
   }
 
   return getStream(stream)
-}
-
-function createNoScriptNode (node) {
-  return {
-    tagName: 'noscript',
-    attrs: [],
-    childNodes: [
-      {
-        tagName: 'link',
-        attrs: [
-          { name: 'rel', value: 'stylesheet' },
-          ...node.attrs.filter(({ name }) => {
-            return name === 'href'
-          })
-        ]
-      }
-    ]
-  }
 }

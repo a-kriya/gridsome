@@ -1,11 +1,7 @@
-const chalk = require('chalk')
-const config = require('../utils/configstore')
+import chalk from 'chalk'
+import * as config from '../utils/configstore.js'
 
-/**
- * @param {string | undefined} value
- * @param {import('commander').Command} cmd
- */
-module.exports = async (value, cmd) => {
+export default async (value, cmd) => {
   if (cmd.json) {
     const path = config.path
     const json = JSON.stringify(config.all, null, 2)
@@ -19,7 +15,8 @@ module.exports = async (value, cmd) => {
   if (cmd.get) {
     if (config.has(cmd.get)) {
       return console.log(`${cmd.get}: ${chalk.bold(config.get(cmd.get))}`)
-    } else {
+    }
+    else {
       return console.log(`No option for ${chalk.bold(cmd.get)} found.`)
     }
   }
@@ -28,7 +25,8 @@ module.exports = async (value, cmd) => {
     if (config.has(cmd.delete)) {
       config.delete(cmd.delete)
       return console.log(`Deleted ${chalk.bold(cmd.delete)}`)
-    } else {
+    }
+    else {
       return console.log(`No option for ${chalk.bold(cmd.delete)} found.`)
     }
   }

@@ -1,8 +1,10 @@
-const chalk = require('chalk')
-const resolveCwd = require('resolve-cwd')
+import chalk from 'chalk'
+import resolveCwd from 'resolve-cwd'
+import importSync from 'import-sync'
+import packageJson from '../../package.json'
 
-module.exports = function resolveVersions (pkgPath) {
-  const cliVersion = require('../../package.json').version
+export default function resolveVersions(pkgPath) {
+  const cliVersion = packageJson.version
   const versions = [`@kriya/gridsome-cli v${cliVersion}`]
 
   if (pkgPath) {
@@ -17,11 +19,10 @@ module.exports = function resolveVersions (pkgPath) {
   return versions.join('\n')
 }
 
-function resolveProjectVersions (pkgPath) {
+function resolveProjectVersions(pkgPath) {
   const versions = []
-
-  const projectPkgJson = require(pkgPath)
-  const { devDependencies = {}, dependencies = {}} = projectPkgJson
+  const projectPkgJson = importSync(pkgPath)
+  const { devDependencies = {}, dependencies = {} } = projectPkgJson
   const packages = { ...devDependencies, ...dependencies }
 
   if (packages['@kriya/gridsome']) {
@@ -43,9 +44,8 @@ function resolveProjectVersions (pkgPath) {
   return versions
 }
 
-function resolvePackageVersion (name) {
+function resolvePackageVersion(name) {
   const pkgPath = resolveCwd.silent(`${name}/package.json`)
-  const pkgJson = pkgPath ? require(pkgPath) : null
-
+  const pkgJson = pkgPath ? importSync(pkgPath) : null
   return pkgJson ? pkgJson.version : null
 }

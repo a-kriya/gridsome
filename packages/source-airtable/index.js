@@ -1,8 +1,8 @@
-const Airtable = require('airtable')
-const { deprecate } = require('@kriya/gridsome/lib/utils/deprecate')
+import Airtable from 'airtable'
+import { deprecate } from '@kriya/gridsome/lib/utils/deprecate'
 
 class AirtableSource {
-  constructor (api, options) {
+  constructor(api, options) {
     // renamed "baseId" config to "base"
     options.base = options.base || options.baseId
     this.base = new Airtable({ apiKey: options.apiKey }).base(options.base)
@@ -77,8 +77,9 @@ class AirtableSource {
         return this.store.createReference(link.typeName, id)
       })
     })
+
     return item
   }
 }
 
-module.exports = AirtableSource
+export default AirtableSource

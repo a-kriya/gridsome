@@ -99,8 +99,11 @@ const GhostPage = ({ page, author, tag }) => `type ${page} implements Node {
   tags: [${tag}]
   ghostId: String
 }`
-
-module.exports = {
+export { GhostAuthor }
+export { GhostTag }
+export { GhostPost }
+export { GhostPage }
+export default {
   GhostAuthor,
   GhostTag,
   GhostPost,

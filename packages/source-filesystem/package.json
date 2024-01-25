@@ -5,6 +5,7 @@
   "homepage": "https://github.com/gridsome/gridsome/tree/master/packages/source-filesystem#readme",
   "repository": "https://github.com/gridsome/gridsome/tree/master/packages/source-filesystem",
   "main": "index.js",
+  "type": "module",
   "keywords": [
     "gridsome",
     "gridsome-plugin",

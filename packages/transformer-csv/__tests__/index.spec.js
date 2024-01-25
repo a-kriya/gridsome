@@ -1,4 +1,4 @@
-const CSVTransformer = require('../index')
+import CSVTransformer from '../index'
 
 test('parse valid csv', async () => {
   const transformer = new CSVTransformer()

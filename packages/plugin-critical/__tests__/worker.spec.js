@@ -1,6 +1,5 @@
-const path = require('path')
-const { processHtmlFile } = require('../lib/worker')
-
+import path from 'path'
+import { processHtmlFile } from '../lib/worker.js'
 test('inline critical css', async () => {
   const filePath = path.join(__dirname, '__fixtures__/index-2.html')
   const html = await processHtmlFile(filePath, {
