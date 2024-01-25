@@ -1,6 +1,6 @@
 {
   "name": "test",
   "dependencies": {
-    "@kriya/gridsome": "^0.9.1"
+    "@kriya/gridsome": "0.9.1-test"
   }
 }

@@ -9,7 +9,7 @@ const config = {
   transform: {},
   testEnvironment: 'node',
   testMatch: [
-    `**/cli/__tests__/**/*.${GRIDSOME_TEST === 'e2e' ? 'e2e' : 'spec'}.js`
+    `**/__tests__/**/*.${GRIDSOME_TEST === 'e2e' ? 'e2e' : 'spec'}.js`
   ],
   collectCoverageFrom: [
     'gridsome/lib/**/*.js'

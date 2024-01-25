@@ -1,9 +1,10 @@
+import { createRequire } from 'node:module'
 import path from 'path'
 import sysinfo from '../utils/sysinfo.js'
-import jestWorker from 'jest-worker'
+import {Worker} from 'jest-worker'
 import { getDirname } from 'cross-dirname'
 
-const Worker = jestWorker.default
+const require = createRequire(import.meta.url)
 
 function createWorker(filename) {
   const filepath = path.join(getDirname(), filename)

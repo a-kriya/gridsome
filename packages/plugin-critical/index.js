@@ -1,8 +1,7 @@
 import fs from 'fs-extra'
 import micromatch from 'micromatch'
-import * as jestWorker from 'jest-worker'
+import {Worker} from 'jest-worker'
 
-const Worker = { default: jestWorker }.default
 const normalize = p => p.replace(/\/+$/, '') || '/'
 
 export const defaultOptions = () => ({

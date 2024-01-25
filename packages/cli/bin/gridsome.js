@@ -32,14 +32,8 @@ program
   })
 
 try {
-  const commandsPath = resolveCwd.silent('@kriya/gridsome/commands')
   const gridsomePath = resolveCwd.silent('@kriya/gridsome')
-
-  if (commandsPath) {
-    importSync(commandsPath)({ context, program })
-  } else if (gridsomePath) {
-    importSync(gridsomePath)({ context, program })
-  }
+  importSync(gridsomePath).default({ context, program })
 }
 catch (err) {
   console.log(err)
@@ -70,7 +64,7 @@ program.arguments('<command>').action(async (command) => {
     return steps < 3
   })
 
-  console.log(chalk.red(`Unknown command ${chalk.bold(command)}`))
+  console.log(chalk.red(`Unknown command ${command}`))
 
   if (utils.isGridsomeProject(pkgPath) && !suggestion) {
     console.log()

@@ -40,5 +40,5 @@ test('show helpful error message', async () => {
   const transformer = new JSONTransformer()
   const parse = () => transformer.parse('{ foo: "bar" }')
 
-  expect(parse).toThrow(`while parsing near '{ foo: "bar" }'`)
+  expect(parse).toThrow(`while parsing '{ foo: "bar" }'`)
 })

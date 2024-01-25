@@ -4,7 +4,6 @@ import * as stackTrace from 'stack-trace'
 import { codeFrameColumns } from '@babel/code-frame'
 import develop from './lib/develop.js'
 import build from './lib/build.js'
-import explore from './lib/explore.js'
 
 function wrapCommand(fn) {
   return (context, args) => {
@@ -61,14 +60,6 @@ export default ({ context, program }) => {
     .description('build site for production')
     .action(() => {
       wrapCommand(build)(context, {})
-    })
-  program
-    .command('explore')
-    .description('explore GraphQL data')
-    .option('-p, --port <port>', 'use specified port (default: 8080)')
-    .option('-h, --host <host>', 'use specified host (default: 0.0.0.0)')
-    .action(args => {
-      wrapCommand(explore)(context, args)
     })
     // TODO
     // program

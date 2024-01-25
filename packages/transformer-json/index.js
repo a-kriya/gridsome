@@ -4,6 +4,7 @@ class JSONTransformer {
   static mimeTypes() {
     return ['application/json']
   }
+
   parse(source) {
     const data = parseJson(source)
     return typeof data !== 'object' || Array.isArray(data)

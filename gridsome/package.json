@@ -6,7 +6,7 @@
   "repository": "https://github.com/gridsome/gridsome",
   "bugs": "https://github.com/gridsome/gridsome/issues",
   "license": "MIT",
-  "main": "index.js",
+  "exports": "./index.js",
   "types": "types.d.ts",
   "type": "module",
   "browser": "app/index.js",

@@ -12,7 +12,7 @@ test('show local gridsome version', async () => {
   const testPath = path.join(getDirname(), '__fixtures__', 'project')
   const { stdout } = await runCLI(['-v'], { cwd: testPath })
 
-  expect(stdout).toMatch(/@kriya\/gridsome v(\d+\.?){3}/)
+  expect(stdout).toMatch(/@kriya\/gridsome v(\d+\.?){3}-test/)
 })
 
 test('warn about unknown command', async () => {
