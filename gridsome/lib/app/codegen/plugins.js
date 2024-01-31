@@ -1,6 +1,5 @@
 import path from 'path'
-import lodash from 'lodash'
-const { snakeCase } = lodash
+import { snakeCase } from 'lodash'
 
 function genPlugins(app, isServer) {
   const plugins = app.config.plugins

@@ -2,11 +2,11 @@ import path from 'path'
 import fs from 'fs-extra'
 import slash from 'slash'
 import crypto from 'crypto'
-import * as mime from 'mime-types'
-import lodash from 'lodash'
+import mime from 'mime-types'
 import glob from 'globby'
-import * as chokidar from 'chokidar'
-const { mapValues, trim, trimEnd } = lodash
+import { mapValues, trim, trimEnd } from 'lodash'
+import chokidar from 'chokidar'
+
 const isDev = process.env.NODE_ENV === 'development'
 
 class FilesystemSource {

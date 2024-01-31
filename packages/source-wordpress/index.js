@@ -1,9 +1,8 @@
 import pMap from 'p-map'
 import axios from 'axios'
 import camelCase from 'camelcase'
-import lodash from 'lodash'
+import { mapKeys, isPlainObject, trimEnd, trimStart } from 'lodash'
 
-const { mapKeys, isPlainObject, trimEnd, trimStart } = lodash
 const TYPE_AUTHOR = 'author'
 const TYPE_ATTACHEMENT = 'attachment'
 

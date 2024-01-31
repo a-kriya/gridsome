@@ -1,12 +1,11 @@
 import path from 'path'
 import crypto from 'crypto'
-import * as mime from 'mime-types'
+import mime from 'mime-types'
 import autoBind from 'auto-bind'
 import camelCase from 'camelcase'
 import { deprecate } from '../utils/deprecate.js'
-import lodash from 'lodash'
+import { mapValues, isPlainObject } from 'lodash'
 import { resolvePath } from './utils.js'
-const { mapValues, isPlainObject } = lodash
 
 class PluginStore {
   constructor(app, pluginOptions = {}, { transformers }) {

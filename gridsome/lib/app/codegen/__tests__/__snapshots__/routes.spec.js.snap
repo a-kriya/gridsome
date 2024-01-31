@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`generate a route with meta 1`] = `
 "const c1 = () => import(/* webpackChunkName: "page--fixtures--page-a-vue" */ "__fixtures__/PageA.vue")

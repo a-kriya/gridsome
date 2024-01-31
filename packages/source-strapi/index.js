@@ -1,8 +1,6 @@
 import axios from 'axios'
+import { trimEnd, upperFirst, camelCase } from 'lodash'
 import query from './helpers/query.js'
-import lodash from 'lodash'
-
-const { trimEnd, upperFirst, camelCase } = lodash
 
 export const defaultOptions = () => ({
   apiURL: 'http://localhost:1337',

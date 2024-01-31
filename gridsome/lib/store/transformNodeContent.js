@@ -1,6 +1,6 @@
-import lodash from 'lodash'
+import { omit } from 'lodash'
 import normalizeNodeOptions from './normalizeNodeOptions.js'
-const { omit } = lodash
+
 export default (function transformNodeContent(node, collection) {
   const { mimeType, content } = node.internal
   const { _mimeTypes } = collection

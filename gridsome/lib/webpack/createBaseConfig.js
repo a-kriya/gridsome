@@ -1,10 +1,10 @@
 import { createRequire } from 'node:module'
 import path from 'path'
-import * as compiler from 'vue-loader/lib/compiler'
+import compiler from 'vue-loader/lib/compiler'
 import {globbySync} from 'globby'
 import fs from 'fs-extra'
 import hash from 'hash-sum'
-import lodash from 'lodash'
+import { pick } from 'lodash'
 import Config from 'webpack-chain'
 import { forwardSlash } from '../utils/index.js'
 import { VueLoaderPlugin } from 'vue-loader'
@@ -34,7 +34,6 @@ try {
 // eslint-disable-next-line no-empty
 } catch(e) {}
 
-const { pick } = lodash
 const resolve = (p, c) => path.resolve(c || getDirname(), p)
 const resolveExists = (path) => fs.existsSync(path) ? path : false
 

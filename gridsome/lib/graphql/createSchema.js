@@ -1,6 +1,6 @@
-import lodash from 'lodash'
-import { parse, isType, getNamedType, isSpecifiedScalarType, isIntrospectionType, defaultFieldResolver } from 'graphql'
-import * as graphqlCompose from 'graphql-compose'
+import { isEmpty, isPlainObject, findLastIndex, get } from 'lodash'
+import { parse, isType, getNamedType, isSpecifiedScalarType, isIntrospectionType, defaultFieldResolver } from 'graphql-compose/lib/graphql.js'
+import { SchemaComposer, EnumTypeComposer, InputTypeComposer, UnionTypeComposer, ScalarTypeComposer, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose'
 import directives from './directives/index.js'
 import initMustHaveTypes from './types/index.js'
 import createPagesSchema from './pages.js'
@@ -11,8 +11,6 @@ import { addDirectives, applyFieldExtensions } from './extensions/index.js'
 import { isRefField } from '../store/utils.js'
 import { isCreatedType, hasNodeReference, CreatedGraphQLType, validateTypeName } from './utils.js'
 import { createReferenceOneUnionResolver, createReferenceManyUnionResolver } from './nodes/resolvers.js'
-const { isEmpty, isPlainObject, findLastIndex, get } = lodash
-const { SchemaComposer, EnumTypeComposer, InputTypeComposer, UnionTypeComposer, ScalarTypeComposer, ObjectTypeComposer, InterfaceTypeComposer } = graphqlCompose
 
 function setupBelongsTo(schemaComposer, store) {
   const typeNames = Object.keys(store.collections)
@@ -141,7 +139,7 @@ function convertExtensionsToDirectives(options) {
 
         fieldConfig.directives = fieldExtensions
       }
-      else {
+      else if (fieldConfig.extensions) {
         fieldConfig.directives = fieldConfig.extensions
       }
     }

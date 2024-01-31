@@ -1,8 +1,7 @@
-import lodash from 'lodash'
+import { omit, isDate } from 'lodash'
 import { isResolvablePath } from '../utils/index.js'
 import { NODE_FIELDS } from '../utils/constants.js'
 import { resolvePath } from './utils.js'
-const { omit, isDate } = lodash
 
 function processFields(fields = {}, options = {}) {
   const { origin = '', context, resolveAbsolute } = options

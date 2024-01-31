@@ -1,8 +1,9 @@
-import * as he from 'he'
+import he from 'he'
 import u from 'unist-builder'
-import * as toHTML from 'hast-util-to-html'
-import * as toHAST from 'mdast-util-to-hast'
+import toHTML from 'hast-util-to-html'
+import toHAST from 'mdast-util-to-hast'
 import { genImportBlock, genTemplateBlock, genFrontMatterBlock } from './codegen.js'
+
 export default (function toSfc() {
   this.Compiler = compiler
 

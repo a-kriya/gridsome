@@ -1,5 +1,5 @@
 import App from '../../app/App.js'
-import { Kind } from 'graphql'
+import { Kind } from 'graphql-compose/lib/graphql.js'
 import PluginAPI from '../../app/PluginAPI.js'
 import createPageQuery from '../createPageQuery.js'
 import { PER_PAGE } from '../../utils/constants.js'

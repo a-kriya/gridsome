@@ -1,8 +1,7 @@
-import { valueFromASTUntyped } from 'graphql'
+import { valueFromASTUntyped } from 'graphql-compose/lib/graphql.js'
+import { get, isUndefined } from 'lodash'
 import { PER_PAGE } from '../utils/constants.js'
 import { isRefField } from '../store/utils.js'
-import lodash from 'lodash'
-const { get, isUndefined } = lodash
 
 function variablesFromContext(context, queryVariables = []) {
   return queryVariables.reduce((acc, { path, name, defaultValue }) => {

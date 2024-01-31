@@ -1,5 +1,5 @@
-import graphql from '@kriya/gridsome/graphql'
-const { GraphQLInt, GraphQLString, GraphQLEnumType, GraphQLObjectType } = graphql
+import { GraphQLInt, GraphQLString, GraphQLEnumType, GraphQLObjectType } from '@kriya/gridsome/graphql'
+
 const HeadingType = new GraphQLObjectType({
   name: 'VueRemarkHeading',
   fields: {
@@ -19,6 +19,7 @@ const HeadingLevels = new GraphQLEnumType({
     h6: { value: 6 }
   }
 })
+
 export { HeadingType }
 export { HeadingLevels }
 export default {

@@ -2,8 +2,7 @@ import camelCase from 'camelcase'
 import { warn } from '../utils/log.js'
 import { isRefField } from '../store/utils.js'
 import { isRefFieldDefinition } from './utils.js'
-import lodash from 'lodash'
-const { omit, isNil, isEmpty, isNumber, isInteger, isPlainObject } = lodash
+import { omit, isNil, isEmpty, isNumber, isInteger, isPlainObject } from 'lodash'
 
 function resolveValues(obj, currentObj = {}, options = {}, path = []) {
   const res = { ...currentObj }

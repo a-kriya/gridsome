@@ -1,5 +1,5 @@
 import path from 'path'
-import {jest} from '@jest/globals'
+import { vi } from 'vitest'
 import App from '../../app/App.js'
 import PluginAPI from '../../app/PluginAPI.js'
 import JSONTransformer from './__fixtures__/JSONTransformer.js'
@@ -55,7 +55,7 @@ test('add collection', async () => {
 test('add node', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
-  const emit = jest.spyOn(collection._events, 'emit')
+  const emit = vi.spyOn(collection._events, 'emit')
   const node = collection.addNode({
     id: 'test',
     title: 'Lorem ipsum dolor sit amet',
@@ -83,7 +83,7 @@ test('update node', async () => {
     typeName: 'TestPost',
     route: '/test/:foo/:slug'
   })
-  const emit = jest.spyOn(collection._events, 'emit')
+  const emit = vi.spyOn(collection._events, 'emit')
   const oldNode = collection.addNode({
     id: 'test',
     slug: 'test',
@@ -174,7 +174,7 @@ test('remove node', async () => {
   const api = await createPlugin()
   const collection = api.store.addCollection('TestPost')
 
-  const emit = jest.spyOn(collection._events, 'emit')
+  const emit = vi.spyOn(collection._events, 'emit')
   const node = collection.addNode({ id: 'test' })
 
   collection.removeNode('test')

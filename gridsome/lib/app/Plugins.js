@@ -1,9 +1,8 @@
 import PluginAPI from './PluginAPI.js'
 import { requireEsModule, hashString } from '../utils/index.js'
-import lodash from 'lodash'
+import { defaultsDeep } from 'lodash'
 import { BOOTSTRAP_SOURCES, BOOTSTRAP_GRAPHQL, BOOTSTRAP_PAGES } from '../utils/constants.js'
 import { createSchemaActions, createPagesActions, createManagedPagesActions } from './actions.js'
-const { defaultsDeep } = lodash
 
 class Plugins {
   constructor(app) {

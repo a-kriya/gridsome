@@ -1,6 +1,7 @@
 import isUrl from 'is-url'
 import isRelative from 'is-relative'
 import visit from 'unist-util-visit'
+
 export default (function attacher(options = {}) {
   return function transform(tree) {
     visit(tree, 'image', node => {

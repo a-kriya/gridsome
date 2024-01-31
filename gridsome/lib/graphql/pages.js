@@ -1,7 +1,6 @@
+import { trimEnd } from 'lodash'
 import { createFilterInput } from './filters/input.js'
 import { toFilterArgs } from './filters/query.js'
-import lodash from 'lodash'
-const { trimEnd } = lodash
 
 export default schemaComposer => {
   const typeComposer = schemaComposer.createObjectTC({

@@ -9,13 +9,12 @@ import colorString from 'color-string'
 import enhancedResolve from 'enhanced-resolve'
 import { getDirname } from 'cross-dirname'
 import { deprecate } from '../utils/deprecate.js'
-import lodash from 'lodash'
+import { defaultsDeep, camelCase, isString, isFunction } from 'lodash'
 import { internalRE, transformerRE, SUPPORTED_IMAGE_TYPES } from '../utils/constants.js'
 import { requireEsModule } from '../utils/index.js'
 import esbuild from 'esbuild'
 import importSync from 'import-sync'
 
-const { defaultsDeep, camelCase, isString, isFunction } = lodash
 const resolve = enhancedResolve.create.sync({
   extensions: ['.js', '.ts']
 })

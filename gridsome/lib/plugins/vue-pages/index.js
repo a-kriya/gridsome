@@ -1,11 +1,10 @@
 import path from 'path'
 import fs from 'fs-extra'
-import {globby} from 'globby'
+import { globby } from 'globby'
 import slash from 'slash'
-import * as chokidar from 'chokidar'
-import lodash from 'lodash'
+import chokidar from 'chokidar'
+import { trimEnd } from 'lodash'
 import { createPagePath } from './lib/utils.js'
-const { trimEnd } = lodash
 
 class VuePages {
   static defaultOptions() {

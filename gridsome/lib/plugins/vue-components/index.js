@@ -1,7 +1,10 @@
+import { createRequire } from 'node:module'
 import path from 'path'
 import fs from 'fs-extra'
 import * as compiler from 'vue/compiler-sfc'
 import { getDirname } from 'cross-dirname'
+
+const require = createRequire(import.meta.url)
 
 class VueComponents {
   static defaultOptions() {

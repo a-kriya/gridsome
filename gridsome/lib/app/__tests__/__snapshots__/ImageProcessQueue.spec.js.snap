@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`disable lazy loading 1`] = `"<img class="g-image" src="/assets/static/1000x600.97c148e.test.png" width="1000" height="600">"`;
 

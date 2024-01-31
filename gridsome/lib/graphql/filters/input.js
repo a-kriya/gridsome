@@ -1,9 +1,7 @@
 import { hasNodeReference } from '../utils.js'
-import lodash from 'lodash'
-import * as graphqlCompose from 'graphql-compose'
+import { without } from 'lodash'
+import { EnumTypeComposer, ObjectTypeComposer, InputTypeComposer } from 'graphql-compose'
 import { listOperators, scalarOperators, defaultOperators, toOperatorConfig } from './operators.js'
-const { without } = lodash
-const { EnumTypeComposer, ObjectTypeComposer, InputTypeComposer } = graphqlCompose
 
 function createFilterInput(schemaComposer, typeComposer) {
   const inputTypeName = `${typeComposer.getTypeName()}FilterInput`

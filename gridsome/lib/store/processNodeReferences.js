@@ -1,8 +1,7 @@
+import { omit, isPlainObject } from 'lodash'
 import { safeKey } from '../utils/index.js'
-import lodash from 'lodash'
 import { isRefField } from './utils.js'
 import { NODE_FIELDS } from '../utils/constants.js'
-const { omit, isPlainObject } = lodash
 
 function getBelongsTo(obj, res = {}) {
   for (const key in obj) {

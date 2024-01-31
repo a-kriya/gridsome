@@ -1,7 +1,9 @@
 import { resolve } from 'path'
 import { getDirname } from 'cross-dirname'
-import VueRemark from '..'
-import App from '@kriya/gridsome/lib/app/App'
+import App from '@kriya/gridsome/lib/app/App.js'
+import VueRemark from '../index.js'
+
+const DIRNAME = getDirname()
 
 test('parse simple title', async () => {
   const plugin = await createPlugin()
@@ -401,9 +403,9 @@ describe('process import statements', () => {
 })
 
 async function createPlugin (options = {}) {
-  const app = new App(resolve(getDirname(), './__fixtures__'), {
+  const app = new App(resolve(DIRNAME, './__fixtures__'), {
     plugins: [{
-      use: require.resolve('..'),
+      use: resolve(DIRNAME, '../index.js'),
       options: { typeName: 'Test', baseDir: '.', ...options }
     }]
   })

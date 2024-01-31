@@ -1,12 +1,12 @@
 import url from 'url'
 import path from 'path'
 import isUrl from 'is-url'
-import * as mime from 'mime-types'
+import mime from 'mime-types'
 import camelCase from 'camelcase'
 import isRelative from 'is-relative'
-import lodash from 'lodash'
+import { isPlainObject } from 'lodash'
 import { isResolvablePath } from '../utils/index.js'
-const { isPlainObject } = lodash
+
 const nonValidCharsRE = new RegExp('[^a-zA-Z0-9_]', 'g')
 const leadingNumberRE = new RegExp('^([0-9])')
 

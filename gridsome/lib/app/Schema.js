@@ -1,6 +1,6 @@
 import autoBind from 'auto-bind'
 import { createSchema } from '../graphql/index.js'
-import { graphql, execute } from 'graphql'
+import { graphql, execute } from 'graphql-compose/lib/graphql.js'
 import { deprecate } from '../utils/deprecate.js'
 
 class Schema {

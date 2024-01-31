@@ -1,12 +1,10 @@
 import crypto from 'crypto'
-import lodash from 'lodash'
-import { specifiedDirectives } from 'graphql'
+import { pick } from 'lodash'
+import * as graphql from 'graphql-compose/lib/graphql.js'
+import { GraphQLJSON } from 'graphql-compose'
 import PluginStore from '../store/PluginStore.js'
 import { deprecate } from '../utils/deprecate.js'
 import { createEnumType, createObjectType, createUnionType, createScalarType, createInterfaceType, createInputType } from '../graphql/utils.js'
-import * as graphqlCompose from 'graphql-compose'
-import * as graphql from 'graphql'
-const { pick } = lodash
 
 function createBaseActions(api, app) {
   return {
@@ -105,7 +103,6 @@ function createStoreActions(api, app) {
 
 function createSchemaActions(api, app) {
   const baseActions = createStoreActions(api, app)
-  const { GraphQLJSON } = graphqlCompose
   // TODO: these should just be imported from gridsome/graphql instead
   const graphqlTypes = pick(graphql, [
     // Definitions
@@ -128,7 +125,7 @@ function createSchemaActions(api, app) {
     'GraphQLBoolean',
     'GraphQLID'
   ])
-  const directiveNames = specifiedDirectives.map(directive => directive.name)
+  const directiveNames = graphql.specifiedDirectives.map(directive => directive.name)
   return {
     ...baseActions,
     ...graphqlTypes,

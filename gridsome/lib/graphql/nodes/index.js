@@ -7,11 +7,9 @@ import createFieldDefinitions from '../createFieldDefinitions.js'
 import { createFieldTypes } from '../createFieldTypes.js'
 import { isRefFieldDefinition, createTypeName, validateTypeName } from '../utils.js'
 import { isRefField } from '../../store/utils.js'
-import * as graphqlCompose from 'graphql-compose'
-import lodash from 'lodash'
+import { ObjectTypeComposer, NonNullComposer, ThunkComposer, ListComposer, unwrapTC } from 'graphql-compose'
+import { omit, mapValues, isEmpty, isPlainObject } from 'lodash'
 import { createFindOneResolver, createFindManyPaginatedResolver, createReferenceOneResolver, createReferenceManyResolver, createReferenceManyAdvancedResolver } from './resolvers.js'
-const { ObjectTypeComposer, NonNullComposer, ThunkComposer, ListComposer, unwrapTC } = graphqlCompose
-const { omit, mapValues, isEmpty, isPlainObject } = lodash
 
 function createTypeComposers(schemaComposer, store) {
   for (const typeName in store.collections) {

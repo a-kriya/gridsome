@@ -1,8 +1,9 @@
 import path from 'path'
 import chalk from 'chalk'
 import columnify from 'columnify'
-import * as stackTrace from 'stack-trace'
+import stackTrace from 'stack-trace'
 import { log as logUtil } from './log.js'
+
 const warned = new Map()
 const warnings = new Set()
 

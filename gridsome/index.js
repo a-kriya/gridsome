@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs-extra'
-import * as stackTrace from 'stack-trace'
+import stackTrace from 'stack-trace'
 import { codeFrameColumns } from '@babel/code-frame'
 import develop from './lib/develop.js'
 import build from './lib/build.js'

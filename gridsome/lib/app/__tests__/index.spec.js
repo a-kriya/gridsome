@@ -5,6 +5,7 @@ import PluginAPI from '../PluginAPI.js'
 import loadConfig from '../loadConfig.js'
 import { BOOTSTRAP_CONFIG } from '../../utils/constants.js'
 import { getDirname } from 'cross-dirname'
+
 const context = path.join(getDirname(), '../../__tests__/__fixtures__/project-basic')
 const originalEnv = { ...process.env }
 

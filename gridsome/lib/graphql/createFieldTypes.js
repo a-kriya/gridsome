@@ -1,12 +1,10 @@
-import lodash from 'lodash'
+import { isEmpty } from 'lodash'
 import { isFile, fileType } from './types/file.js'
 import { isImage, imageType } from './types/image.js'
 import { isDate, dateType } from './types/date.js'
-import * as graphqlCompose from 'graphql-compose'
+import { ObjectTypeComposer } from 'graphql-compose'
 import { is32BitInt, isRefFieldDefinition, createTypeName } from './utils.js'
 import { createReferenceOneUnionResolver, createReferenceManyUnionResolver } from './nodes/resolvers.js'
-const { isEmpty } = lodash
-const { ObjectTypeComposer } = graphqlCompose
 
 function createFieldTypes(schemaComposer, fields, prefix = '') {
   const res = {}

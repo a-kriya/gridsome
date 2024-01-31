@@ -1,4 +1,4 @@
-import { parse, validate, specifiedRules } from 'graphql'
+import { parse, validate, specifiedRules } from 'graphql-compose/lib/graphql.js'
 
 export default (schema, doc, rules = specifiedRules) => {
   if (typeof doc === 'string') {

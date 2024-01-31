@@ -3,8 +3,8 @@ import { relative } from 'path'
 import { slugify } from '../../utils/index.js'
 import { pathToFilePath } from '../../pages/utils.js'
 import { NOT_FOUND_NAME } from '../../utils/constants.js'
-import lodash from 'lodash'
-const { uniqBy } = lodash
+import { uniqBy } from 'lodash'
+
 const isUnitTest = process.env.GRIDSOME_TEST === 'unit'
 
 function genRoutes(app) {

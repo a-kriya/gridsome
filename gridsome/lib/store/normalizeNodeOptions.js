@@ -1,8 +1,7 @@
 import hash from 'hash-sum'
 import crypto from 'crypto'
-import lodash from 'lodash'
+import { pick, omit } from 'lodash'
 import { NODE_FIELDS } from '../utils/constants.js'
-const { pick, omit } = lodash
 
 function genUid(value) {
   return crypto.createHash('md5').update(value).digest('hex')

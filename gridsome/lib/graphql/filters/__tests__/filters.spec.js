@@ -1,10 +1,9 @@
-import lodash from 'lodash'
+import { forEach } from 'lodash'
 import initMustHaveTypes from '../../types/index.js'
 import { createFilterInput } from '../input.js'
-import * as graphqlCompose from 'graphql-compose'
+import { SchemaComposer } from 'graphql-compose'
 import { scalarOperators, listOperators } from '../operators.js'
-const { forEach } = lodash
-const { SchemaComposer } = graphqlCompose
+
 test.each(['ID', 'Boolean', 'JSON', 'String', 'Int', 'Float', 'Date'])('create filter operators for %s scalar type', (typeName) => {
   const typeComposer = createTypeComposer({
     name: 'Post',

@@ -1,6 +1,5 @@
 import path from 'path'
-import lodash from 'lodash'
-const { debounce } = lodash
+import { debounce } from 'lodash'
 
 export default (app, pages) => {
   const createPages = debounce(() => app.plugins.createPages(), 16)

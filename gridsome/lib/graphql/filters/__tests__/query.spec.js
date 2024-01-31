@@ -1,8 +1,8 @@
 import { toFilterArgs } from '../query.js'
 import initMustHaveTypes from '../../types/index.js'
 import { createFilterInput } from '../input.js'
-import * as graphqlCompose from 'graphql-compose'
-const { SchemaComposer } = graphqlCompose
+import { SchemaComposer } from 'graphql-compose'
+
 test('convert filters to Loki query', () => {
   const inputTypeComposer = createInputTypeComposer(`
     type Post implements Node {
@@ -17,6 +17,7 @@ test('convert filters to Loki query', () => {
   expect(query.title).toMatchObject({ $eq: 'Test' })
   expect(query.author).toMatchObject({ $in: ['1', '2'] })
 })
+
 test('convert deep objects to dot notation (single)', () => {
   const [, , , post] = createTypes([
     `type Three { four: String! }`,
@@ -29,6 +30,7 @@ test('convert deep objects to dot notation (single)', () => {
   }, post.getInputTypeComposer())
   expect(query['one.two.three.four']).toMatchObject({ '$in': ['1', '2'] })
 })
+
 test('convert deep objects to dot notation (list)', () => {
   const [, , , post] = createTypes([
     `type Three { four: [String] }`,
@@ -41,6 +43,7 @@ test('convert deep objects to dot notation (list)', () => {
   }, post.getInputTypeComposer())
   expect(query['one.two.three.four']).toMatchObject({ '$contains': '1' })
 })
+
 test('convert proxied filters to Loki query', () => {
   const inputTypeComposer = createInputTypeComposer(`
     type Post implements Node {
@@ -53,6 +56,7 @@ test('convert proxied filters to Loki query', () => {
   expect(query['field-name']).toMatchObject({ $eq: 'Test' })
   expect(query.proxyValue).toBeUndefined()
 })
+
 test('use custom loki operators for node references (single)', () => {
   const [, post] = createTypes([
     `type Author implements Node {

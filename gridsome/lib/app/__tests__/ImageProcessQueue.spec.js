@@ -3,6 +3,7 @@ import fs from 'fs-extra'
 import AssetsQueue from '../queue/AssetsQueue.js'
 import ImageProcessQueue from '../queue/ImageProcessQueue.js'
 import { getDirname } from 'cross-dirname'
+
 const context = path.resolve(getDirname(), '../../__tests__')
 const imagesDir = path.join(context, 'assets', 'static')
 const pathPrefix = '/'
@@ -22,7 +23,7 @@ const baseconfig = {
   }
 }
 
-beforeEach(() => (ImageProcessQueue.uid = 0))
+beforeEach(() => { ImageProcessQueue.uid = 0 })
 afterAll(() => fs.remove(imagesDir))
 
 test('generate srcset for image', async () => {

@@ -1,5 +1,5 @@
-import lodash from 'lodash'
-const { isArray, isPlainObject } = lodash
+import { isArray, isPlainObject } from 'lodash'
+
 const refCheckFn = (a, b) => isPlainObject(a)
   ? String(a.id) === String(b)
   : String(a) === String(b)
@@ -17,6 +17,7 @@ const $refListEq = (a, b) => isArray(a)
   : false
 const $refListNe = (a, b) => !$refListEq(a, [b])
 const $refListExists = (a, b) => b ? !$refListEq(a, undefined) : $refListEq(a, undefined)
+
 export { $refIn }
 export { $refNin }
 export { $refEq }

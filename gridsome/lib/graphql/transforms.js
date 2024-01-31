@@ -1,4 +1,4 @@
-import { Kind } from 'graphql'
+import { Kind } from 'graphql-compose/lib/graphql.js'
 
 const getNamedAstType = node => {
   if (node && node.kind !== Kind.NAMED_TYPE) {

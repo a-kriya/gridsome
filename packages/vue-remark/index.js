@@ -1,10 +1,11 @@
+import { createRequire } from 'node:module'
 import path from 'path'
-import pathToRegexp$0 from 'path-to-regexp'
+import { pathToRegexp, compile } from 'path-to-regexp'
 import { getDirname } from 'cross-dirname'
+import { omit, trimEnd, kebabCase } from 'lodash'
 import Filesystem from '@kriya/gridsome-source-filesystem'
 import RemarkTransformer from '@kriya/gridsome-transformer-remark'
-import lodash from 'lodash'
-import graphql from '@kriya/gridsome/graphql'
+import { GraphQLList, GraphQLBoolean } from '@kriya/gridsome/graphql'
 import toSFC from './lib/toSfc.js'
 import sfcSyntax from './lib/sfcSyntax.js'
 import toVueRemarkAst from './lib/toVueRemarkAst.js'
@@ -13,9 +14,8 @@ import remarkImagePlugin from './lib/plugins/image.js'
 import { HeadingType, HeadingLevels } from './lib/types/HeadingType.js'
 import { createFile, makePathParams, normalizeLayout, createCacheIdentifier } from './lib/utils.js'
 
-const { pathToRegexp, compile } = pathToRegexp$0
-const { omit, trimEnd, kebabCase } = lodash
-const { GraphQLList, GraphQLBoolean } = graphql
+const require = createRequire(import.meta.url)
+
 const normalizeRouteKeys = keys => keys
   .filter(key => typeof key.name === 'string')
   .map(key => {

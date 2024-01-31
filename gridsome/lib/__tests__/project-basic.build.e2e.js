@@ -2,11 +2,11 @@ import path from 'path'
 import fs from 'fs-extra'
 import build from '../build.js'
 import cheerio from 'cheerio'
-import * as express from 'express'
+import express from 'express'
 import puppeteer from 'puppeteer'
-import lodash from 'lodash'
+import { trim, uniq } from 'lodash'
 import { getDirname } from 'cross-dirname'
-const { trim, uniq } = lodash
+
 const context = path.join(getDirname(), '__fixtures__', 'project-basic')
 const content = file => fs.readFileSync(path.join(context, file), 'utf8')
 const exists = file => fs.existsSync(path.join(context, file))

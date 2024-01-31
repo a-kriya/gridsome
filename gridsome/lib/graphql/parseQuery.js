@@ -8,7 +8,7 @@ import {
   valueFromASTUntyped,
   visit,
   visitWithTypeInfo
-} from 'graphql'
+} from 'graphql-compose/lib/graphql.js'
 import { deprecate } from '../utils/deprecate.js'
 
 function hasInterface(typeDef, interfaceName) {

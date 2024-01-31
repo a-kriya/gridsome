@@ -1,8 +1,7 @@
 import camelCase from 'camelcase'
-import lodash from 'lodash'
-import * as graphqlCompose from 'graphql-compose'
-const { pickBy, isObject, isPlainObject } = lodash
-const { ThunkComposer, UnionTypeComposer, ObjectTypeComposer } = graphqlCompose
+import { pickBy, isObject, isPlainObject } from 'lodash'
+import { ThunkComposer, UnionTypeComposer, ObjectTypeComposer } from 'graphql-compose'
+
 const CreatedGraphQLType = {
   Enum: 'Enum',
   Object: 'Object',

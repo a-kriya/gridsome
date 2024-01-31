@@ -2,9 +2,9 @@ import { getDirname } from 'cross-dirname'
 import App from '../../app/App.js'
 import { createFieldTypes } from '../createFieldTypes.js'
 import createFieldDefinitions from '../createFieldDefinitions.js'
-import * as graphqlCompose from 'graphql-compose'
+import { ListComposer, SchemaComposer, UnionTypeComposer, ObjectTypeComposer } from 'graphql-compose'
 import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
-const { ListComposer, SchemaComposer, UnionTypeComposer, ObjectTypeComposer } = graphqlCompose
+
 const nodes = [
   {
     '123': 1,

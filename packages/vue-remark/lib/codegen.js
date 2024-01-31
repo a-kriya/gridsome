@@ -1,7 +1,6 @@
 import { parse } from '@babel/parser'
-import { default as default$0 } from '@babel/traverse'
+import traverse from '@babel/traverse'
 import { normalizeLayout } from './utils.js'
-const { default: traverse } = { default: default$0 }
 
 function propsToAttrs(props = {}) {
   const attrs = []

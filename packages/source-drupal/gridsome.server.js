@@ -1,9 +1,7 @@
 import axios from 'axios'
-import lodash from 'lodash'
+import { forEach, uniq } from 'lodash'
 import { DEFAULT_EXCLUDES } from './lib/constants.js'
 import Entity from './lib/Entity.js'
-
-const { forEach, uniq } = lodash
 
 class DrupalSource {
   // defaultOptions merged with this.options in App.vue

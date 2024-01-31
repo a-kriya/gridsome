@@ -1,9 +1,8 @@
 import path from 'path'
 import fs from 'fs-extra'
-import lodash from 'lodash'
+import { mapValues } from 'lodash'
 import { createWorker } from '../../workers/index.js'
 import { SUPPORTED_IMAGE_TYPES } from '../../utils/constants.js'
-const { mapValues } = lodash
 
 export default ({ context, config, assets }) => {
   const worker = createWorker('image-processor')

@@ -4,13 +4,12 @@ import crypto from 'crypto'
 import autoBind from 'auto-bind'
 import isRelative from 'is-relative'
 import EventEmitter from 'eventemitter3'
+import Loki from 'lokijs'
+import { mapValues, isPlainObject } from 'lodash'
 import { deprecate } from '../utils/deprecate.js'
 import normalizeNodeOptions from './normalizeNodeOptions.js'
 import { parseUrl, createFieldName } from './utils.js'
 import { warn } from '../utils/log.js'
-import lodash from 'lodash'
-import Loki from 'lokijs'
-const { mapValues, isPlainObject } = lodash
 
 class Collection {
   constructor(typeName, options, store) {

@@ -1,10 +1,11 @@
 import path from 'path'
 import moment from 'moment'
-import lodash from 'lodash'
+import { getDirname } from 'cross-dirname'
+import { isPlainObject, get } from 'lodash'
 import importSync from 'import-sync'
 import packageJson from '../package.json'
 
-const { isPlainObject, get } = lodash
+const DIRNAME = getDirname()
 
 const SUPPORTED_DATE_FORMATS = [
   'YYYY',
@@ -83,7 +84,7 @@ export const createCacheIdentifier = function (context, options, attachers = [])
 }
 
 export const normalizeLayout = function (layout) {
-  const defaultLayout = require.resolve('../src/VueRemarkRoot.js')
+  const defaultLayout = path.resolve(DIRNAME, '../src/VueRemarkRoot.js')
 
   if (typeof layout === 'string') {
     return { component: layout, props: {} }

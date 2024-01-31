@@ -1,5 +1,4 @@
-import lodash from 'lodash'
-const { template } = lodash
+import { template } from 'lodash'
 
 function createHTMLRenderer(htmlTemplate) {
   const render = template(htmlTemplate)

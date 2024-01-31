@@ -2,7 +2,7 @@ import path from 'path'
 import { LRUCache } from 'lru-cache'
 import hash from 'hash-sum'
 import validate from '../validate.js'
-import { parse, NoDeprecatedCustomRule } from 'graphql'
+import { parse, NoDeprecatedCustomRule } from 'graphql-compose/lib/graphql.js'
 import { deprecate } from '../../../../utils/deprecate.js'
 const cache = new LRUCache({ max: 1000 })
 export default (async function (source, map) {

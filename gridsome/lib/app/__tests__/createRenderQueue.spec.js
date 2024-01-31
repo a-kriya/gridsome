@@ -4,6 +4,7 @@ import createApp from '../index.js'
 import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
 import createRenderQueue from '../build/createRenderQueue.js'
 import { getDirname } from 'cross-dirname'
+
 test('create render queue for basic project', async () => {
   const context = path.resolve(getDirname(), '../../__tests__/__fixtures__/project-basic')
   const app = await createApp(context, undefined, BOOTSTRAP_PAGES)

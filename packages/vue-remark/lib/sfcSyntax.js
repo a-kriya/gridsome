@@ -1,4 +1,5 @@
-import * as htmlTags from 'html-tags'
+import htmlTags from 'html-tags'
+
 const isImport = value => /^import\s+/.test(value)
 const isStyle = value => /^<style/.test(value)
 const isScript = value => /^<script/.test(value)

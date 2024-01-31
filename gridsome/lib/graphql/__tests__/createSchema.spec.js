@@ -1,4 +1,4 @@
-import {jest} from '@jest/globals'
+import { vi } from 'vitest'
 import { getDirname } from 'cross-dirname'
 import App from '../../app/App.js'
 import { BOOTSTRAP_CONFIG, BOOTSTRAP_PAGES } from '../../utils/constants.js'
@@ -1058,8 +1058,8 @@ test('add a experimental field extension', async () => {
 })
 
 test('apply extensions once per field', async () => {
-  const resolve = jest.fn((src, args, ctx, info) => src[info.fieldName])
-  const apply = jest.fn(() => ({ resolve }))
+  const resolve = vi.fn((src, args, ctx, info) => src[info.fieldName])
+  const apply = vi.fn(() => ({ resolve }))
 
   const app = await createApp(api => {
     api.loadSource(({ addCollection, addSchemaTypes, addSchemaFieldExtension }) => {
@@ -1091,7 +1091,7 @@ test('apply extensions once per field', async () => {
 })
 
 test('use extension multiple times on field', async () => {
-  const apply = jest.fn((ext, config) => ({
+  const apply = vi.fn((ext, config) => ({
     resolve(src, args, ctx, info) {
       return config.resolve(src, args, ctx, info) + ext.value
     }
@@ -1158,32 +1158,32 @@ test('fail if adding type with reserved type name (SDL)', async () => {
   expect(app).rejects.toThrow(`'File'`)
 })
 
-test('prevent overriding built-in GraphQL directives', done => {
+test('prevent overriding built-in GraphQL directives', () => new Promise((done) => {
   createApp(api => {
     api.loadSource(({ addSchemaFieldExtension }) => {
       expect(() => addSchemaFieldExtension({ name: 'skip' })).toThrow('@skip')
       done()
     })
   })
-})
+}))
 
-test('prevent overriding @paginate directives', done => {
+test('prevent overriding @paginate directives', () => new Promise((done) => {
   createApp(api => {
     api.loadSource(({ addSchemaFieldExtension }) => {
       expect(() => addSchemaFieldExtension({ name: 'paginate' })).toThrow('@paginate')
       done()
     })
   })
-})
+}))
 
-test('prevent overriding built-in extensions', done => {
+test('prevent overriding built-in extensions', () => new Promise((done) => {
   createApp(api => {
     api.loadSource(({ addSchemaFieldExtension }) => {
       expect(() => addSchemaFieldExtension({ name: 'reference' })).toThrow('@reference')
       done()
     })
   })
-})
+}))
 
 test('output field value as JSON', async () => {
   const app = await initApp(({ addSchemaTypes }) => {

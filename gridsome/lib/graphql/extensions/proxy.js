@@ -1,6 +1,5 @@
-import { defaultFieldResolver } from 'graphql'
-import lodash from 'lodash'
-const { get } = lodash
+import { defaultFieldResolver } from 'graphql-compose/lib/graphql.js'
+import { get } from 'lodash'
 export const description = 'Return value from another field.'
 export const args = {
   from: 'String'

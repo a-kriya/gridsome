@@ -1,20 +1,18 @@
-import path$0 from 'path'
+import path from 'path'
 import fs from 'fs-extra'
 import { LRUCache } from 'lru-cache'
 import crypto from 'crypto'
 import invariant from 'invariant'
 import initWatcher from './watch.js'
-import lokijs from 'lokijs'
+import { Collection } from 'lokijs'
 import { FSWatcher } from 'chokidar'
 import { parseQuery } from '../graphql/index.js'
 import { pathToRegexp, compile } from 'path-to-regexp'
 import createPageQuery from './createPageQuery.js'
 import { HookMap, SyncWaterfallHook, SyncBailHook } from 'tapable'
-import lodash from 'lodash'
+import { snakeCase, trimEnd } from 'lodash'
 import validateInput from './schemas.js'
-let path = path$0
-const { Collection } = lokijs
-const { snakeCase, trimEnd } = lodash
+
 const TYPE_STATIC = 'static'
 const TYPE_DYNAMIC = 'dynamic'
 const createHash = value => crypto.createHash('md5').update(value).digest('hex')

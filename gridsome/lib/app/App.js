@@ -14,6 +14,7 @@ import AssetsQueue from './queue/AssetsQueue.js'
 import Codegen from './codegen/index.js'
 import Pages from '../pages/pages.js'
 import Compiler from './Compiler.js'
+
 const { version } = packageJson
 
 class App {

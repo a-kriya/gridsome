@@ -1,7 +1,6 @@
 import axios from 'axios'
-import lodash from 'lodash'
+import { reduce } from 'lodash'
 import camelCase from 'camelcase'
-const { reduce } = lodash
 
 class Entity {
   constructor(source, actions, { entityType, url }) {

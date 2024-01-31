@@ -1,4 +1,5 @@
-import * as utils from 'loader-utils'
+import utils from 'loader-utils'
+
 export default (async function (source, map) {
   const callback = this.async()
   this.cacheable(false)

@@ -1,7 +1,6 @@
-import { print } from 'graphql'
-import lodash from 'lodash'
+import { print } from 'graphql-compose/lib/graphql.js'
+import { trimEnd } from 'lodash'
 import { createQueryVariables } from '../../graphql/utils.js'
-const { trimEnd } = lodash
 
 export default ({ pages }) => {
   return async function graphqlMiddleware(req, res, next) {

@@ -1,7 +1,7 @@
 import hash from 'hash-sum'
 import webpack from 'webpack'
-import lodash from 'lodash'
-const { uniq } = lodash
+import { uniq } from 'lodash'
+
 const isJS = file => /\.js(\?[^.]+)?$/.test(file)
 const isCSS = file => /\.css(\?[^.]+)?$/.test(file)
 const stripModuleIdHash = id => id.replace(/\|\w+$/, '')

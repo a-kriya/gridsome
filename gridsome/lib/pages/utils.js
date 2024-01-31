@@ -1,6 +1,6 @@
-import lodash from 'lodash'
+import { snakeCase } from 'lodash'
 import slugify from '@sindresorhus/slugify'
-const { snakeCase } = lodash
+
 const hasDynamicParam = value => /:|\(/.test(value)
 
 const processRexExp = value => {

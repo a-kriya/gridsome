@@ -1,11 +1,11 @@
-import * as graphql from 'graphql'
+import graphql from 'graphql-compose/lib/graphql.js'
 import parseQuery from './parseQuery.js'
 import createSchema from './createSchema.js'
-import * as graphqlCompose from 'graphql-compose'
+import { GraphQLJSON } from 'graphql-compose'
 import { toFilterArgs } from './filters/query.js'
 import { createBelongsToKey } from './nodes/belongsTo.js'
 import { createPagedNodeEdges } from './nodes/utils.js'
-const { GraphQLJSON } = graphqlCompose
+
 export { GraphQLJSON }
 export { createSchema }
 export { parseQuery }

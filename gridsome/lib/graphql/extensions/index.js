@@ -1,6 +1,7 @@
-import { GraphQLDirective, DirectiveLocation, defaultFieldResolver } from 'graphql'
+import { GraphQLDirective, DirectiveLocation, defaultFieldResolver } from 'graphql-compose/lib/graphql.js'
 import reference from './reference.js'
 import proxy from './proxy.js'
+
 const objectExtensions = {
   infer: {
     description: 'Add fields from field values.'

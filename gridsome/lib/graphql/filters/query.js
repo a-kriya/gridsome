@@ -1,7 +1,6 @@
-import lodash from 'lodash'
-import * as graphqlCompose from 'graphql-compose'
-const { reduce, mapKeys, findLastIndex } = lodash
-const { InputTypeComposer, ThunkComposer } = graphqlCompose
+import { reduce, mapKeys, findLastIndex } from 'lodash'
+import { InputTypeComposer, ThunkComposer } from 'graphql-compose'
+
 const listRefOpsMap = {
   '$in': '$refListIn',
   '$nin': '$refListNin',

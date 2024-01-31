@@ -1,5 +1,5 @@
 import path from 'path'
-import {jest} from '@jest/globals'
+import { vi } from 'vitest'
 import App from '../../app/App.js'
 import { pathToFilePath } from '../utils.js'
 import { BOOTSTRAP_PAGES } from '../../utils/constants.js'
@@ -197,7 +197,7 @@ test('cache parsed components', async () => {
     })
   })
 
-  const parseComponent = jest.spyOn(pages.hooks.parseComponent.for('vue')._x, 0)
+  const parseComponent = vi.spyOn(pages.hooks.parseComponent.for('vue')._x, 0)
 
   pages.createPage({ path: '/page/1', component: './__fixtures__/PagedPage.vue' })
   pages.createPage({ path: '/page/2', component: './__fixtures__/PagedPage.vue' })
@@ -381,8 +381,8 @@ test('find page by query', async () => {
   expect(matchingPage).toEqual(expect.objectContaining({ path: pathToMatch }))
 })
 test('api.createManagedPages() should only be called once', async () => {
-  const createPages = jest.fn()
-  const createManagedPages = jest.fn()
+  const createPages = vi.fn()
+  const createManagedPages = vi.fn()
   const app = await createApp(api => {
     api.createPages(createPages)
     api.createManagedPages(createManagedPages)

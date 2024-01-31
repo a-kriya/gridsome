@@ -1,4 +1,4 @@
-import * as portfinder from 'portfinder'
+import portfinder from 'portfinder'
 
 export default (port) => {
   if (port) return Promise.resolve(port)

@@ -2,14 +2,13 @@ import path from 'path'
 import fs from 'fs-extra'
 import sharp from 'sharp'
 import crypto from 'crypto'
-import * as mime from 'mime-types'
+import mime from 'mime-types'
 import colorString from 'color-string'
 import md5File from 'md5-file'
 import { forwardSlash } from '../../utils/index.js'
-import lodash from 'lodash'
+import { reject, pickBy } from 'lodash'
 import { optimize } from 'svgo'
 import potrace from 'potrace'
-const { reject, pickBy } = lodash
 
 class ImageProcessQueue {
   constructor({ context, config }) {

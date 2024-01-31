@@ -1,8 +1,9 @@
 import path from 'path'
 import isUrl from 'is-url'
-import * as mime from 'mime-types'
+import mime from 'mime-types'
 import FileProcessQueue from './FileProcessQueue.js'
 import ImageProcessQueue from './ImageProcessQueue.js'
+
 const isDev = process.env.NODE_ENV === 'development'
 
 class AssetsQueue {

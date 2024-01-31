@@ -1,7 +1,6 @@
-import lodash from 'lodash'
+import { isEmpty } from 'lodash'
 import { createFieldTypes } from './createFieldTypes.js'
 import createFieldDefinitions from './createFieldDefinitions.js'
-const { isEmpty } = lodash
 
 function inferMetadata(schemaComposer, typeCompoer, metadata) {
   const fieldDefs = createFieldDefinitions([metadata])

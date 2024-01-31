@@ -1,9 +1,9 @@
-import Loki from 'lokijs'
 import autoBind from 'auto-bind'
+import { isArray, isPlainObject } from 'lodash'
+import Loki from 'lokijs'
 import NodeIndex from './NodeIndex.js'
 import EventEmitter from 'eventemitter3'
 import { deprecate } from '../utils/deprecate.js'
-import lodash from 'lodash'
 import Collection from './Collection.js'
 import { safeKey } from '../utils/index.js'
 import lokiOps from './lokiOps.js'
@@ -11,7 +11,7 @@ import { SyncWaterfallHook } from 'tapable'
 import SyncBailWaterfallHook from '../app/SyncBailWaterfallHook.js'
 import transformNodeContent from './transformNodeContent.js'
 import processNodeFields from './processNodeFields.js'
-const { isArray, isPlainObject } = lodash
+
 Object.assign(Loki.LokiOps, lokiOps)
 
 class Store {

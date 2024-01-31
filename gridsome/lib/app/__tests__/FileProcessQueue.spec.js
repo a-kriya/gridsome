@@ -1,6 +1,7 @@
 import path from 'path'
 import { getDirname } from 'cross-dirname'
 import AssetsQueue from '../queue/AssetsQueue.js'
+
 const context = path.resolve(getDirname(), '../../__tests__')
 const filesDir = path.join(context, 'assets', 'files')
 const pathPrefix = '/'

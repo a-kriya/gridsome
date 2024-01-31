@@ -1,7 +1,9 @@
+import { createRequire } from 'node:module'
 import fs from 'fs-extra'
 import micromatch from 'micromatch'
 import {Worker} from 'jest-worker'
 
+const require = createRequire(import.meta.url)
 const normalize = p => p.replace(/\/+$/, '') || '/'
 
 export const defaultOptions = () => ({

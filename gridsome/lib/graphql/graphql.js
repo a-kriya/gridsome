@@ -1,7 +1,8 @@
-import * as graphql from 'graphql'
-import * as graphqlCompose from 'graphql-compose'
-const { GraphQLJSON } = graphqlCompose
+import graphql from 'graphql-compose/lib/graphql.js'
+import { GraphQLJSON } from 'graphql-compose'
+
 export { GraphQLJSON }
+
 export default {
   ...graphql,
   GraphQLJSON

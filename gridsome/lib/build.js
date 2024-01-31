@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import pMap from 'p-map'
 import hirestime from 'hirestime'
-import lodash from 'lodash'
+import { chunk } from 'lodash'
 import sysinfo from './utils/sysinfo.js'
 import executeQueries from './app/build/executeQueries.js'
 import createRenderQueue from './app/build/createRenderQueue.js'
@@ -10,7 +10,6 @@ import { logAllWarnings } from './utils/deprecate.js'
 import { log, info, writeLine } from './utils/log.js'
 import createApp from './app/index.js'
 import { createWorker } from './workers/index.js'
-const { chunk } = lodash
 
 async function runWebpack(app) {
   const compileTime = hirestime()

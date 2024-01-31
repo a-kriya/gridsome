@@ -1,6 +1,6 @@
 import url from 'url'
 import path from 'path'
-import * as mime from 'mime-types'
+import mime from 'mime-types'
 import { isResolvablePath } from '../../utils/index.js'
 import { SUPPORTED_IMAGE_TYPES } from '../../utils/constants.js'
 

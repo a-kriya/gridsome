@@ -1,8 +1,7 @@
 import { isRefField } from '../../store/utils.js'
 import { toFilterArgs } from '../filters/query.js'
-import lodash from 'lodash'
+import { trimEnd } from 'lodash'
 import { applyChainArgs, createSortOptions, createPagedNodeEdges } from './utils.js'
-const { trimEnd } = lodash
 
 export const createFindOneResolver = function (typeComposer) {
   const typeName = typeComposer.getTypeName()

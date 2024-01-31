@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import build from '../build.js'
 import cheerio from 'cheerio'
-import * as express from 'express'
+import express from 'express'
 import puppeteer from 'puppeteer'
 import { getDirname } from 'cross-dirname'
 

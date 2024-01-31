@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { Kind } from 'graphql'
+import { Kind } from 'graphql-compose/lib/graphql.js'
 import { SUPPORTED_DATE_FORMATS } from '../../utils/constants.js'
 
 function formatDate(value, args = {}) {

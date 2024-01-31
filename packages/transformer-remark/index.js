@@ -4,12 +4,12 @@ import parse from 'gray-matter'
 import remarkHtml from 'remark-html'
 import remarkParse from 'remark-parse'
 import sanitizeHTML from 'sanitize-html'
-import lodash from 'lodash'
+import { defaultsDeep } from 'lodash'
 import { cacheKey, createFile, findHeadings, createPlugins } from './lib/utils.js'
 import { estimateTimeToRead } from './lib/timeToRead.js'
 import { HeadingType, HeadingLevels } from './lib/types/HeadingType.js'
 import graphql from '@kriya/gridsome/graphql'
-const { defaultsDeep } = lodash
+
 const cache = new LRUCache({ max: 1000 })
 const { GraphQLInt, GraphQLList, GraphQLString, GraphQLBoolean } = graphql
 

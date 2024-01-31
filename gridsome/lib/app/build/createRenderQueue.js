@@ -1,8 +1,7 @@
 import path from 'path'
 import { pathToFilePath } from '../../pages/utils.js'
-import lodash from 'lodash'
+import { trimEnd } from 'lodash'
 import { toFilterArgs, createBelongsToKey, createPagedNodeEdges } from '../../graphql/index.js'
-const { trimEnd } = lodash
 
 function createRenderQueue({ hooks, pages, store, schema, config }) {
   const queue = []

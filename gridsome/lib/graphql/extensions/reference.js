@@ -1,4 +1,4 @@
-import { defaultFieldResolver } from 'graphql'
+import { defaultFieldResolver } from 'graphql-compose/lib/graphql.js'
 export const description = 'Add reference resolver.'
 export const args = {
   by: {

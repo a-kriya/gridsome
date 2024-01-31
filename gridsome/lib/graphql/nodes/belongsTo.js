@@ -1,10 +1,9 @@
-import * as graphqlCompose from 'graphql-compose'
+import { ObjectTypeComposer } from 'graphql-compose'
 import { PER_PAGE, SORT_ORDER } from '../../utils/constants.js'
 import { createFilterInput } from '../filters/input.js'
 import { toFilterArgs } from '../filters/query.js'
 import { safeKey } from '../../utils/index.js'
 import { createSortOptions, createPagedNodeEdges } from './utils.js'
-const { ObjectTypeComposer } = graphqlCompose
 
 function createFilterComposer(schemaComposer) {
   const typeComposer = ObjectTypeComposer.createTemp({
