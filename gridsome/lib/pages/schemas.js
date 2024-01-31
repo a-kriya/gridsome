@@ -1,4 +1,5 @@
-import Joi from '@hapi/joi'
+import Joi from 'joi'
+
 const schemas = {
   route: Joi.object()
     .label('Route options')
@@ -44,7 +45,7 @@ const schemas = {
 }
 
 function validate(schema, options) {
-  const { error, value } = Joi.validate(options, schemas[schema])
+  const { error, value } = schemas[schema].validate(options)
 
   if (error) {
     throw new Error(error.message)

@@ -1,6 +1,6 @@
 {
   "version": "independent",
-  "npmClient": "yarn",
+  "npmClient": "npm",
   "ignoreChanges": ["**/__fixtures__/**", "**/__tests__/**", "**/!(README).md"],
   "command": {
     "publish": {
