@@ -52,12 +52,11 @@ function createSocketServer(app, server) {
 }
 
 function setupGraphQLMiddleware(middlewares, app) {
-  const { default: playground } = graphqlPlaygroundMiddlewareExpress
   const index = middlewares.findIndex((m) => m.name === 'connect-history-api-fallback')
   middlewares.splice(index, 0, {
     name: 'gridsome-explore',
     path: '/___explore',
-    middleware: playground({
+    middleware: graphqlPlaygroundMiddlewareExpress({
       endpoint: '/___graphql',
       title: 'Gridsome GraphQL Explorer',
       faviconUrl: 'https://avatars0.githubusercontent.com/u/17981963?s=200&v=4'

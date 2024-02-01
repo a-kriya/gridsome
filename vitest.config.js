@@ -12,6 +12,7 @@ export default defineConfig({
     globals: true,
     watch: false,
     include: [
+      // 'gridsome/lib/__tests__/project-simple.build.e2e.js',
       `**/__tests__/**/*.${GRIDSOME_TEST === 'e2e' ? 'e2e' : 'spec'}.js`
     ],
     exclude: [

@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-require('@kriya/gridsome-cli')
+import '@kriya/gridsome-cli'
